@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="Logo.png" type="image/png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>COA Pipeline — LogicFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      /* Light Theme Variables */
+      --bg:#eceeff;
+      --surface:rgba(255, 255, 255, 0.55);
+      --border:rgba(255, 255, 255, 0.6);
+      --border-dark:rgba(0, 0, 0, 0.08);
+      --green:#10B981;--cyan:#06b6d4;--purple:#7C3AED;--amber:#F59E0B;--blue:#1A56DB;
+      --text:#0f0f1a;--muted:#475569;
+      --font-display:'Syne',sans-serif;
+      --font-body:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      --font-mono:'JetBrains Mono',monospace;
+    }
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh}
+    
+    /* NAV - Glassy */
+    nav { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 100; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50px; padding: 10px 20px; display: flex; align-items: center; gap: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; color: #111; text-decoration: none; }
+    .logo-img { width: 28px; height: 28px; object-fit: contain; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { color: #222; text-decoration: none; font-size: 14.5px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: #000; }
+    .nav-links a.active { color: var(--purple); font-weight: 700; }
+
+    .page{padding-top:100px;max-width:1300px;margin:0 auto;padding-left:2rem;padding-right:2rem;padding-bottom:3rem;position:relative;z-index:10}
+    .page-header{padding:1.75rem 0 1.25rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+    .breadcrumb{display:flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.65rem;color:var(--muted);margin-bottom:.6rem;font-weight:600}
+    .badge{padding:.15rem .5rem;border-radius:999px;font-size:.65rem}
+    .badge-blue{background:rgba(26,86,219,.15);border:1px solid rgba(26,86,219,.3);color:var(--blue)}
+    .badge-purple{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#6d28d9}
+    h1{font-family:var(--font-display);font-size:2.2rem;color:var(--text);margin-bottom:.35rem;letter-spacing:-0.03em}
+    .page-header p{font-size:.9rem;color:var(--muted);font-weight:500}
+    .btn{display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1rem;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;border:none;font-family:var(--font-body)}
+    .btn:hover{transform:translateY(-1px)}
+    
+    /* BANNER */
+    .instr-banner{border-radius:14px;padding:1.1rem 1.4rem;margin-bottom:1.25rem;border:1px solid;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;background:var(--surface);backdrop-filter:blur(10px);box-shadow:0 4px 16px rgba(0,0,0,0.02)}
+    
+    /* PIPELINE STAGES */
+    .stages-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.25rem}
+    .stage-box{border:1px solid var(--border);background:var(--surface);backdrop-filter:blur(12px);border-radius:14px;padding:1.2rem;position:relative;transition:all .35s;text-align:left;box-shadow:0 4px 16px rgba(0,0,0,0.02)}
+    .stage-box.active{box-shadow:0 8px 32px rgba(26,86,219,.15);transform:translateY(-2px)}
+    .stage-box.done{border-color:rgba(16,185,129,.4)}
+    .stage-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-mono:var(--font-mono);font-size:.72rem;font-weight:700;margin-bottom:.75rem;transition:all .35s;color:#fff}
+    .stage-name{font-family:var(--font-mono);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem;transition:color .35s}
+    .stage-desc{font-size:.7rem;color:var(--muted);line-height:1.5;font-weight:500}
+    
+    /* DETAIL PANEL */
+    .detail-panel{border:1px solid var(--border);background:var(--surface);backdrop-filter:blur(12px);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem;min-height:80px;box-shadow:0 4px 16px rgba(0,0,0,0.02)}
+    .detail-label{font-family:var(--font-mono);font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem}
+    .detail-text{font-size:.9rem;color:var(--text);line-height:1.6;font-family:var(--font-mono);font-weight:500}
+    
+    /* BOTTOM GRID */
+    .bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+    .panel{background:var(--surface);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:14px;padding:1.25rem;box-shadow:0 4px 16px rgba(0,0,0,0.02)}
+    .panel-label{font-family:var(--font-mono);font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}
+    
+    /* REGISTERS */
+    .reg-row{display:flex;align-items:center;gap:.75rem;padding:.5rem .6rem;border-radius:8px;transition:all .35s;margin-bottom:.3rem}
+    .reg-row.active{background:rgba(26,86,219,.08);border:1px solid rgba(26,86,219,.25)}
+    .reg-row:not(.active){border:1px solid transparent}
+    .reg-abbr{font-family:var(--font-mono);font-size:.75rem;font-weight:700;width:36px;flex-shrink:0;color:var(--muted)}
+    .reg-hex{font-family:var(--font-mono);font-size:.85rem;font-weight:700;width:50px;transition:color .3s;color:var(--text)}
+    .reg-bits{display:flex;gap:2px}
+    .bit{width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:.62rem;font-weight:700;transition:all .3s}
+    .bit.hi{background:rgba(16,185,129,.2);color:#059669;border:1px solid rgba(16,185,129,.4)}
+    .bit.lo{background:rgba(0,0,0,.04);color:#64748b;border:1px solid rgba(0,0,0,.1)}
+    .updated-tag{font-family:var(--font-mono);font-size:.6rem;color:#d97706;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);padding:.15rem .45rem;border-radius:999px;transition:opacity .5s;font-weight:600}
+    
+    /* FLAGS */
+    .flags-row{display:flex;gap:.5rem;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border-dark);flex-wrap:wrap}
+    .flag-badge{padding:.3rem .6rem;border-radius:6px;font-family:var(--font-mono);font-size:.7rem;font-weight:700;transition:all .35s}
+    .flag-badge.active{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:#059669}
+    .flag-badge.inactive{background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.1);color:#64748b}
+    
+    /* PROGRAM */
+    .prog-row{display:flex;align-items:center;gap:.75rem;padding:.5rem .6rem;border-radius:8px;margin-bottom:.25rem;transition:all .35s}
+    .prog-row.active-prog{background:rgba(26,86,219,.08);border:1px solid rgba(26,86,219,.25)}
+    .prog-row.done-prog{border:1px solid rgba(16,185,129,.25);background:rgba(16,185,129,.05)}
+    .prog-row:not(.active-prog):not(.done-prog){border:1px solid transparent}
+    .prog-addr{font-family:var(--font-mono);font-size:.75rem;color:var(--muted);width:35px;font-weight:600}
+    .prog-mnem{font-family:var(--font-mono);font-size:.8rem;font-weight:700;width:50px;transition:color .3s}
+    .prog-oper{font-family:var(--font-mono);font-size:.75rem;color:var(--amber);font-weight:600}
+    .prog-check{margin-left:auto;color:#059669;font-size:.8rem;font-weight:700}
+    
+    /* NAV CONTROLS */
+    .controls{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+    
+    /* BRIDGE */
+    .bridge-panel{border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.05);border-radius:14px;padding:1.5rem;margin-top:1.25rem;backdrop-filter:blur(10px)}
+    .bridge-label{font-family:var(--font-mono);font-size:.65rem;font-weight:700;color:#d97706;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem}
+    .bridge-title{font-family:var(--font-display);font-size:1.3rem;color:var(--text);margin-bottom:.5rem;letter-spacing:-0.02em}
+    .bridge-desc{font-size:.85rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;font-weight:500}
+    .bridge-diag{background:rgba(255,255,255,.6);border:1px solid var(--border-dark);border-radius:10px;padding:.75rem;overflow-x:auto}
+    
+    @media(max-width:900px){.bottom-grid{grid-template-columns:1fr}.stages-row{grid-template-columns:1fr 1fr}.nav-links{display:none}}
+    @media(max-width:540px){.stages-row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<canvas id="bgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="Logo.png" alt="LogicFlow Logo" class="logo-img">
+    LogicFlow
+  </a>
+  <ul class="nav-links">
+    <li><a href="exp3_diode.html">Experiments</a></li>
+    <li><a href="sandbox.html">Logic Gates</a></li>
+    <li><a href="coa.html" class="active">COA</a></li>
+    <li><a href="curriculum.html">Curriculum</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <a href="coa.html" style="color:var(--muted);text-decoration:none">COA</a>
+        <span>›</span>
+        <span class="badge badge-blue">Exp 01</span>
+      </div>
+      <h1>Pipeline Stepper</h1>
+      <p>Trace instruction execution through Fetch → Decode → Execute → WriteBack. Watch registers update at each stage.</p>
+    </div>
+    <div class="controls" id="headerControls">
+      <button class="btn" id="playBtn" style="background:rgba(26,86,219,.1);border:1px solid rgba(26,86,219,.3);color:var(--blue)" onclick="togglePlay()">▶ Auto-play</button>
+      <button class="btn" style="background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.08);color:var(--muted)" onclick="resetPipeline()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="instr-banner" id="instrBanner">
+    <div>
+      <div style="font-family:var(--font-mono);font-size:.65rem;color:var(--muted);margin-bottom:.3rem;font-weight:700" id="instrNum">Instruction 1 / 5</div>
+      <div style="font-family:var(--font-mono);font-size:1rem;font-weight:700;color:var(--text)" id="instrText">LOAD 0x10</div>
+      <div style="font-size:.8rem;color:var(--muted);margin-top:.2rem;font-weight:500" id="instrDesc">Load value from memory address 0x10 into Accumulator</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.75rem">
+      <span style="color:var(--muted);font-weight:600">Stage:</span>
+      <span style="font-weight:700" id="stageName">FETCH</span>
+    </div>
+  </div>
+
+  <div class="stages-row" id="stagesRow">
+    </div>
+
+  <div class="detail-panel">
+    <div class="detail-label">⚡ <span id="stageLabel">Fetch Stage</span></div>
+    <div class="detail-text" id="detailText"></div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="panel">
+      <div class="panel-label">🗄 Register Bank</div>
+      <div id="regBank"></div>
+      <div class="flags-row" id="flagsRow"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">💾 Program Memory</div>
+      <div id="progList"></div>
+      <div style="margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--border-dark);display:flex;gap:.75rem">
+        <button class="btn" id="nextBtn" style="flex:1;background:rgba(26,86,219,.1);border:1px solid rgba(26,86,219,.3);color:var(--blue);justify-content:center" onclick="nextStage()">Next Stage ›</button>
+        <a href="curriculum.html" class="btn" style="background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.08);color:var(--text);text-decoration:none">Curriculum ›</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="bridge-panel" id="bridgePanel" style="display:none">
+    <div class="bridge-label">⚡ Bridge Feature</div>
+    <div class="bridge-title">The Logic You Built Lives Here</div>
+    <div class="bridge-desc">The <strong style="color:var(--amber)">Execute stage</strong> uses the <strong style="color:var(--green)">ALU</strong>. At its core, the ALU is a chain of <strong style="color:var(--blue)">Half Adders</strong> — the exact XOR + AND circuit you built in the Logic Sandbox. Eight of them chained together form an 8-bit adder.</div>
+    <div class="bridge-diag">
+      <svg viewBox="0 0 480 80" width="100%" style="max-height:70px">
+        <rect x="10" y="15" width="110" height="50" rx="6" fill="rgba(16,185,129,.1)" stroke="rgba(16,185,129,.5)" stroke-width="1.5"/>
+        <text x="65" y="36" text-anchor="middle" font-size="9" font-weight="700" fill="#059669" font-family="JetBrains Mono">HALF ADDER</text>
+        <text x="65" y="48" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono">XOR + AND</text>
+        <text x="65" y="58" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono">SUM + CARRY</text>
+        <text x="135" y="44" font-size="11" fill="#d97706" font-family="JetBrains Mono">×8</text>
+        <line x1="122" y1="40" x2="155" y2="40" stroke="#F59E0B" stroke-width="1.5" marker-end="url(#arr1)"/>
+        <defs><marker id="arr1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#F59E0B"/></marker>
+        <marker id="arr2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7C3AED"/></marker></defs>
+        <rect x="160" y="10" width="130" height="60" rx="6" fill="rgba(26,86,219,.1)" stroke="rgba(26,86,219,.5)" stroke-width="1.5"/>
+        <text x="225" y="32" text-anchor="middle" font-size="9" font-weight="700" fill="#1A56DB" font-family="JetBrains Mono">8-BIT ALU</text>
+        <text x="225" y="44" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono">ADD / SUB / AND</text>
+        <text x="225" y="56" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono">A[7:0] OP B[7:0]</text>
+        <line x1="292" y1="40" x2="325" y2="40" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <rect x="328" y="10" width="140" height="60" rx="6" fill="rgba(124,58,237,.1)" stroke="rgba(124,58,237,.5)" stroke-width="1.5"/>
+        <text x="398" y="32" text-anchor="middle" font-size="9" font-weight="700" fill="#6d28d9" font-family="JetBrains Mono">EXECUTE STAGE</text>
+        <text x="398" y="44" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono">IR decoded → ALU</text>
+        <text x="398" y="56" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono">ACC ← result</text>
+      </svg>
+    </div>
+    <div style="display:flex;gap:.6rem;margin-top:.75rem;flex-wrap:wrap">
+      <a href="sandbox.html" class="btn" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#059669;font-size:.75rem;text-decoration:none">⚡ Revisit Half Adder</a>
+      <a href="sandbox.html" class="btn" style="background:rgba(26,86,219,.1);border:1px solid rgba(26,86,219,.25);color:var(--blue);font-size:.75rem;text-decoration:none">Build More Gates ›</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Animated Background ──────────────────────────────────────────
+(function () {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let W, H;
+      const blobs = [
+        { xf: .15, yf: .15, rf: .45, color: [120, 100, 255], speed: 0.00018, phase: 0 },
+        { xf: .78, yf: .10, rf: .40, color: [90, 140, 255], speed: 0.00013, phase: 1.2 },
+        { xf: .50, yf: .55, rf: .38, color: [160, 80, 240], speed: 0.00021, phase: 2.4 },
+        { xf: .08, yf: .68, rf: .33, color: [200, 160, 255], speed: 0.00016, phase: 0.7 },
+        { xf: .88, yf: .72, rf: .32, color: [100, 120, 255], speed: 0.00019, phase: 3.1 },
+        { xf: .42, yf: .85, rf: .28, color: [130, 90, 255], speed: 0.00014, phase: 4.5 },
+      ];
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      function draw(ts) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#eceeff'; ctx.fillRect(0, 0, W, H);
+        for (const b of blobs) {
+          const angle = ts * b.speed + b.phase;
+          const cx = (b.xf + Math.sin(angle * 1.3) * 0.12) * W;
+          const cy = (b.yf + Math.cos(angle * 0.9) * 0.10) * H;
+          const r = b.rf * Math.min(W, H) * (0.9 + 0.1 * Math.sin(angle * 2.1));
+          const [R, G, B] = b.color;
+          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+          g.addColorStop(0, `rgba(${R},${G},${B},0.58)`);
+          g.addColorStop(0.5, `rgba(${R},${G},${B},0.20)`);
+          g.addColorStop(1, `rgba(${R},${G},${B},0)`);
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fillStyle = g; ctx.fill();
+        }
+        const vx = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.3, W / 2, H / 2, Math.min(W, H) * 0.9);
+        vx.addColorStop(0, 'rgba(255,255,255,0)');
+        vx.addColorStop(1, 'rgba(255,255,255,0.30)');
+        ctx.fillStyle = vx; ctx.fillRect(0, 0, W, H);
+        requestAnimationFrame(draw);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+      requestAnimationFrame(draw);
+})();
+
+// ── Data ──────────────────────────────────────────────────────
+const STAGES = ['Fetch','Decode','Execute','WriteBack'];
+const STAGE_META = {
+  Fetch:     { color:'#1A56DB', desc:'PC → MAR → MDR → IR. The Program Counter sends the next instruction address to memory. The instruction word is fetched into the Instruction Register.', regs:['pc','mar','mdr','ir'] },
+  Decode:    { color:'#7C3AED', desc:'The Control Unit decodes the opcode in IR. It identifies the operation type, extracts the operand address, and routes control signals to the correct units.', regs:['ir','mar'] },
+  Execute:   { color:'#10B981', desc:'The ALU performs the operation. For arithmetic instructions, the Accumulator is updated. This is where the Half Adder logic you built lives.', regs:['acc','mdr'] },
+  WriteBack: { color:'#F59E0B', desc:'The result is written to the destination register or memory. The Program Counter is incremented to point to the next instruction.', regs:['pc','acc'] },
+};
+const PROGRAM = [
+  { mnemonic:'LOAD',  operand:'0x10', desc:'Load value from address 0x10 into Accumulator' },
+  { mnemonic:'ADD',   operand:'0x11', desc:'Add value at address 0x11 to Accumulator' },
+  { mnemonic:'STORE', operand:'0x20', desc:'Store Accumulator into memory address 0x20' },
+  { mnemonic:'JUMP',  operand:'0x00', desc:'Jump to 0x00 if Zero flag is set' },
+  { mnemonic:'HALT',  operand:null,   desc:'Stop execution' },
+];
+const REG_META = {
+  pc:{ abbr:'PC', full:'Program Counter', color:'#1A56DB' },
+  ir:{ abbr:'IR', full:'Instruction Register', color:'#7C3AED' },
+  mar:{ abbr:'MAR', full:'Memory Address Register', color:'#06b6d4' },
+  mdr:{ abbr:'MDR', full:'Memory Data Register', color:'#10B981' },
+  acc:{ abbr:'ACC', full:'Accumulator', color:'#F59E0B' },
+};
+const FLAGS = ['ZERO','CARRY','OVER','SIGN'];
+
+// ── State ────────────────────────────────────────────────────
+let state = { stage:0, instr:0, done:false, regs:{pc:0,ir:0,mar:0,mdr:0,acc:0}, flags:{ZERO:false,CARRY:false,OVER:false,SIGN:false}, prevRegs:{pc:0,ir:0,mar:0,mdr:0,acc:0} };
+let playing = false, timer = null;
+
+function toHex(n){ return '0x'+n.toString(16).toUpperCase().padStart(2,'0'); }
+function toBin(n){ return (n>>>0).toString(2).padStart(8,'0'); }
+
+// ── Render ───────────────────────────────────────────────────
+function render() {
+  const s = state;
+  const sm = STAGE_META[STAGES[s.stage]];
+  const instr = PROGRAM[Math.min(s.instr, PROGRAM.length-1)];
+
+  // Banner
+  document.getElementById('instrNum').textContent = `Instruction ${Math.min(s.instr+1,PROGRAM.length)} / ${PROGRAM.length}`;
+  document.getElementById('instrText').textContent = instr.mnemonic + (instr.operand?' '+instr.operand:'');
+  document.getElementById('instrDesc').textContent = instr.desc;
+  const banner = document.getElementById('instrBanner');
+  const stageName = document.getElementById('stageName');
+  if (s.done) {
+    banner.style.borderColor='rgba(16,185,129,.4)'; banner.style.background='rgba(16,185,129,.05)';
+    document.getElementById('instrText').textContent='✓ Program Complete — all 5 instructions executed';
+    document.getElementById('instrText').style.color='#059669';
+    document.getElementById('instrDesc').textContent='';
+    stageName.textContent='DONE'; stageName.style.color='#059669';
+  } else {
+    banner.style.borderColor=sm.color+'50'; banner.style.background=sm.color+'0a';
+    document.getElementById('instrText').style.color='var(--text)';
+    stageName.textContent=STAGES[s.stage].toUpperCase(); stageName.style.color=sm.color;
+  }
+
+  // Stages
+  const row = document.getElementById('stagesRow');
+  row.innerHTML = STAGES.map((st,i) => {
+    const m = STAGE_META[st];
+    const isActive = !s.done && i===s.stage;
+    const isDone   = s.done || i<s.stage;
+    return `<div class="stage-box ${isActive?'active':''} ${isDone?'done':''}"
+      style="border-color:${isActive?m.color+'70':isDone?m.color+'40':'var(--border)'}; background:${isActive?m.color+'0a':isDone?m.color+'05':'var(--surface)'}">
+      <div class="stage-num" style="background:${isActive?m.color:isDone?m.color+'30':'rgba(0,0,0,0.08)'}; color:${isActive?'#fff':isDone?m.color:'#64748b'}">
+        ${isDone&&!isActive?'✓':i+1}</div>
+      <div class="stage-name" style="color:${isActive?m.color:isDone?m.color+'99':'#64748B'}">${st.toUpperCase()}</div>
+      <div class="stage-desc" style="color:${isActive?'var(--text)':'var(--muted)'}">${m.desc.split('.')[0]}.</div>
+    </div>`;
+  }).join('');
+
+  // Detail
+  document.getElementById('stageLabel').textContent = s.done ? 'Execution Complete' : STAGES[s.stage]+' Stage';
+  document.getElementById('detailText').textContent = s.done
+    ? 'All 5 instructions completed the full Fetch → Decode → Execute → WriteBack cycle in 20 clock cycles.'
+    : sm.desc;
+
+  // Registers
+  const activeRegs = s.done ? [] : sm.regs;
+  document.getElementById('regBank').innerHTML = Object.keys(s.regs).map(k=>{
+    const m = REG_META[k];
+    const val = s.regs[k];
+    const prev = s.prevRegs[k];
+    const changed = val!==prev;
+    const isActive = activeRegs.includes(k);
+    const bin = toBin(val);
+    return `<div class="reg-row ${isActive?'active':''}">
+      <span class="reg-abbr" style="color:${isActive?m.color:'var(--muted)'}">${m.abbr}</span>
+      <span class="reg-hex" style="color:${isActive?m.color:'var(--text)'}">${toHex(val)}</span>
+      <div class="reg-bits">${bin.split('').map(b=>`<div class="bit ${b==='1'?'hi':'lo'}">${b}</div>`).join('')}</div>
+      ${changed?`<span class="updated-tag">updated</span>`:''}
+    </div>`;
+  }).join('');
+
+  // Flags
+  document.getElementById('flagsRow').innerHTML = `<div style="font-family:var(--font-mono);font-size:.65rem;font-weight:700;color:var(--muted);width:100%;margin-bottom:.3rem">FLAG REGISTER</div>`
+    +FLAGS.map(f=>`<span class="flag-badge ${s.flags[f]?'active':'inactive'}">${f.slice(0,2)}</span>`).join('');
+
+  // Program
+  document.getElementById('progList').innerHTML = PROGRAM.map((p,i)=>{
+    const isActive = !s.done && i===s.instr;
+    const isDone   = s.done || i<s.instr;
+    return `<div class="prog-row ${isActive?'active-prog':''} ${isDone?'done-prog':''}">
+      <span class="prog-addr">${toHex(i)}</span>
+      <span class="prog-mnem" style="color:${isActive?'var(--blue)':isDone?'#059669':'var(--muted)'}">${p.mnemonic}</span>
+      <span class="prog-oper" style="color:${isActive?'var(--amber)':isDone?'#059669':'var(--muted)'}">${p.operand||''}</span>
+      ${isDone&&!isActive?'<span class="prog-check">✓</span>':''}
+      ${isActive?'<span style="margin-left:auto;color:var(--blue);animation:blink 1s infinite">●</span>':''}
+    </div>`;
+  }).join('');
+
+  // Next button
+  const nb = document.getElementById('nextBtn');
+  if (s.done) { nb.textContent='Program Complete'; nb.style.opacity='.4'; nb.style.cursor='not-allowed'; }
+  else { nb.style.opacity='1'; nb.style.cursor='pointer'; nb.textContent=`Next Stage ›`; }
+
+  // Bridge feature — show on Execute
+  document.getElementById('bridgePanel').style.display = (STAGES[s.stage]==='Execute'||s.done) ? 'block' : 'none';
+
+  // Style blink
+  if (!document.getElementById('blinkStyle')) {
+    const st = document.createElement('style');
+    st.id='blinkStyle'; st.textContent='@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}';
+    document.head.appendChild(st);
+  }
+}
+
+// ── Logic ────────────────────────────────────────────────────
+function nextStage() {
+  const s = state;
+  if (s.done) return;
+  const prev = {...s.regs};
+  const stName = STAGES[s.stage];
+
+  if (stName==='Fetch')     { s.regs.ir=(s.instr*17+42)%256; s.regs.mar=s.instr*4; s.regs.mdr=(s.instr*13+8)%256; }
+  if (stName==='Decode')    { s.regs.mar=(s.instr*8)%256; }
+  if (stName==='Execute')   { s.regs.acc=(s.regs.acc+s.instr*7+3)%256; s.flags.ZERO=s.regs.acc===0; }
+  if (stName==='WriteBack') { const ni=s.stage===3?s.instr+1:s.instr; s.regs.pc=ni; }
+
+  s.prevRegs = prev;
+  const nextStageIdx = (s.stage+1)%4;
+  if (s.stage===3) {
+    s.instr++;
+    if (s.instr>=PROGRAM.length) { s.done=true; s.stage=0; render(); return; }
+  }
+  s.stage = nextStageIdx;
+  render();
+}
+
+function resetPipeline() {
+  clearInterval(timer); playing=false;
+  document.getElementById('playBtn').textContent='▶ Auto-play';
+  document.getElementById('playBtn').style.color='var(--blue)';
+  state={stage:0,instr:0,done:false,regs:{pc:0,ir:0,mar:0,mdr:0,acc:0},flags:{ZERO:false,CARRY:false,OVER:false,SIGN:false},prevRegs:{pc:0,ir:0,mar:0,mdr:0,acc:0}};
+  render();
+}
+
+function togglePlay() {
+  if (state.done) return;
+  playing=!playing;
+  const btn=document.getElementById('playBtn');
+  if (playing) {
+    btn.textContent='⏸ Pause'; btn.style.color='#d97706';
+    timer=setInterval(()=>{ if(state.done){clearInterval(timer);playing=false;btn.textContent='▶ Auto-play';btn.style.color='var(--blue)';}else nextStage(); },1200);
+  } else {
+    clearInterval(timer); btn.textContent='▶ Auto-play'; btn.style.color='var(--blue)';
+  }
+}
+
+render();
+</script>
+</body>
+</html>

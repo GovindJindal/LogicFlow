@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="Logo.png" type="image/png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Basic Equipments Lab — LogicFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#eceeff;
+      --surface:rgba(255, 255, 255, 0.55);
+      --border:rgba(255, 255, 255, 0.6);
+      --border-dark:rgba(0, 0, 0, 0.08);
+      --green:#10B981;--cyan:#06b6d4;--purple:#7C3AED;--amber:#F59E0B;--blue:#1A56DB;--rose:#F43F5E;
+      --text:#0f0f1a;--muted:#475569;
+      --font-display:'Syne',sans-serif;
+      --font-body:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      --font-mono:'JetBrains Mono',monospace;
+    }
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh}
+
+    /* NAV */
+    nav { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 100; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50px; padding: 10px 20px; display: flex; align-items: center; gap: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; color: #111; text-decoration: none; }
+    .logo-img { width: 28px; height: 28px; object-fit: contain; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { color: #222; text-decoration: none; font-size: 14.5px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: #000; }
+    .nav-links a.active { color: var(--blue); font-weight: 700; }
+
+    /* LAYOUT */
+    .page{padding-top:100px;max-width:1300px;margin:0 auto;padding-left:2rem;padding-right:2rem;position:relative;z-index:10}
+    .page-header{padding:1.75rem 0 1.25rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+    .breadcrumb{display:flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.65rem;color:var(--muted);margin-bottom:.6rem}
+    .breadcrumb .badge{background:rgba(26,86,219,.15);border:1px solid rgba(26,86,219,.3);color:var(--blue);padding:.15rem .5rem;border-radius:999px;font-weight:700}
+    .page-header h1{font-family:var(--font-display);font-size:2.2rem;color:var(--text);margin-bottom:.35rem;letter-spacing:-0.03em}
+    .page-header p{font-size:.9rem;color:var(--muted);max-width:580px;line-height:1.6}
+    
+    .lab-grid{display:grid;grid-template-columns:350px 1fr;gap:1.5rem;padding-bottom:3rem}
+
+    /* PANELS */
+    .panel { background: var(--surface); backdrop-filter: blur(20px); border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.03); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+    .panel-header { display: flex; align-items: center; gap: .75rem; border-bottom: 1px solid var(--border-dark); padding-bottom: 1rem; }
+    .panel-icon { font-size: 1.5rem; }
+    .panel-title { font-family: var(--font-display); font-size: 1.2rem; color: var(--text); }
+    .panel-label { font-family: var(--font-mono); font-size: .65rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
+
+    /* FUNCTION GENERATOR */
+    .wave-btns { display: flex; gap: .5rem; background: rgba(0,0,0,.04); padding: .3rem; border-radius: 10px; border: 1px solid var(--border-dark); }
+    .wave-btn { flex: 1; padding: .6rem; border: none; background: transparent; border-radius: 6px; cursor: pointer; transition: all .2s; font-family: var(--font-mono); font-size: .75rem; font-weight: 700; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: .3rem; }
+    .wave-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .wave-btn.active { background: var(--blue); color: #fff; box-shadow: 0 4px 12px rgba(26,86,219,.3); }
+
+    .slider-wrap { display: flex; flex-direction: column; gap: .5rem; }
+    .slider-head { display: flex; justify-content: space-between; align-items: center; }
+    .slider-val { font-family: var(--font-mono); font-size: .95rem; font-weight: 700; color: var(--text); background: rgba(255,255,255,.6); padding: .2rem .6rem; border-radius: 6px; border: 1px solid var(--border); }
+    input[type=range] { width: 100%; height: 6px; border-radius: 3px; outline: none; -webkit-appearance: none; background: rgba(0,0,0,.1); }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 8px rgba(26,86,219,.4); border: 2px solid #fff; cursor: pointer; }
+
+    /* CRO DISPLAY */
+    .cro-screen-wrap { background: #0f172a; padding: 1.5rem; border-radius: 12px; border: 4px solid #334155; position: relative; box-shadow: inset 0 8px 32px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.1); }
+    .cro-canvas { width: 100%; height: 320px; background: #020617; border-radius: 4px; box-shadow: inset 0 0 20px rgba(0,0,0,1); cursor: crosshair; }
+    
+    .cro-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
+    .knob-row { display: flex; flex-direction: column; gap: .5rem; background: rgba(255,255,255,.5); padding: 1rem; border-radius: 10px; border: 1px solid var(--border); }
+    
+    .status-panel { background: rgba(0,0,0,.8); padding: .5rem 1rem; border-radius: 4px; position: absolute; top: 1.5rem; right: 1.5rem; display: flex; gap: 1rem; font-family: var(--font-mono); font-size: .7rem; color: #10B981; pointer-events: none; border: 1px solid rgba(16,185,129,.3); }
+
+    @media(max-width:900px){ .lab-grid{grid-template-columns:1fr;} .cro-controls{grid-template-columns:1fr;} .nav-links{display:none;} }
+  </style>
+</head>
+<body>
+
+<canvas id="bgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="Logo.png" alt="LogicFlow Logo" class="logo-img">
+    LogicFlow
+  </a>
+  <ul class="nav-links">
+    <li><a href="exp1_components.html" class="active">Experiments</a></li>
+    <li><a href="sandbox.html">Logic Gates</a></li>
+    <li><a href="coa.html">COA</a></li>
+    <li><a href="curriculum.html">Curriculum</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span class="badge">Experiment 02</span>
+        <span>›</span><span>Measurement Equipment</span>
+      </div>
+      <h1>Virtual Oscilloscope & Function Generator</h1>
+      <p>Connect a virtual function generator to a Cathode Ray Oscilloscope (CRO). Adjust amplitude, frequency, and waveform shapes, and learn how to use the Time/Div and Volts/Div dials to interpret electrical signals visually.</p>
+    </div>
+  </div>
+
+  <div class="lab-grid">
+    <!-- FUNCTION GENERATOR -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-icon">🎛️</span>
+        <h2 class="panel-title">Function Generator</h2>
+      </div>
+
+      <div>
+        <div class="panel-label" style="margin-bottom:.5rem">Waveform Select</div>
+        <div class="wave-btns">
+          <button class="wave-btn active" onclick="setWave('sine')" id="btn-sine">
+            <svg viewBox="0 0 24 24"><path d="M2 12c4-8 6-8 10 0s6 8 10 0"/></svg> Sine
+          </button>
+          <button class="wave-btn" onclick="setWave('square')" id="btn-square">
+            <svg viewBox="0 0 24 24"><path d="M2 12h5v-6h10v12h5v-6"/></svg> Square
+          </button>
+          <button class="wave-btn" onclick="setWave('triangle')" id="btn-triangle">
+            <svg viewBox="0 0 24 24"><path d="M2 12l5-8 10 16 5-8"/></svg> Triangle
+          </button>
+        </div>
+      </div>
+
+      <div class="slider-wrap">
+        <div class="slider-head">
+          <span class="panel-label">Frequency</span>
+          <span class="slider-val" id="lbl-freq">1000 Hz</span>
+        </div>
+        <input type="range" id="sid-freq" min="10" max="5000" step="10" value="1000" oninput="updateGen()">
+      </div>
+
+      <div class="slider-wrap">
+        <div class="slider-head">
+          <span class="panel-label">Amplitude (Vpp)</span>
+          <span class="slider-val" id="lbl-amp">5.0 V</span>
+        </div>
+        <input type="range" id="sid-amp" min="0.1" max="20" step="0.1" value="5" oninput="updateGen()">
+      </div>
+      
+      <div class="slider-wrap">
+        <div class="slider-head">
+          <span class="panel-label">DC Offset</span>
+          <span class="slider-val" id="lbl-offset">0.0 V</span>
+        </div>
+        <input type="range" id="sid-offset" min="-10" max="10" step="0.1" value="0" oninput="updateGen()">
+      </div>
+    </div>
+
+    <!-- OSCILLOSCOPE -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-icon">📺</span>
+        <h2 class="panel-title">Cathode Ray Oscilloscope (CRO)</h2>
+      </div>
+
+      <div class="cro-screen-wrap">
+        <div class="status-panel">
+          <div id="cro-ch1">CH1: 2.0 V/DIV</div>
+          <div id="cro-time">TIME: 0.5 ms/DIV</div>
+        </div>
+        <canvas id="croCanvas" class="cro-canvas"></canvas>
+      </div>
+
+      <div class="cro-controls">
+        <div class="knob-row">
+          <div class="slider-head">
+            <span class="panel-label">VOLTS / DIV (Ch 1)</span>
+            <span class="slider-val" id="lbl-vdiv" style="background:var(--surface)">2 V</span>
+          </div>
+          <input type="range" id="sid-vdiv" min="0.5" max="10" step="0.5" value="2" oninput="updateCRO()" style="accent-color:var(--amber)">
+        </div>
+
+        <div class="knob-row">
+          <div class="slider-head">
+            <span class="panel-label">TIME / DIV</span>
+            <span class="slider-val" id="lbl-tdiv" style="background:var(--surface)">0.5 ms</span>
+          </div>
+          <input type="range" id="sid-tdiv" min="0.1" max="5" step="0.1" value="0.5" oninput="updateCRO()" style="accent-color:var(--amber)">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Animated Background ──────────────────────────────────────────
+  (function () {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let W, H;
+      const blobs = [
+        { xf: .15, yf: .15, rf: .45, color: [120, 100, 255], speed: 0.00018, phase: 0 },
+        { xf: .78, yf: .10, rf: .40, color: [90, 140, 255], speed: 0.00013, phase: 1.2 },
+        { xf: .50, yf: .55, rf: .38, color: [160, 80, 240], speed: 0.00021, phase: 2.4 },
+        { xf: .08, yf: .68, rf: .33, color: [200, 160, 255], speed: 0.00016, phase: 0.7 }
+      ];
+      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+      function draw(ts) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#eceeff'; ctx.fillRect(0, 0, W, H);
+        for (const b of blobs) {
+          const angle = ts * b.speed + b.phase;
+          const cx = (b.xf + Math.sin(angle * 1.3) * 0.12) * W;
+          const cy = (b.yf + Math.cos(angle * 0.9) * 0.10) * H;
+          const r = b.rf * Math.min(W, H) * (0.9 + 0.1 * Math.sin(angle * 2.1));
+          const [R, G, B] = b.color;
+          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+          g.addColorStop(0, `rgba(${R},${G},${B},0.58)`);
+          g.addColorStop(1, `rgba(${R},${G},${B},0)`);
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fillStyle = g; ctx.fill();
+        }
+        requestAnimationFrame(draw);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+      requestAnimationFrame(draw);
+  })();
+
+  // ── State ────────────────────────────────────────────────────────
+  let waveType = 'sine'; // sine, square, triangle
+  let freq = 1000;       // Hz
+  let amp = 5;           // V peak-to-peak
+  let offset = 0;        // V DC offset
+  
+  let vdiv = 2;          // Volts per division (Vertical)
+  let tdiv = 0.5;        // ms per division (Horizontal)
+
+  function setWave(type) {
+    waveType = type;
+    document.querySelectorAll('.wave-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('btn-'+type).classList.add('active');
+  }
+
+  function updateGen() {
+    freq = parseFloat(document.getElementById('sid-freq').value);
+    amp = parseFloat(document.getElementById('sid-amp').value);
+    offset = parseFloat(document.getElementById('sid-offset').value);
+    
+    document.getElementById('lbl-freq').textContent = freq + ' Hz';
+    document.getElementById('lbl-amp').textContent = amp.toFixed(1) + ' Vpp';
+    document.getElementById('lbl-offset').textContent = offset.toFixed(1) + ' V';
+  }
+
+  function updateCRO() {
+    vdiv = parseFloat(document.getElementById('sid-vdiv').value);
+    tdiv = parseFloat(document.getElementById('sid-tdiv').value);
+    
+    document.getElementById('lbl-vdiv').textContent = vdiv.toFixed(1) + ' V';
+    document.getElementById('lbl-tdiv').textContent = tdiv.toFixed(1) + ' ms';
+    
+    document.getElementById('cro-ch1').textContent = `CH1: ${vdiv.toFixed(1)} V/DIV`;
+    document.getElementById('cro-time').textContent = `TIME: ${tdiv.toFixed(1)} ms/DIV`;
+  }
+
+  // ── CRO Rendering ──────────────────────────────────────────────────
+  const croCanvas = document.getElementById('croCanvas');
+  const croCtx = croCanvas.getContext('2d');
+  
+  function resizeCRO() {
+    croCanvas.width = croCanvas.offsetWidth;
+    croCanvas.height = croCanvas.offsetHeight;
+  }
+  window.addEventListener('resize', resizeCRO);
+  resizeCRO();
+
+  let timeBase = 0;
+
+  function drawCRO() {
+    const W = croCanvas.width;
+    const H = croCanvas.height;
+    
+    // Grid Setup
+    // 10 horizontal divisions, 8 vertical divisions
+    const divW = W / 10;
+    const divH = H / 8;
+    const midX = W / 2;
+    const midY = H / 2;
+
+    // Background & Glow
+    croCtx.fillStyle = '#020617';
+    croCtx.fillRect(0, 0, W, H);
+    
+    // Draw Grid
+    croCtx.strokeStyle = 'rgba(16, 185, 129, 0.2)';
+    croCtx.lineWidth = 1;
+    croCtx.beginPath();
+    for(let i=1; i<10; i++) { croCtx.moveTo(i*divW, 0); croCtx.lineTo(i*divW, H); }
+    for(let i=1; i<8; i++)  { croCtx.moveTo(0, i*divH); croCtx.lineTo(W, i*divH); }
+    croCtx.stroke();
+    
+    // Draw Axes markers
+    croCtx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
+    croCtx.beginPath();
+    croCtx.moveTo(midX, 0); croCtx.lineTo(midX, H);
+    croCtx.moveTo(0, midY); croCtx.lineTo(W, midY);
+    // Sub-ticks
+    for(let i=0; i<50; i++) {
+        croCtx.moveTo(i*(W/50), midY-3); croCtx.lineTo(i*(W/50), midY+3);
+        croCtx.moveTo(midX-3, i*(H/40)); croCtx.lineTo(midX+3, i*(H/40));
+    }
+    croCtx.stroke();
+
+    // Signal Calculation
+    // Total time across screen = 10 divisions * tdiv (ms)
+    const totalTimeMs = 10 * tdiv;
+    const totalTimeSec = totalTimeMs / 1000;
+    
+    timeBase += 0.016; // Realtime ticking (~60fps)
+
+    croCtx.beginPath();
+    croCtx.strokeStyle = '#34d399';
+    croCtx.lineWidth = 2;
+    croCtx.shadowBlur = 8;
+    croCtx.shadowColor = '#10B981';
+
+    const Vp = amp / 2;
+    const pixelsPerVolt = divH / vdiv;
+
+    // Trigger emulation: find zero-crossing to stabilize wave visually
+    const T = 1 / freq; // Period in seconds
+    const phaseShift = (timeBase % T) * 2 * Math.PI * freq;
+    
+    for (let x = 0; x <= W; x++) {
+      // Time at this pixel relative to screen start
+      const t = (x / W) * totalTimeSec;
+      
+      let v = 0;
+      const omegaT = 2 * Math.PI * freq * t + phaseShift;
+
+      if (waveType === 'sine') {
+        v = Vp * Math.sin(omegaT);
+      } else if (waveType === 'square') {
+        v = Math.sign(Math.sin(omegaT)) * Vp;
+      } else if (waveType === 'triangle') {
+        v = (2 * Vp / Math.PI) * Math.asin(Math.sin(omegaT));
+      }
+
+      v += offset; // apply DC offset
+
+      // Map voltage to pixel Y coordinate
+      // Y goes down positively, so subtract from midY
+      const py = midY - (v * pixelsPerVolt);
+      
+      if (x === 0) croCtx.moveTo(x, py);
+      else croCtx.lineTo(x, py);
+    }
+    croCtx.stroke();
+    croCtx.shadowBlur = 0;
+
+    requestAnimationFrame(drawCRO);
+  }
+
+  // Start
+  updateGen();
+  updateCRO();
+  drawCRO();
+</script>
+</body>
+</html>

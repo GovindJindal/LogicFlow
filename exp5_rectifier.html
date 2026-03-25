@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="Logo.png" type="image/png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Rectifier Circuits Lab — LogicFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#eceeff;
+      --surface:rgba(255, 255, 255, 0.55);
+      --border:rgba(255, 255, 255, 0.6);
+      --border-dark:rgba(0, 0, 0, 0.08);
+      --green:#10B981;--cyan:#06b6d4;--purple:#7C3AED;--amber:#F59E0B;--blue:#1A56DB;--rose:#F43F5E;
+      --text:#0f0f1a;--muted:#475569;
+      --font-display:'Syne',sans-serif;
+      --font-body:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      --font-mono:'JetBrains Mono',monospace;
+    }
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh}
+    
+    /* NAV */
+    nav { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 100; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50px; padding: 10px 20px; display: flex; align-items: center; gap: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; color: #111; text-decoration: none; }
+    .logo-img { width: 28px; height: 28px; object-fit: contain; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { color: #222; text-decoration: none; font-size: 14.5px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: #000; }
+    .nav-links a.active { color: var(--blue); font-weight: 700; }
+
+    /* LAYOUT */
+    .page{padding-top:100px;max-width:1300px;margin:0 auto;padding-left:2rem;padding-right:2rem;position:relative;z-index:10}
+    .page-header{padding:1.75rem 0 1.25rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+    .breadcrumb{display:flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.65rem;color:var(--muted);margin-bottom:.6rem}
+    .breadcrumb .badge{background:rgba(26,86,219,.15);border:1px solid rgba(26,86,219,.3);color:var(--blue);padding:.15rem .5rem;border-radius:999px}
+    .page-header h1{font-family:var(--font-display);font-size:2.2rem;color:var(--text);margin-bottom:.35rem;letter-spacing:-0.03em}
+    .page-header p{font-size:.9rem;color:var(--muted);max-width:550px;line-height:1.6}
+    
+    .lab-grid{display:grid;grid-template-columns:360px 1fr;gap:1.5rem;padding-bottom:3rem}
+    
+    /* PANEL */
+    .panel{background:var(--surface);backdrop-filter:blur(20px);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.03);border-radius:16px;padding:1.5rem}
+    .panel-label{font-family:var(--font-mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.25rem;font-weight:700}
+    
+    /* TOGGLES */
+    .toggle-group{display:flex;gap:.5rem;background:rgba(0,0,0,.04);border:1px solid var(--border-dark);border-radius:10px;padding:.3rem;margin-bottom:1.5rem}
+    .toggle-btn{flex:1;padding:.6rem;border-radius:7px;border:none;background:none;color:var(--muted);font-family:var(--font-mono);font-size:.78rem;cursor:pointer;transition:all .2s;font-weight:600}
+    .toggle-btn.active{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(26,86,219,.3)}
+    
+    /* SWITCH */
+    .switch-row{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:10px;margin-bottom:1.5rem}
+    .switch-label{font-weight:600;color:#059669;font-size:.9rem}
+    .switch-input{appearance:none;width:40px;height:24px;background:rgba(0,0,0,.2);border-radius:12px;position:relative;cursor:pointer;outline:none;transition:background .3s}
+    .switch-input::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .3s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+    .switch-input:checked{background:#10B981}
+    .switch-input:checked::after{transform:translateX(16px)}
+
+    /* SLIDERS */
+    .slider-wrap{margin-bottom:1.25rem}
+    .slider-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+    .slider-title{font-size:.8rem;font-weight:600;color:var(--text)}
+    .slider-val{font-family:var(--font-mono);font-size:1rem;font-weight:700;color:var(--text)}
+    input[type=range]{width:100%;height:6px;border-radius:3px;outline:none;-webkit-appearance:none;background:rgba(0,0,0,.1)}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px rgba(26,86,219,.4);border:2px solid #fff;cursor:pointer}
+    .slider-range{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.6rem;color:var(--muted);margin-top:.4rem}
+    
+    /* METERS */
+    .meter-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem}
+    .meter-card{background:rgba(255,255,255,0.7);border:1px solid var(--border);border-radius:10px;padding:1rem;box-shadow:0 2px 12px rgba(0,0,0,0.02)}
+    .meter-key{font-family:var(--font-mono);font-size:.65rem;color:var(--muted);margin-bottom:.4rem;font-weight:700}
+    .meter-val{font-family:var(--font-mono);font-size:1.3rem;font-weight:700}
+
+    /* CHART AREA */
+    .chart-panel{display:flex;flex-direction:column;gap:1.5rem}
+    .chart-box{height:250px;position:relative;background:rgba(255,255,255,0.4);border-radius:12px;padding:10px;border:1px solid var(--border)}
+    
+    @media(max-width:900px){.lab-grid{grid-template-columns:1fr}.nav-links{display:none}}
+  </style>
+</head>
+<body>
+
+<canvas id="bgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="Logo.png" alt="LogicFlow Logo" class="logo-img">
+    LogicFlow
+  </a>
+  <ul class="nav-links">
+    <li><a href="exp1_components.html" class="active">Experiments</a></li>
+    <li><a href="sandbox.html">Logic Gates</a></li>
+    <li><a href="coa.html">COA</a></li>
+    <li><a href="curriculum.html">Curriculum</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span class="badge">Experiment 06</span>
+        <span>›</span><span>Diode Applications</span>
+      </div>
+      <h1>Rectifier & Filter Circuits</h1>
+      <p>Convert Alternating Current (AC) to Direct Current (DC). Toggle between Half-Wave and Full-Wave (Bridge) topologies, and engage the capacitor filter to observe ripple reduction.</p>
+    </div>
+  </div>
+
+  <div class="lab-grid">
+    <div style="display:flex;flex-direction:column;gap:1.5rem">
+      <div class="panel">
+        <div class="panel-label">Topology Settings</div>
+        
+        <div class="toggle-group">
+          <button class="toggle-btn active" id="btn-hw" onclick="setTopology('hw')">Half-Wave</button>
+          <button class="toggle-btn" id="btn-fw" onclick="setTopology('fw')">Full-Wave Bridge</button>
+        </div>
+
+        <div class="switch-row">
+          <span class="switch-label">Enable Capacitor Filter</span>
+          <input type="checkbox" class="switch-input" id="chk-filter" onchange="updateLab()">
+        </div>
+
+        <div class="slider-wrap">
+          <div class="slider-head"><span class="slider-title">Filter Cap (C)</span><span class="slider-val" id="lbl-cap" style="color:var(--green)">10 µF</span></div>
+          <input type="range" id="sid-cap" min="1" max="100" step="1" value="10" oninput="updateLab()" style="accent-color:var(--green)">
+          <div class="slider-range"><span>1µF</span><span>100µF</span></div>
+        </div>
+
+        <div class="slider-wrap">
+          <div class="slider-head"><span class="slider-title">Load Res. (RL)</span><span class="slider-val" id="lbl-load">1000 Ω</span></div>
+          <input type="range" id="sid-load" min="100" max="10000" step="100" value="1000" oninput="updateLab()">
+          <div class="slider-range"><span>100Ω</span><span>10kΩ</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">Circuit Observations</div>
+        <div class="meter-grid" style="margin-bottom:0">
+          <div class="meter-card">
+            <div class="meter-key">AVG DC VOLTAGE (Vdc)</div>
+            <div class="meter-val" id="m-vdc" style="color:var(--blue)">0.00 V</div>
+          </div>
+          <div class="meter-card">
+            <div class="meter-key">RIPPLE VOLTAGE (Vrpp)</div>
+            <div class="meter-val" id="m-vrip" style="color:var(--amber)">0.00 V</div>
+          </div>
+          <div class="meter-card">
+            <div class="meter-key">RIPPLE FACTOR (γ)</div>
+            <div class="meter-val" id="m-gamma" style="color:var(--rose)">0.00 %</div>
+          </div>
+          <div class="meter-card">
+            <div class="meter-key">EFFICIENCY (η)</div>
+            <div class="meter-val" id="m-eff" style="color:var(--green)">0.00 %</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-panel">
+      <div class="chart-box">
+        <div class="panel-label" style="position:absolute;top:15px;left:15px;z-index:10">Input AC Waveform (Vin)</div>
+        <canvas id="chartIn"></canvas>
+      </div>
+
+      <div class="chart-box">
+        <div class="panel-label" style="position:absolute;top:15px;left:15px;z-index:10">Output DC Waveform (Vout)</div>
+        <canvas id="chartOut"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Animated Background ──────────────────────────────────────────
+  (function () {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let W, H;
+      const blobs = [
+        { xf: .15, yf: .15, rf: .45, color: [120, 100, 255], speed: 0.00018, phase: 0 },
+        { xf: .78, yf: .10, rf: .40, color: [90, 140, 255], speed: 0.00013, phase: 1.2 },
+        { xf: .50, yf: .55, rf: .38, color: [160, 80, 240], speed: 0.00021, phase: 2.4 },
+        { xf: .08, yf: .68, rf: .33, color: [200, 160, 255], speed: 0.00016, phase: 0.7 }
+      ];
+      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+      function draw(ts) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#eceeff'; ctx.fillRect(0, 0, W, H);
+        for (const b of blobs) {
+          const angle = ts * b.speed + b.phase;
+          const cx = (b.xf + Math.sin(angle * 1.3) * 0.12) * W;
+          const cy = (b.yf + Math.cos(angle * 0.9) * 0.10) * H;
+          const r = b.rf * Math.min(W, H) * (0.9 + 0.1 * Math.sin(angle * 2.1));
+          const [R, G, B] = b.color;
+          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+          g.addColorStop(0, `rgba(${R},${G},${B},0.58)`);
+          g.addColorStop(1, `rgba(${R},${G},${B},0)`);
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fillStyle = g; ctx.fill();
+        }
+        requestAnimationFrame(draw);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+      requestAnimationFrame(draw);
+  })();
+
+  // ── Physics ────────────────────────────────────────────────────────
+  let topo = 'hw'; // hw, fw
+  const f = 50; // Hz
+  const Vm = 10; // Peak input voltage
+  const T = 1 / f;
+  const diodeDrop = 0.7;
+
+  // ── Chart setup ──────────────────────────────────────────────
+  Chart.defaults.font.family = 'JetBrains Mono';
+  Chart.defaults.color = '#64748B';
+
+  const chartIn = new Chart(document.getElementById('chartIn'), {
+    type: 'line', data: { datasets: [{ borderColor: '#64748B', borderWidth: 2, pointRadius: 0, tension: 0.4 }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { type: 'linear', min: 0, max: 0.04, title: { display: true, text: 'Time (s)' }, ticks: {maxTicksLimit:5} },
+                y: { min: -15, max: 15, title: { display: true, text: 'Voltage (V)' } } }
+    }
+  });
+
+  const chartOut = new Chart(document.getElementById('chartOut'), {
+    type: 'line', data: { datasets: [{ borderColor: '#10B981', borderWidth: 2.5, pointRadius: 0, tension: 0, fill: true, backgroundColor: 'rgba(16,185,129,0.1)' }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { type: 'linear', min: 0, max: 0.04, title: { display: true, text: 'Time (s)' }, ticks: {maxTicksLimit:5} },
+                y: { min: -5, max: 15, title: { display: true, text: 'Voltage (V)' } } }
+    }
+  });
+
+  function setTopology(t) {
+    topo = t;
+    document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(`btn-${t}`).classList.add('active');
+    updateLab();
+  }
+
+  function updateLab() {
+    const isFilter = document.getElementById('chk-filter').checked;
+    const C = parseFloat(document.getElementById('sid-cap').value) * 1e-6; // F
+    const RL = parseFloat(document.getElementById('sid-load').value); // Ω
+    
+    document.getElementById('lbl-cap').textContent = (C * 1e6) + ' µF';
+    document.getElementById('lbl-load').textContent = RL >= 1000 ? (RL/1000).toFixed(1) + ' kΩ' : RL + ' Ω';
+    
+    // Sliders
+    document.getElementById('sid-cap').style.background = `linear-gradient(to right, #10B981 ${((C*1e6-1)/99)*100}%, rgba(0,0,0,0.1) ${((C*1e6-1)/99)*100}%)`;
+    document.getElementById('sid-load').style.background = `linear-gradient(to right, #1A56DB ${((RL-100)/9900)*100}%, rgba(0,0,0,0.1) ${((RL-100)/9900)*100}%)`;
+
+    // Timeline
+    const steps = 500;
+    const tMax = 0.04;
+    const dt = tMax / steps;
+    
+    const ptsIn = [];
+    const ptsOut = [];
+    
+    let lastVoutPeak = 0;
+    let tDischargeStart = 0;
+    let inDischarge = false;
+
+    // Numerical integration for filter
+    for (let i = 0; i <= steps; i++) {
+      const t = i * dt;
+      const vsi = Vm * Math.sin(2 * Math.PI * f * t);
+      ptsIn.push({x: t, y: vsi});
+      
+      let vrect = 0;
+      if (topo === 'hw') {
+        if (vsi > diodeDrop) vrect = vsi - diodeDrop;
+      } else {
+        if (Math.abs(vsi) > 2 * diodeDrop) vrect = Math.abs(vsi) - 2 * diodeDrop;
+      }
+
+      if (!isFilter) {
+        ptsOut.push({x: t, y: vrect});
+      } else {
+        // Capacitor charging/discharging logic
+        if (vrect > lastVoutPeak * Math.exp(-(t - tDischargeStart) / (RL * C))) {
+          // Charging (diode conducting)
+          ptsOut.push({x: t, y: vrect});
+          lastVoutPeak = vrect;
+          tDischargeStart = t;
+        } else {
+          // Discharging
+          const vdc = lastVoutPeak * Math.exp(-(t - tDischargeStart) / (RL * C));
+          ptsOut.push({x: t, y: vdc});
+        }
+      }
+    }
+
+    chartIn.data.datasets[0].data = ptsIn;
+    chartOut.data.datasets[0].data = ptsOut;
+    chartIn.update();
+    chartOut.update();
+
+    // METRICS
+    let Vdc = 0, Vrpp = 0, gamma = 0, eff = 0;
+    const Vp = topo === 'hw' ? Vm - diodeDrop : Vm - 2*diodeDrop;
+    
+    if (!isFilter) {
+        if (topo === 'hw') {
+            Vdc = Vp / Math.PI;
+            const Vrms = Vp / 2;
+            gamma = Math.sqrt(Math.pow(Vrms/Vdc, 2) - 1) * 100;
+            eff = (40.6) / (1 + diodeDrop/Vm); // Theoretical 40.6%
+        } else {
+            Vdc = 2 * Vp / Math.PI;
+            const Vrms = Vp / Math.sqrt(2);
+            gamma = Math.sqrt(Math.pow(Vrms/Vdc, 2) - 1) * 100;
+            eff = (81.2) / (1 + 2*diodeDrop/Vm); // Theoretical 81.2%
+        }
+        Vrpp = ptsOut.reduce((max, p) => p.y > max ? p.y : max, 0) - ptsOut.reduce((min, p) => p.y < min ? p.y : min, Vm);
+        // Without cap, Vrpp is just Vp
+        Vrpp = Vp;
+    } else {
+        // Ripple approximation: Vrpp = Vp / (f * R * C) for HW, Vrpp = Vp / (2*f*R*C) for FW
+        const freqMult = topo === 'hw' ? 1 : 2;
+        Vrpp = Vp / (freqMult * f * RL * C);
+        if (Vrpp > Vp) Vrpp = Vp; // Limit
+        Vdc = Vp - (Vrpp / 2);
+        
+        const Vrms_ac = Vrpp / (2 * Math.sqrt(3));
+        gamma = (Vrms_ac / Vdc) * 100;
+        eff = 90; // Approx high efficiency with cap filter
+    }
+
+    document.getElementById('m-vdc').textContent = Vdc.toFixed(2) + ' V';
+    document.getElementById('m-vrip').textContent = Vrpp.toFixed(2) + ' V';
+    document.getElementById('m-gamma').textContent = gamma.toFixed(1) + ' %';
+    document.getElementById('m-eff').textContent = eff > 100 ? '≈100%' : eff.toFixed(1) + ' %';
+  }
+
+  updateLab();
+</script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="Logo.png" type="image/png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>BCD Decoder Lab — LogicFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#eceeff;
+      --surface:rgba(255, 255, 255, 0.55);
+      --border:rgba(255, 255, 255, 0.6);
+      --border-dark:rgba(0, 0, 0, 0.08);
+      --green:#10B981;--cyan:#06b6d4;--purple:#7C3AED;--amber:#F59E0B;--blue:#1A56DB;--rose:#F43F5E;
+      --text:#0f0f1a;--muted:#475569;
+      --font-display:'Syne',sans-serif;
+      --font-body:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      --font-mono:'JetBrains Mono',monospace;
+    }
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh}
+
+    /* NAV */
+    nav { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 100; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50px; padding: 10px 20px; display: flex; align-items: center; gap: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; color: #111; text-decoration: none; }
+    .logo-img { width: 28px; height: 28px; object-fit: contain; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { color: #222; text-decoration: none; font-size: 14.5px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: #000; }
+    .nav-links a.active { color: var(--blue); font-weight: 700; }
+
+    /* LAYOUT */
+    .page{padding-top:100px;max-width:1300px;margin:0 auto;padding-left:2rem;padding-right:2rem;position:relative;z-index:10}
+    .page-header{padding:1.75rem 0 1.25rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+    .breadcrumb{display:flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.65rem;color:var(--muted);margin-bottom:.6rem}
+    .breadcrumb .badge{background:rgba(26,86,219,.15);border:1px solid rgba(26,86,219,.3);color:var(--blue);padding:.15rem .5rem;border-radius:999px;font-weight:700}
+    .page-header h1{font-family:var(--font-display);font-size:2.2rem;color:var(--text);margin-bottom:.35rem;letter-spacing:-0.03em}
+    .page-header p{font-size:.9rem;color:var(--muted);max-width:550px;line-height:1.6}
+    
+    .lab-grid{display:grid;grid-template-columns:300px 1fr;gap:1.5rem;padding-bottom:3rem}
+    
+    /* PANELS */
+    .panel{background:var(--surface);backdrop-filter:blur(20px);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.03);border-radius:16px;padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem}
+    .panel-label{font-family:var(--font-mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;font-weight:700}
+
+    /* INPUT SWITCHES */
+    .switch-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .logic-switch{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.6);border:1px solid var(--border);border-radius:8px;padding:.75rem}
+    .sw-label{font-family:var(--font-mono);font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:.5rem;display:flex;flex-direction:column;align-items:center}
+    .sw-weight{font-size:.6rem;color:var(--muted);font-weight:400}
+    .sw-track{width:36px;height:20px;background:rgba(0,0,0,.2);border-radius:10px;position:relative;cursor:pointer;transition:background .3s}
+    .sw-thumb{width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .3s}
+    .logic-switch.on .sw-track{background:var(--cyan)}
+    .logic-switch.on .sw-thumb{transform:translateX(16px)}
+    
+    .val-display{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.3);color:#0891b2;padding:1rem;border-radius:8px;text-align:center;font-family:var(--font-mono);font-size:1.5rem;font-weight:700}
+    .dec-val{font-size:3rem;line-height:1}
+
+    /* 7-SEGMENT DISPLAY */
+    .display-scene{background:#0f172a;border-radius:12px;padding:2rem;display:flex;justify-content:center;align-items:center;border:4px solid #334155;box-shadow:inset 0 10px 30px rgba(0,0,0,0.8)}
+    .seg-container{width:120px;height:200px;position:relative}
+    
+    .seg{position:absolute;background:rgba(239,68,68,0.05);border-radius:10px;transition:all .1s}
+    .seg.on{background:#ef4444;box-shadow:0 0 20px #ef4444, 0 0 40px #ef4444, inset 0 0 4px #fff}
+    
+    /* Using CSS shapes for segmented lines */
+    .seg-h{height:16px;width:70px;left:25px;clip-path:polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%)}
+    .seg-v{width:16px;height:70px;clip-path:polygon(50% 0, 100% 10%, 100% 90%, 50% 100%, 0 90%, 0 10%)}
+    
+    .sa{top:5px} .sb{right:5px;top:20px} .sc{right:5px;bottom:20px} 
+    .sd{bottom:5px} .se{left:5px;bottom:20px} .sf{left:5px;top:20px} .sg{top:92px}
+    
+    /* TRUTH TABLE */
+    .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.6)}
+    table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:.8rem;text-align:center}
+    th{background:var(--surface);padding:1rem .5rem;color:var(--text);font-weight:700;border-bottom:2px solid var(--border-dark)}
+    td{padding:.6rem .5rem;border-bottom:1px solid var(--border);color:var(--muted)}
+    tr.active{background:rgba(6,182,212,.1);font-weight:700}
+    tr.active td{color:#0891b2}
+
+    @media(max-width:900px){.lab-grid{grid-template-columns:1fr}.nav-links{display:none}}
+  </style>
+</head>
+<body>
+
+<canvas id="bgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="Logo.png" alt="LogicFlow Logo" class="logo-img">
+    LogicFlow
+  </a>
+  <ul class="nav-links">
+    <li><a href="exp1_components.html" class="active">Experiments</a></li>
+    <li><a href="sandbox.html">Logic Gates</a></li>
+    <li><a href="coa.html">COA</a></li>
+    <li><a href="curriculum.html">Curriculum</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span class="badge" style="background:rgba(6,182,212,.15);border-color:rgba(6,182,212,.3);color:var(--cyan)">Experiment 08</span>
+        <span>›</span><span>Combinational Logic</span>
+      </div>
+      <h1>BCD to 7-Segment Decoder</h1>
+      <p>Simulate an IC 7447 decoder. Input a 4-bit Binary Coded Decimal (BCD) number using the data switches, and observe how the combinational logic converts it into active-low signals to drive a 7-segment LED display.</p>
+    </div>
+  </div>
+
+  <div class="lab-grid">
+    <div class="panel">
+      <div class="panel-label">BCD Input (Data Switches)</div>
+      
+      <div class="switch-grid">
+        <div class="logic-switch" id="sw-D" onclick="toggle(3)">
+          <span class="sw-label">D <span class="sw-weight">(MSB - 8)</span></span>
+          <div class="sw-track"><div class="sw-thumb"></div></div>
+        </div>
+        <div class="logic-switch" id="sw-C" onclick="toggle(2)">
+          <span class="sw-label">C <span class="sw-weight">(4)</span></span>
+          <div class="sw-track"><div class="sw-thumb"></div></div>
+        </div>
+        <div class="logic-switch" id="sw-B" onclick="toggle(1)">
+          <span class="sw-label">B <span class="sw-weight">(2)</span></span>
+          <div class="sw-track"><div class="sw-thumb"></div></div>
+        </div>
+        <div class="logic-switch" id="sw-A" onclick="toggle(0)">
+          <span class="sw-label">A <span class="sw-weight">(LSB - 1)</span></span>
+          <div class="sw-track"><div class="sw-thumb"></div></div>
+        </div>
+      </div>
+
+      <div class="val-display">
+        <div style="font-size:.7rem;color:var(--muted);margin-bottom:.5rem;">DECIMAL VALUE</div>
+        <div class="dec-val" id="decVal">0</div>
+        <div style="font-size:.8rem;margin-top:.5rem" id="binVal">0000_2</div>
+      </div>
+
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1.5rem">
+      <div class="panel" style="padding:0;overflow:hidden;background:#0f172a">
+        <div style="padding:1rem 1.5rem;border-bottom:1px solid #334155;background:#1e293b;display:flex;justify-content:space-between;align-items:center">
+          <span class="panel-label" style="color:#94a3b8;margin:0">Common Anode 7-Segment Display</span>
+        </div>
+        
+        <div class="display-scene">
+          <div class="seg-container">
+            <div class="seg seg-h sa" id="seg-a"></div>
+            <div class="seg seg-v sb" id="seg-b"></div>
+            <div class="seg seg-v sc" id="seg-c"></div>
+            <div class="seg seg-h sd" id="seg-d"></div>
+            <div class="seg seg-v se" id="seg-e"></div>
+            <div class="seg seg-v sf" id="seg-f"></div>
+            <div class="seg seg-h sg" id="seg-g"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel" style="padding:0">
+        <div class="table-wrap">
+          <table id="truthTable">
+            <thead>
+              <tr>
+                <th colspan="4" style="border-right:1px solid rgba(0,0,0,.1)">Inputs (BCD)</th>
+                <th colspan="7">Outputs (Segments a-g)</th>
+                <th>Display</th>
+              </tr>
+              <tr style="font-size:.7rem">
+                <th>D(8)</th><th>C(4)</th><th>B(2)</th><th style="border-right:1px solid rgba(0,0,0,.1)">A(1)</th>
+                <th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>g</th>
+                <th>Char</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Generated JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Animated Background ──────────────────────────────────────────
+  (function () {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let W, H;
+      const blobs = [
+        { xf: .15, yf: .15, rf: .45, color: [120, 100, 255], speed: 0.00018, phase: 0 },
+        { xf: .78, yf: .10, rf: .40, color: [90, 140, 255], speed: 0.00013, phase: 1.2 },
+        { xf: .50, yf: .55, rf: .38, color: [160, 80, 240], speed: 0.00021, phase: 2.4 },
+        { xf: .08, yf: .68, rf: .33, color: [200, 160, 255], speed: 0.00016, phase: 0.7 }
+      ];
+      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+      function draw(ts) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#eceeff'; ctx.fillRect(0, 0, W, H);
+        for (const b of blobs) {
+          const angle = ts * b.speed + b.phase;
+          const cx = (b.xf + Math.sin(angle * 1.3) * 0.12) * W;
+          const cy = (b.yf + Math.cos(angle * 0.9) * 0.10) * H;
+          const r = b.rf * Math.min(W, H) * (0.9 + 0.1 * Math.sin(angle * 2.1));
+          const [R, G, B] = b.color;
+          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+          g.addColorStop(0, `rgba(${R},${G},${B},0.58)`);
+          g.addColorStop(1, `rgba(${R},${G},${B},0)`);
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fillStyle = g; ctx.fill();
+        }
+        requestAnimationFrame(draw);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+      requestAnimationFrame(draw);
+  })();
+
+  // ── Decoder Logic ──────────────────────────────────────────
+  // Bits: [A(LSB), B, C, D(MSB)]
+  const swState = [0, 0, 0, 0]; 
+  const swIds = ['A', 'B', 'C', 'D'];
+
+  // Segments: a, b, c, d, e, f, g  (1 = ON, 0 = OFF)
+  const hexMap = [
+    [1,1,1,1,1,1,0], // 0
+    [0,1,1,0,0,0,0], // 1
+    [1,1,0,1,1,0,1], // 2
+    [1,1,1,1,0,0,1], // 3
+    [0,1,1,0,0,1,1], // 4
+    [1,0,1,1,0,1,1], // 5
+    [1,0,1,1,1,1,1], // 6
+    [1,1,1,0,0,0,0], // 7
+    [1,1,1,1,1,1,1], // 8
+    [1,1,1,1,0,1,1], // 9
+    // Following 7447 standard for states > 9 (pseudo-hex)
+    [0,0,0,1,1,0,1], // 10 (c)
+    [0,0,1,1,0,0,1], // 11 (u)
+    [0,1,0,0,0,1,1], // 12
+    [1,0,0,1,0,1,1], // 13
+    [0,0,0,1,1,1,1], // 14
+    [0,0,0,0,0,0,0]  // 15 (blank)
+  ];
+
+  function toggle(idx) {
+    swState[idx] = 1 - swState[idx];
+    updateUI();
+  }
+
+  function updateUI() {
+    // Switches
+    for(let i=0; i<4; i++) {
+        const sw = document.getElementById(`sw-${swIds[i]}`);
+        if(swState[i]) sw.classList.add('on'); else sw.classList.remove('on');
+    }
+
+    // Number
+    const dec = (swState[3]<<3) | (swState[2]<<2) | (swState[1]<<1) | swState[0];
+    document.getElementById('decVal').textContent = dec > 9 ? 'Error' : dec;
+    if(dec > 9) document.getElementById('decVal').style.color = '#ef4444'; 
+    else document.getElementById('decVal').style.color = '';
+    
+    document.getElementById('binVal').textContent = `${swState[3]}${swState[2]}${swState[1]}${swState[0]}₂`;
+
+    // 7-Seg
+    const segs = hexMap[dec];
+    const segIds = ['a','b','c','d','e','f','g'];
+    for(let i=0; i<7; i++) {
+        const el = document.getElementById(`seg-${segIds[i]}`);
+        if(segs[i]) el.classList.add('on'); else el.classList.remove('on');
+    }
+
+    // Truth Table
+    renderTable(dec);
+  }
+
+  function renderTable(activeDec) {
+    const tbody = document.querySelector('#truthTable tbody');
+    tbody.innerHTML = '';
+    for(let i=0; i<16; i++) {
+        const D = (i>>3)&1, C = (i>>2)&1, B = (i>>1)&1, A = i&1;
+        const s = hexMap[i];
+        
+        let char = i.toString();
+        if(i > 9) char = '-';
+
+        const tr = document.createElement('tr');
+        if(i === activeDec) tr.className = 'active';
+        
+        tr.innerHTML = `
+            <td>${D}</td><td>${C}</td><td>${B}</td><td style="border-right:1px solid rgba(0,0,0,.1)">${A}</td>
+            <td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td>${s[3]}</td><td>${s[4]}</td><td>${s[5]}</td><td>${s[6]}</td>
+            <td style="font-weight:bold">${char}</td>
+        `;
+        tbody.appendChild(tr);
+    }
+  }
+
+  updateUI();
+</script>
+</body>
+</html>

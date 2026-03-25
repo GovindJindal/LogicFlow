@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="Logo.png" type="image/png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Curriculum — LogicFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      /* Light Theme Variables */
+      --bg:#eceeff;
+      --surface:rgba(255, 255, 255, 0.55);
+      --border:rgba(255, 255, 255, 0.6);
+      --border-dark:rgba(0, 0, 0, 0.08);
+      --green:#10B981;--cyan:#06b6d4;--purple:#7C3AED;--amber:#F59E0B;--blue:#1A56DB;
+      --text:#0f0f1a;--muted:#475569;
+      --font-display:'Syne',sans-serif;
+      --font-body:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      --font-mono:'JetBrains Mono',monospace;
+    }
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh}
+    
+    /* NAV - Glassy */
+    nav { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 100; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50px; padding: 10px 20px; display: flex; align-items: center; gap: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; color: #111; text-decoration: none; }
+    .logo-img { width: 28px; height: 28px; object-fit: contain; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { color: #222; text-decoration: none; font-size: 14.5px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: #000; }
+    .nav-links a.active { color: var(--blue); font-weight: 700; }
+
+    .page{padding-top:100px;max-width:1000px;margin:0 auto;padding-left:2rem;padding-right:2rem;padding-bottom:4rem;position:relative;z-index:10}
+    
+    /* HEADER */
+    .page-header{padding:2rem 0 1.5rem}
+    .header-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem 1rem;border-radius:999px;margin-bottom:1.1rem;border:1px solid rgba(26,86,219,.35);background:rgba(26,86,219,.1);font-size:.7rem;font-family:var(--font-mono);color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+    h1{font-family:var(--font-display);font-size:2.6rem;color:var(--text);margin-bottom:.75rem;letter-spacing:-0.03em}
+    .page-header p{font-size:.95rem;color:var(--muted);max-width:580px;line-height:1.7;margin-bottom:1.5rem}
+    
+    /* STATS ROW */
+    .stats-row{display:flex;gap:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border-dark);flex-wrap:wrap}
+    .stat-val{font-family:var(--font-display);font-size:1.8rem;font-weight:700;margin-bottom:.15rem}
+    .stat-label{font-size:.75rem;color:var(--muted);font-family:var(--font-mono);font-weight:600}
+    
+    /* UNIVERSITY TABS */
+    .uni-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.5rem 0 .5rem}
+    .uni-tab{padding:.5rem 1.1rem;border-radius:8px;border:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.5);color:var(--muted);font-family:var(--font-mono);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
+    .uni-tab:hover{color:var(--text);background:rgba(255,255,255,.8)}
+    .uni-tab.active{background:rgba(26,86,219,.1);border-color:rgba(26,86,219,.4);color:var(--blue)}
+    .uni-full{font-family:var(--font-mono);font-size:.7rem;color:var(--muted);margin-bottom:1.75rem;font-weight:600}
+    
+    /* MODULE SECTION */
+    .module-section{margin-bottom:2.25rem}
+    .module-header{display:flex;align-items:center;gap:1rem;margin-bottom:.75rem}
+    .module-label{font-family:var(--font-mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700}
+    .module-line{flex:1;height:1px;background:var(--border-dark)}
+    .module-count{font-family:var(--font-mono);font-size:.65rem;color:rgba(0,0,0,.3);font-weight:600}
+    
+    /* EXPERIMENT ROW */
+    .exp-row{display:flex;align-items:center;gap:.9rem;padding:.9rem 1rem;border-radius:12px;border:1px solid rgba(255,255,255,.7);background:var(--surface);backdrop-filter:blur(10px);box-shadow:0 4px 12px rgba(0,0,0,0.02);margin-bottom:.5rem;text-decoration:none;color:inherit;transition:all .2s;cursor:pointer}
+    .exp-row:hover{background:rgba(255,255,255,0.9);border-color:#fff;transform:translateX(3px);box-shadow:0 8px 24px rgba(0,0,0,0.05)}
+    .exp-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+    .exp-main{flex:1;min-width:0}
+    .exp-title{font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:.25rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+    .exp-tag{font-family:var(--font-mono);font-size:.58rem;padding:.15rem .5rem;border-radius:999px;font-weight:600}
+    .exp-meta{font-family:var(--font-mono);font-size:.65rem;color:var(--muted);display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;font-weight:500}
+    .meta-sep{color:rgba(0,0,0,.2)}
+    .exp-co{color:var(--amber);font-weight:700}
+    .exp-progress{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:.3rem}
+    .progress-bar{width:54px;height:4px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden}
+    .progress-fill{height:100%;border-radius:2px;background:var(--green);transition:width .3s}
+    .progress-label{font-family:var(--font-mono);font-size:.6rem;color:var(--muted);font-weight:600}
+    .arrow{font-size:.9rem;color:rgba(0,0,0,.2);transition:color .2s;flex-shrink:0}
+    .exp-row:hover .arrow{color:rgba(0,0,0,.6)}
+    
+    /* LAB RECORD LEGEND */
+    .legend{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;margin-top:1.5rem;padding:1.25rem;border:1px solid var(--border);background:var(--surface);backdrop-filter:blur(10px);border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.02)}
+    .legend-item{display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.6rem;border-radius:8px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.8)}
+    .legend-icon{font-size:1.1rem}
+    .legend-name{font-size:.7rem;font-weight:700;color:var(--text);text-align:center}
+    .legend-count{font-family:var(--font-mono);font-size:.65rem;color:var(--muted);font-weight:600}
+    
+    /* CTA */
+    .bottom-cta{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:2rem;padding:1.25rem 1.5rem;border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.08);border-radius:14px;flex-wrap:wrap}
+    .btn-amber{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.2rem;border-radius:8px;border:1px solid rgba(245,158,11,.4);background:rgba(245,158,11,.15);color:#d97706;font-size:.82rem;font-weight:700;font-family:var(--font-mono);text-decoration:none;transition:all .2s;white-space:nowrap}
+    .btn-amber:hover{transform:translateY(-2px);background:rgba(245,158,11,.2)}
+    
+    @media(max-width:700px){.legend{grid-template-columns:repeat(3,1fr)}.nav-links{display:none}}
+  </style>
+</head>
+<body>
+
+<canvas id="bgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="Logo.png" alt="LogicFlow Logo" class="logo-img">
+    LogicFlow
+  </a>
+  <ul class="nav-links">
+    <li><a href="exp3_diode.html">Experiments</a></li>
+    <li><a href="sandbox.html">Logic Gates</a></li>
+    <li><a href="coa.html">COA</a></li>
+    <li><a href="curriculum.html" class="active">Curriculum</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div class="header-badge">🎓 Curriculum Mapping</div>
+    <h1>Course Alignment</h1>
+    <p>Every LogicFlow experiment maps directly to your university syllabus. Select your university below to see the exact paper code, semester, and course outcome each experiment covers.</p>
+    <div class="stats-row">
+      <div><div class="stat-val" style="color:var(--green)">12</div><div class="stat-label">Experiments</div></div>
+      <div><div class="stat-val" style="color:var(--blue)">12</div><div class="stat-label">Complete</div></div>
+      <div><div class="stat-val" style="color:#d97706">4</div><div class="stat-label">Universities</div></div>
+      <div><div class="stat-val" style="color:var(--purple)">4 / 4</div><div class="stat-label">Lab-record ready</div></div>
+    </div>
+  </div>
+
+  <div class="uni-tabs">
+    <button class="uni-tab active" onclick="setUni('aktu',this)">AKTU</button>
+    <button class="uni-tab" onclick="setUni('vtu',this)">VTU</button>
+    <button class="uni-tab" onclick="setUni('anna',this)">Anna Univ.</button>
+    <button class="uni-tab" onclick="setUni('mumbai',this)">Mumbai Univ.</button>
+  </div>
+  <div class="uni-full" id="uniFullName">Dr. APJ Abdul Kalam Technical University</div>
+
+  <div id="expList"></div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-icon">🎯</div><div class="legend-name">Aim</div><div class="legend-count">12/12</div></div>
+    <div class="legend-item"><div class="legend-icon">⚡</div><div class="legend-name">Circuit</div><div class="legend-count">8/12</div></div>
+    <div class="legend-item"><div class="legend-icon">📊</div><div class="legend-name">Observations</div><div class="legend-count">12/12</div></div>
+    <div class="legend-item"><div class="legend-icon">✅</div><div class="legend-name">Conclusion</div><div class="legend-count">12/12</div></div>
+    <div class="legend-item"><div class="legend-icon">💬</div><div class="legend-name">Viva Q&A</div><div class="legend-count">4/12</div></div>
+  </div>
+
+  <div class="bottom-cta">
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;font-size:18px">📄</div>
+      <div>
+        <div style="font-weight:700;color:var(--text);margin-bottom:.15rem;font-size:.9rem">Export Lab Report PDF</div>
+        <div style="font-size:.78rem;color:var(--muted);font-weight:500">After completing a DiodeLab experiment, click "Export Lab Report" to generate a submission-ready PDF.</div>
+      </div>
+    </div>
+    <a href="exp3_diode.html" class="btn-amber">Open Diode Lab ›</a>
+  </div>
+</div>
+
+<script>
+// ── Animated Background ──────────────────────────────────────────
+(function () {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let W, H;
+      const blobs = [
+        { xf: .15, yf: .15, rf: .45, color: [120, 100, 255], speed: 0.00018, phase: 0 },
+        { xf: .78, yf: .10, rf: .40, color: [90, 140, 255], speed: 0.00013, phase: 1.2 },
+        { xf: .50, yf: .55, rf: .38, color: [160, 80, 240], speed: 0.00021, phase: 2.4 },
+        { xf: .08, yf: .68, rf: .33, color: [200, 160, 255], speed: 0.00016, phase: 0.7 },
+        { xf: .88, yf: .72, rf: .32, color: [100, 120, 255], speed: 0.00019, phase: 3.1 },
+        { xf: .42, yf: .85, rf: .28, color: [130, 90, 255], speed: 0.00014, phase: 4.5 },
+      ];
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      function draw(ts) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#eceeff'; ctx.fillRect(0, 0, W, H);
+        for (const b of blobs) {
+          const angle = ts * b.speed + b.phase;
+          const cx = (b.xf + Math.sin(angle * 1.3) * 0.12) * W;
+          const cy = (b.yf + Math.cos(angle * 0.9) * 0.10) * H;
+          const r = b.rf * Math.min(W, H) * (0.9 + 0.1 * Math.sin(angle * 2.1));
+          const [R, G, B] = b.color;
+          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+          g.addColorStop(0, `rgba(${R},${G},${B},0.58)`);
+          g.addColorStop(0.5, `rgba(${R},${G},${B},0.20)`);
+          g.addColorStop(1, `rgba(${R},${G},${B},0)`);
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fillStyle = g; ctx.fill();
+        }
+        const vx = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.3, W / 2, H / 2, Math.min(W, H) * 0.9);
+        vx.addColorStop(0, 'rgba(255,255,255,0)');
+        vx.addColorStop(1, 'rgba(255,255,255,0.30)');
+        ctx.fillStyle = vx; ctx.fillRect(0, 0, W, H);
+        requestAnimationFrame(draw);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+      requestAnimationFrame(draw);
+})();
+
+const UNI_NAMES = {
+  aktu:'Dr. APJ Abdul Kalam Technical University',
+  vtu:'Visvesvaraya Technological University',
+  anna:'Anna University, Chennai',
+  mumbai:'University of Mumbai'
+};
+
+const EXPERIMENTS = [
+  { title:'Exp 1: Electronic Components', module:'Fundementals', href:'exp1_components.html', icon:'🔌', color:'var(--blue)',
+    tagColor:'rgba(26,86,219,.15)', tagBorder:'rgba(26,86,219,.3)', tagText:'#1A56DB',
+    record:{aim:1,circuit:1,obs:1,conc:1,viva:1},
+    map:{aktu:{paper:'KEC-301',sem:'III',topic:'Unit I — Lab Intro',co:'CO1'},vtu:{paper:'18EC32',sem:'III',topic:'Module 1',co:'CO1'},anna:{paper:'EC3251',sem:'III',topic:'Unit 1',co:'CO1'},mumbai:{paper:'BECOC301',sem:'III',topic:'Lab Intro',co:'CO1'}}},
+  
+  { title:'Exp 2: Basic Equipments (CRO)', module:'Fundementals', href:'exp2_equipments.html', icon:'📺', color:'var(--amber)',
+    tagColor:'rgba(245,158,11,.15)', tagBorder:'rgba(245,158,11,.3)', tagText:'#d97706',
+    record:{aim:1,circuit:1,obs:1,conc:1,viva:1},
+    map:{aktu:{paper:'KEC-301',sem:'III',topic:'Unit I — Measurement',co:'CO1'},vtu:{paper:'18EC32',sem:'III',topic:'Module 1',co:'CO1'},anna:{paper:'EC3251',sem:'III',topic:'Unit 1',co:'CO1'},mumbai:{paper:'BECOC301',sem:'III',topic:'Measurement',co:'CO1'}}},
+  
+  { title:'Exp 3: PN Junction Diode', module:'Analog Electronics', href:'diode.html', icon:'🧪', color:'var(--green)',
+    tagColor:'rgba(16,185,129,.15)', tagBorder:'rgba(16,185,129,.3)', tagText:'#059669',
+    record:{aim:1,circuit:1,obs:1,conc:1,viva:1},
+    map:{aktu:{paper:'KEC-301',sem:'III',topic:'Unit II — Diode Theory',co:'CO2'},vtu:{paper:'18EC32',sem:'III',topic:'Module 2',co:'CO1'},anna:{paper:'EC3251',sem:'III',topic:'Unit 1',co:'CO2'},mumbai:{paper:'BECOC301',sem:'III',topic:'Chapter 2',co:'CO1'}}},
+
+  { title:'Exp 4: Zener Diode Regulator', module:'Analog Electronics', href:'zener.html', icon:'⚡', color:'var(--rose)',
+    tagColor:'rgba(244,63,94,.15)', tagBorder:'rgba(244,63,94,.3)', tagText:'#e11d48',
+    record:{aim:1,circuit:1,obs:1,conc:1,viva:1},
+    map:{aktu:{paper:'KEC-301',sem:'III',topic:'Unit II — Zener Diodes',co:'CO2'},vtu:{paper:'18EC32',sem:'III',topic:'Module 2',co:'CO1'},anna:{paper:'EC3251',sem:'III',topic:'Unit 1',co:'CO2'},mumbai:{paper:'BECOC301',sem:'III',topic:'Chapter 2',co:'CO1'}}},
+
+  { title:'Exp 5: Continuous Evaluation 1.1', module:'Evaluation', href:'eval1.html', icon:'📝', color:'var(--purple)',
+    tagColor:'rgba(124,58,237,.15)', tagBorder:'rgba(124,58,237,.3)', tagText:'#6d28d9',
+    record:{aim:1,circuit:1,obs:1,conc:1,viva:1},
+    map:{aktu:{paper:'KEC-301',sem:'III',topic:'Internal Assessment',co:'ALL'},vtu:{paper:'18EC32',sem:'III',topic:'Evaluation',co:'ALL'},anna:{paper:'EC3251',sem:'III',topic:'Test',co:'ALL'},mumbai:{paper:'BECOC301',sem:'III',topic:'Test',co:'ALL'}}},
+
+  { title:'Exp 6: Rectifier Circuits', module:'Analog Electronics', href:'rectifier.html', icon:'🔌', color:'var(--cyan)',
+    tagColor:'rgba(6,182,212,.15)', tagBorder:'rgba(6,182,212,.3)', tagText:'#0891b2',
+    record:{aim:1,circuit:1,obs:1,conc:1,viva:1},
+    map:{aktu:{paper:'KEC-301',sem:'III',topic:'Unit II — Power Supplies',co:'CO2'},vtu:{paper:'18EC32',sem:'III',topic:'Module 2',co:'CO1'},anna:{paper:'EC3251',sem:'III',topic:'Unit 1',co:'CO2'},mumbai:{paper:'BECOC301',sem:'III',topic:'Chapter 3',co:'CO1'}}},
+
+  { title:'Exp 7: D & J-K Flip-Flop', module:'Digital Logic', href:'flipflops.html', icon:'🔄', color:'var(--blue)',
+    tagColor:'rgba(26,86,219,.15)', tagBorder:'rgba(26,86,219,.3)', tagText:'#1A56DB',
+    record:{aim:1,circuit:1,obs:1,conc:1,viva:0},
+    map:{aktu:{paper:'KEC-401',sem:'IV',topic:'Unit III — Sequential Logic',co:'CO3'},vtu:{paper:'18EC33',sem:'III',topic:'Module 3',co:'CO3'},anna:{paper:'EC3352',sem:'IV',topic:'Unit 4',co:'CO3'},mumbai:{paper:'BECOC401',sem:'IV',topic:'Chapter 4',co:'CO3'}}},
+
+  { title:'Exp 8: BCD to 7-Segment', module:'Digital Logic', href:'bcd_decoder.html', icon:'🔢', color:'var(--rose)',
+    tagColor:'rgba(244,63,94,.15)', tagBorder:'rgba(244,63,94,.3)', tagText:'#e11d48',
+    record:{aim:1,circuit:1,obs:1,conc:1,viva:0},
+    map:{aktu:{paper:'KEC-401',sem:'IV',topic:'Unit II — Comb. Logic',co:'CO2'},vtu:{paper:'18EC33',sem:'III',topic:'Module 2',co:'CO2'},anna:{paper:'EC3352',sem:'IV',topic:'Unit 3',co:'CO2'},mumbai:{paper:'BECOC401',sem:'IV',topic:'Chapter 3',co:'CO2'}}},
+
+  { title:'Exp 9: MUX & DEMUX', module:'Digital Logic', href:'sandbox.html', icon:'🔀', color:'var(--amber)',
+    tagColor:'rgba(245,158,11,.15)', tagBorder:'rgba(245,158,11,.3)', tagText:'#d97706',
+    record:{aim:1,circuit:1,obs:0,conc:0,viva:0},
+    map:{aktu:{paper:'KEC-401',sem:'IV',topic:'Unit II — Multiplexers',co:'CO2'},vtu:{paper:'18EC33',sem:'III',topic:'Module 2',co:'CO2'},anna:{paper:'EC3352',sem:'IV',topic:'Unit 3',co:'CO2'},mumbai:{paper:'BECOC401',sem:'IV',topic:'Chapter 3',co:'CO2'}}},
+
+  { title:'Exp 10: COA Hardware', module:'Computer Architecture', href:'coa.html', icon:'🖥️', color:'var(--green)',
+    tagColor:'rgba(16,185,129,.15)', tagBorder:'rgba(16,185,129,.3)', tagText:'#059669',
+    record:{aim:1,circuit:1,obs:1,conc:1,viva:0},
+    map:{aktu:{paper:'KCS-501',sem:'V',topic:'Unit I — Arch Basics',co:'CO1'},vtu:{paper:'18CS42',sem:'IV',topic:'Module 1',co:'CO1'},anna:{paper:'CS3551',sem:'V',topic:'Unit 1',co:'CO1'},mumbai:{paper:'BECOCS501',sem:'V',topic:'Module 1',co:'CO1'}}},
+
+  { title:'Exp 11: ALU Implementation', module:'Computer Architecture', href:'coa.html', icon:'⚙️', color:'var(--purple)',
+    tagColor:'rgba(124,58,237,.15)', tagBorder:'rgba(124,58,237,.3)', tagText:'#6d28d9',
+    record:{aim:1,circuit:1,obs:0,conc:0,viva:0},
+    map:{aktu:{paper:'KCS-501',sem:'V',topic:'Unit II — ALU Design',co:'CO2'},vtu:{paper:'18CS42',sem:'IV',topic:'Module 2',co:'CO2'},anna:{paper:'CS3551',sem:'V',topic:'Unit 2',co:'CO2'},mumbai:{paper:'BECOCS501',sem:'V',topic:'Module 2',co:'CO2'}}},
+
+  { title:'Exp 12: Continuous Eval 1.2', module:'Evaluation', href:'eval1.html', icon:'📝', color:'var(--blue)',
+    tagColor:'rgba(26,86,219,.15)', tagBorder:'rgba(26,86,219,.3)', tagText:'#1A56DB',
+    record:{aim:0,circuit:0,obs:0,conc:0,viva:0},
+    map:{aktu:{paper:'KCS-501',sem:'V',topic:'Assessment',co:'ALL'},vtu:{paper:'18CS42',sem:'IV',topic:'Assessment',co:'ALL'},anna:{paper:'CS3551',sem:'V',topic:'Test',co:'ALL'},mumbai:{paper:'BECOCS501',sem:'V',topic:'Test',co:'ALL'}}}
+];
+
+let activeUni = 'aktu';
+
+function setUni(uni, el) {
+  activeUni = uni;
+  document.querySelectorAll('.uni-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('uniFullName').textContent = UNI_NAMES[uni];
+  renderExps();
+}
+
+function renderExps() {
+  const modules = [...new Set(EXPERIMENTS.map(e=>e.module))];
+  let html = '';
+  modules.forEach(mod => {
+    const exps = EXPERIMENTS.filter(e=>e.module===mod);
+    const done = exps.filter(e=>Object.values(e.record).every(v=>v||v===0)).length;
+    html += `<div class="module-section">
+      <div class="module-header">
+        <span class="module-label">${mod}</span>
+        <div class="module-line"></div>
+        <span class="module-count">${exps.length} exps</span>
+      </div>`;
+    exps.forEach(exp => {
+      const m = exp.map[activeUni];
+      const rec = exp.record;
+      const filled = Object.values(rec).filter(v=>v).length;
+      const total = Object.keys(rec).length;
+      const pct = Math.round(filled/total*100);
+      html += `<a href="${exp.href}" class="exp-row">
+        <div class="exp-icon" style="background:${exp.tagColor};border:1px solid ${exp.tagBorder}">${exp.icon}</div>
+        <div class="exp-main">
+          <div class="exp-title">
+            <span>${exp.title}</span>
+            <span class="exp-tag" style="background:${exp.tagColor};border:1px solid ${exp.tagBorder};color:${exp.tagText}">${exp.module}</span>
+          </div>
+          <div class="exp-meta">
+            <span style="color:${exp.tagText};font-weight:700">${m.paper}</span>
+            <span class="meta-sep">·</span>
+            <span>Sem ${m.sem}</span>
+            <span class="meta-sep">·</span>
+            <span title="${m.topic}">${m.topic.length>52?m.topic.slice(0,52)+'…':m.topic}</span>
+            <span class="meta-sep">·</span>
+            <span class="exp-co">${m.co}</span>
+          </div>
+        </div>
+        <div class="exp-progress">
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+          <div class="progress-label">${filled}/${total}</div>
+        </div>
+        <div class="arrow">›</div>
+      </a>`;
+    });
+    html += '</div>';
+  });
+  document.getElementById('expList').innerHTML = html;
+}
+
+renderExps();
+</script>
+</body>
+</html>

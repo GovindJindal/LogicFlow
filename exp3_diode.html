@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="Logo.png" type="image/png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Diode Lab — LogicFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      /* Light Theme Variables */
+      --bg:#eceeff;
+      --surface:rgba(255, 255, 255, 0.55);
+      --border:rgba(255, 255, 255, 0.6);
+      --border-dark:rgba(0, 0, 0, 0.08);
+      --green:#10B981;--cyan:#06b6d4;--purple:#7C3AED;--amber:#F59E0B;--blue:#1A56DB;--rose:#F43F5E;
+      --text:#0f0f1a;--muted:#475569;
+      --font-display:'Syne',sans-serif;
+      --font-body:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      --font-mono:'JetBrains Mono',monospace;
+    }
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh}
+    
+    /* NAV - Glassy */
+    nav { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 100; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50px; padding: 10px 20px; display: flex; align-items: center; gap: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; color: #111; text-decoration: none; }
+    .logo-img { width: 28px; height: 28px; object-fit: contain; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { color: #222; text-decoration: none; font-size: 14.5px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: #000; }
+    .nav-links a.active { color: var(--blue); font-weight: 700; }
+
+    /* LAYOUT */
+    .page{padding-top:100px;max-width:1300px;margin:0 auto;padding-left:2rem;padding-right:2rem;position:relative;z-index:10}
+    .page-header{padding:1.75rem 0 1.25rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+    .breadcrumb{display:flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.65rem;color:var(--muted);margin-bottom:.6rem}
+    .breadcrumb .badge{background:rgba(26,86,219,.15);border:1px solid rgba(26,86,219,.3);color:var(--blue);padding:.15rem .5rem;border-radius:999px}
+    .page-header h1{font-family:var(--font-display);font-size:2.2rem;color:var(--text);margin-bottom:.35rem;letter-spacing:-0.03em}
+    .page-header p{font-size:.9rem;color:var(--muted);max-width:500px}
+    .header-btns{display:flex;gap:.6rem;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1rem;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;border:none;text-decoration:none}
+    .btn-export{background:rgba(26,86,219,.1);border:1px solid rgba(26,86,219,.2);color:var(--blue)}
+    .btn-export:hover{background:rgba(26,86,219,.2)}
+    .btn-reset{background:rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.1);color:var(--muted)}
+    .btn-reset:hover{color:var(--text)}
+    
+    /* MAIN GRID */
+    .lab-grid{display:grid;grid-template-columns:320px 1fr;gap:1.25rem;padding-bottom:3rem}
+    
+    /* PANEL - Glassy */
+    .panel{background:var(--surface);backdrop-filter:blur(20px);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.03);border-radius:16px;padding:1.25rem}
+    .panel-label{font-family:var(--font-mono);font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}
+    
+    /* BIAS TOGGLE */
+    .bias-wrap{display:flex;gap:.5rem;background:rgba(0,0,0,0.04);border:1px solid var(--border-dark);border-radius:10px;padding:.3rem}
+    .bias-btn{flex:1;padding:.55rem;border-radius:7px;border:none;background:none;color:var(--muted);font-family:var(--font-mono);font-size:.78rem;cursor:pointer;transition:all .2s;font-weight:600}
+    .bias-btn.active{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(26,86,219,.3)}
+    
+    /* SLIDER */
+    .slider-wrap{margin-bottom:.25rem}
+    .slider-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+    .slider-label{font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+    .slider-val{font-family:var(--font-mono);font-size:.9rem;font-weight:700;color:var(--text)}
+    input[type=range]{width:100%;height:6px;border-radius:3px;outline:none;-webkit-appearance:none;cursor:pointer;background:rgba(0,0,0,.1)}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#1A56DB;box-shadow:0 0 8px rgba(26,86,219,.4);border:2px solid #fff}
+    .slider-range{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.6rem;color:var(--muted);margin-top:.35rem}
+    
+    /* DIODE PARAMS */
+    .param-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border-dark)}
+    .param-row:last-child{border-bottom:none}
+    .param-key{font-size:.78rem;color:var(--muted);font-weight:500}
+    .param-val{font-family:var(--font-mono);font-size:.78rem;font-weight:700;color:var(--text)}
+    
+    /* MULTIMETER */
+    .meter-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+    .meter-card{background:rgba(255,255,255,0.6);border:1px solid var(--border);border-radius:10px;padding:.75rem;box-shadow:0 2px 12px rgba(0,0,0,0.02)}
+    .meter-key{font-family:var(--font-mono);font-size:.6rem;color:var(--muted);margin-bottom:.3rem;font-weight:600}
+    .meter-val{font-family:var(--font-mono);font-size:1.1rem;font-weight:700}
+    
+    /* OBS CARD */
+    .obs-card{border-radius:10px;border:1px solid;padding:1rem;margin-top:1rem;background:var(--surface);backdrop-filter:blur(10px)}
+    .obs-title{font-family:var(--font-mono);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem}
+    .obs-point{display:flex;gap:.5rem;font-size:.75rem;color:var(--text);margin-bottom:.4rem;line-height:1.5}
+    
+    /* CHART AREA */
+    .chart-panel{background:var(--surface);backdrop-filter:blur(20px);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.03);border-radius:16px;padding:1.25rem}
+    .chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+    .chart-title{font-family:var(--font-mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+    .qpoint{font-family:var(--font-mono);font-size:.72rem;color:var(--amber);font-weight:700}
+    .chart-box{height:280px;position:relative}
+    
+    /* EQUATION */
+    .eq-box{background:rgba(255,255,255,0.6);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center;font-family:var(--font-mono);font-size:.95rem;font-weight:600;margin:1rem 0 .5rem}
+    .eq-params{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem}
+    .eq-param{display:flex;gap:.5rem;align-items:flex-start}
+    .eq-sym{font-family:var(--font-mono);font-weight:700;color:var(--amber);font-size:.85rem;width:20px}
+    .eq-desc{font-size:.75rem;color:var(--muted);line-height:1.5}
+    
+    /* CIRCUIT SVG */
+    .circuit-wrap{background:rgba(255,255,255,0.6);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+    
+    @media(max-width:900px){.lab-grid{grid-template-columns:1fr}.nav-links{display:none}}
+  </style>
+</head>
+<body>
+
+<canvas id="bgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="Logo.png" alt="LogicFlow Logo" class="logo-img">
+    LogicFlow
+  </a>
+  <ul class="nav-links">
+    <li><a href="exp3_diode.html" class="active">Experiments</a></li>
+    <li><a href="sandbox.html">Logic Gates</a></li>
+    <li><a href="coa.html">COA</a></li>
+    <li><a href="curriculum.html">Curriculum</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span class="badge">Digital Electronics</span>
+        <span>›</span><span>Experiment 01</span>
+      </div>
+      <h1>PN Junction Diode</h1>
+      <p>Adjust voltage and temperature to plot the V-I characteristic in real time. Observe the Shockley equation at work.</p>
+    </div>
+    <div class="header-btns">
+      <button class="btn btn-export" onclick="printReport()">📄 Export Lab Report</button>
+      <button class="btn btn-reset" onclick="resetLab()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="lab-grid">
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div class="panel">
+        <div class="panel-label">Bias Mode</div>
+        <div class="bias-wrap">
+          <button class="bias-btn active" id="fwdBtn" onclick="setBias('forward')">⚡ Forward</button>
+          <button class="bias-btn" id="revBtn" onclick="setBias('reverse')">⬅ Reverse</button>
+        </div>
+        <p id="biasDesc" style="font-size:.75rem;color:var(--muted);margin-top:.6rem">P-side positive → current flows above 0.7V</p>
+      </div>
+
+      <div class="panel">
+        <div class="slider-head"><span class="slider-label">Applied Voltage</span><span class="slider-val" id="vLabel">+0.00 V</span></div>
+        <div class="slider-wrap">
+          <input type="range" id="vSlider" min="-0.5" max="1.2" step="0.01" value="0" oninput="onVChange(this.value)">
+          <div class="slider-range"><span id="vMin">-0.5V</span><span id="vMax">+1.2V</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="slider-head"><span class="slider-label">Temperature</span><span class="slider-val" id="tLabel">25 °C</span></div>
+        <input type="range" id="tSlider" min="0" max="100" step="1" value="25" oninput="onTChange(this.value)" style="accent-color:var(--amber)">
+        <div class="slider-range"><span>0°C</span><span>100°C</span></div>
+        <p style="font-size:.7rem;color:var(--muted);margin-top:.5rem">↑ Temp → ↑ Vt → curve shifts left</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">Diode Parameters</div>
+        <div class="param-row"><span class="param-key">Material</span><span class="param-val">Silicon (Si)</span></div>
+        <div class="param-row"><span class="param-key">Is (sat.)</span><span class="param-val">1×10⁻¹² A</span></div>
+        <div class="param-row"><span class="param-key">n (ideality)</span><span class="param-val">1.0</span></div>
+        <div class="param-row"><span class="param-key">Vf (typ.)</span><span class="param-val">0.7 V</span></div>
+        <div class="param-row"><span class="param-key">Vt at 25°C</span><span class="param-val" id="vtVal">25.85 mV</span></div>
+      </div>
+
+      <div class="obs-card" id="obsCard" style="border-color:rgba(100,116,139,.3);background:rgba(100,116,139,.05)">
+        <div class="obs-title" id="obsTitle" style="color:#94a3b8">📋 Cut-off Region</div>
+        <div id="obsPoints"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div class="panel">
+        <div class="panel-label">Virtual Multimeter</div>
+        <div class="meter-grid">
+          <div class="meter-card">
+            <div class="meter-key">VOLTAGE (V)</div>
+            <div class="meter-val" id="mVolt" style="color:var(--blue)">0.000 V</div>
+          </div>
+          <div class="meter-card">
+            <div class="meter-key">CURRENT</div>
+            <div class="meter-val" id="mCurr" style="color:var(--green)">0.00 mA</div>
+          </div>
+          <div class="meter-card">
+            <div class="meter-key">POWER (mW)</div>
+            <div class="meter-val" id="mPower" style="color:var(--amber)">0.000 mW</div>
+          </div>
+          <div class="meter-card">
+            <div class="meter-key">STATUS</div>
+            <div class="meter-val" id="mStatus" style="color:#64748B;font-size:.75rem">CUT-OFF</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-panel">
+        <div class="chart-head">
+          <span class="chart-title">V-I Characteristic Curve</span>
+          <span class="qpoint" id="qpointLabel">Q-point: (0.00 V, 0.00 mA)</span>
+        </div>
+        <div class="chart-box"><canvas id="viChart"></canvas></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="panel">
+          <div class="panel-label">Shockley Equation</div>
+          <div class="eq-box">
+            <span style="color:var(--blue)">I</span> = <span style="color:var(--green)">Is</span> · (e<span style="color:var(--amber)">^(V/nVt)</span> − 1)
+          </div>
+          <div class="eq-params">
+            <div class="eq-param"><div class="eq-sym">Is</div><div class="eq-desc">Reverse saturation current (A)</div></div>
+            <div class="eq-param"><div class="eq-sym">V</div><div class="eq-desc">Applied voltage (V)</div></div>
+            <div class="eq-param"><div class="eq-sym">n</div><div class="eq-desc">Ideality factor 1–2</div></div>
+            <div class="eq-param"><div class="eq-sym">Vt</div><div class="eq-desc">Thermal voltage ≈26mV@25°C</div></div>
+          </div>
+        </div>
+        <div class="circuit-wrap">
+          <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem;font-weight:600">Circuit Diagram</div>
+          <svg viewBox="0 0 260 140" width="100%">
+            <line x1="20" y1="30" x2="20" y2="110" stroke="#475569" stroke-width="2"/>
+            <line x1="10" y1="55" x2="30" y2="55" stroke="#1A56DB" stroke-width="2.5"/>
+            <line x1="13" y1="65" x2="27" y2="65" stroke="#1A56DB" stroke-width="1.5"/>
+            <text x="20" y="88" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono">Vs</text>
+            <line x1="20" y1="30" x2="90" y2="30" stroke="#10B981" stroke-width="1.8"/>
+            <line x1="20" y1="110" x2="200" y2="110" stroke="#475569" stroke-width="1.8"/>
+            <rect x="90" y="22" width="40" height="16" rx="3" fill="#fff" stroke="#475569" stroke-width="1.5"/>
+            <text x="110" y="33" text-anchor="middle" font-size="8" fill="#475569" font-family="JetBrains Mono">R</text>
+            <line x1="130" y1="30" x2="155" y2="30" stroke="#10B981" stroke-width="1.8"/>
+            <polygon points="155,20 155,40 178,30" fill="#1A56DB" fill-opacity=".8"/>
+            <line x1="178" y1="20" x2="178" y2="40" stroke="#1A56DB" stroke-width="2.5"/>
+            <text x="166" y="14" text-anchor="middle" font-size="8" fill="#1A56DB" font-family="JetBrains Mono">D1</text>
+            <line x1="178" y1="30" x2="200" y2="30" stroke="#10B981" stroke-width="1.8"/>
+            <line x1="200" y1="30" x2="200" y2="110" stroke="#10B981" stroke-width="1.8"/>
+            <text x="215" y="70" font-size="8" fill="#F59E0B" font-family="JetBrains Mono">Vout</text>
+            <line x1="200" y1="55" x2="235" y2="55" stroke="#F59E0B" stroke-width="1.2" stroke-dasharray="3 2"/>
+            <line x1="200" y1="85" x2="235" y2="85" stroke="#F59E0B" stroke-width="1.2" stroke-dasharray="3 2"/>
+            <text x="150" y="48" font-size="7" fill="#10B981" font-family="JetBrains Mono">→ I</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Animated Background ──────────────────────────────────────────
+  (function () {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let W, H;
+      const blobs = [
+        { xf: .15, yf: .15, rf: .45, color: [120, 100, 255], speed: 0.00018, phase: 0 },
+        { xf: .78, yf: .10, rf: .40, color: [90, 140, 255], speed: 0.00013, phase: 1.2 },
+        { xf: .50, yf: .55, rf: .38, color: [160, 80, 240], speed: 0.00021, phase: 2.4 },
+        { xf: .08, yf: .68, rf: .33, color: [200, 160, 255], speed: 0.00016, phase: 0.7 },
+        { xf: .88, yf: .72, rf: .32, color: [100, 120, 255], speed: 0.00019, phase: 3.1 },
+        { xf: .42, yf: .85, rf: .28, color: [130, 90, 255], speed: 0.00014, phase: 4.5 },
+      ];
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      function draw(ts) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#eceeff'; ctx.fillRect(0, 0, W, H);
+        for (const b of blobs) {
+          const angle = ts * b.speed + b.phase;
+          const cx = (b.xf + Math.sin(angle * 1.3) * 0.12) * W;
+          const cy = (b.yf + Math.cos(angle * 0.9) * 0.10) * H;
+          const r = b.rf * Math.min(W, H) * (0.9 + 0.1 * Math.sin(angle * 2.1));
+          const [R, G, B] = b.color;
+          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+          g.addColorStop(0, `rgba(${R},${G},${B},0.58)`);
+          g.addColorStop(0.5, `rgba(${R},${G},${B},0.20)`);
+          g.addColorStop(1, `rgba(${R},${G},${B},0)`);
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fillStyle = g; ctx.fill();
+        }
+        const vx = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.3, W / 2, H / 2, Math.min(W, H) * 0.9);
+        vx.addColorStop(0, 'rgba(255,255,255,0)');
+        vx.addColorStop(1, 'rgba(255,255,255,0.30)');
+        ctx.fillStyle = vx; ctx.fillRect(0, 0, W, H);
+        requestAnimationFrame(draw);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+      requestAnimationFrame(draw);
+  })();
+
+  // ── Physics ──────────────────────────────────────────────────
+  const Is = 1e-12, n = 1;
+  function vt(t) { return (1.380649e-23 * (t + 273.15)) / 1.602176634e-19; }
+  function idiode(v, t) { return Is * (Math.exp(v / (n * vt(t))) - 1); }
+  function fmtCurrent(amps) {
+    const a = Math.abs(amps);
+    if (a < 1e-6) return { v: (amps*1e9).toFixed(2), u: 'nA' };
+    if (a < 1e-3) return { v: (amps*1e6).toFixed(2), u: 'µA' };
+    return { v: (amps*1e3).toFixed(3), u: 'mA' };
+  }
+
+  // ── State ────────────────────────────────────────────────────
+  let bias = 'forward', voltage = 0, temperature = 25;
+
+  // ── Chart setup ──────────────────────────────────────────────
+  const ctxChart = document.getElementById('viChart').getContext('2d');
+  const chart = new Chart(ctxChart, {
+    type: 'line',
+    data: {
+      datasets: [
+        { label: 'V-I Curve', data: [], borderColor: '#1A56DB', borderWidth: 2.5, pointRadius: 0, tension: 0.4 },
+        { label: 'Q-point',   data: [], borderColor: '#F59E0B', backgroundColor: '#F59E0B', pointRadius: 7, pointHoverRadius: 9, showLine: false },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: {
+        backgroundColor: '#fff', titleColor: '#475569', bodyColor: '#0f0f1a', borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1,
+        callbacks: { label: (i) => `I = ${fmtCurrent(i.parsed.y/1000).v} ${fmtCurrent(i.parsed.y/1000).u}` }
+      }},
+      scales: {
+        x: { type: 'linear', title: { display: true, text: 'Voltage (V)', color: '#475569', font: { family: 'JetBrains Mono', size: 10, weight: 600 } },
+             ticks: { color: '#64748B', font: { family: 'JetBrains Mono', size: 9 } },
+             grid: { color: 'rgba(0,0,0,0.05)' }, border: { color: 'rgba(0,0,0,0.1)' } },
+        y: { title: { display: true, text: 'Current (mA)', color: '#475569', font: { family: 'JetBrains Mono', size: 10, weight: 600 } },
+             ticks: { color: '#64748B', font: { family: 'JetBrains Mono', size: 9 } },
+             grid: { color: 'rgba(0,0,0,0.05)' }, border: { color: 'rgba(0,0,0,0.1)' } }
+      }
+    }
+  });
+
+  function buildCurve() {
+    const pts = [];
+    const isF = bias === 'forward';
+    const vMin = isF ? -0.5 : -2.0, vMax = isF ? 1.0 : 0.4;
+    const steps = 200;
+    for (let i = 0; i <= steps; i++) {
+      const v = vMin + (vMax - vMin) * i / steps;
+      const iA = idiode(v, temperature);
+      const iMa = Math.max(Math.min(iA * 1000, isF ? 150 : 20), isF ? -5 : -5);
+      pts.push({ x: v, y: iMa });
+    }
+    return pts;
+  }
+
+  function updateAll() {
+    const pts = buildCurve();
+    chart.data.datasets[0].data = pts;
+
+    // Axis domains
+    const isF = bias === 'forward';
+    chart.options.scales.x.min = isF ? -0.5 : -2;
+    chart.options.scales.x.max = isF ? 1.0  : 0.4;
+    chart.options.scales.y.min = isF ? -5   : -5;
+    chart.options.scales.y.max = isF ? 120  : 20;
+
+    // Q-point
+    const iA  = idiode(voltage, temperature);
+    const iMa = Math.max(Math.min(iA * 1000, isF ? 150 : 20), isF ? -5 : -5);
+    chart.data.datasets[1].data = [{ x: voltage, y: iMa }];
+
+    chart.update();
+
+    // Labels
+    document.getElementById('vLabel').textContent = (voltage >= 0 ? '+' : '') + parseFloat(voltage).toFixed(2) + ' V';
+    document.getElementById('tLabel').textContent = temperature + ' °C';
+    document.getElementById('vtVal').textContent = (vt(temperature)*1000).toFixed(2) + ' mV';
+    document.getElementById('qpointLabel').textContent = `Q-point: (${parseFloat(voltage).toFixed(2)} V, ${iMa.toFixed(2)} mA)`;
+
+    // Multimeter
+    document.getElementById('mVolt').textContent = parseFloat(voltage).toFixed(3) + ' V';
+    const fmt = fmtCurrent(iA);
+    document.getElementById('mCurr').textContent = fmt.v + ' ' + fmt.u;
+    document.getElementById('mPower').textContent = Math.abs(voltage * iA * 1000).toFixed(3) + ' mW';
+
+    let status = 'CUT-OFF', statusColor = '#64748B';
+    if (bias === 'reverse') { status = 'REVERSE BIAS'; statusColor = '#F43F5E'; }
+    else if (voltage >= 0.7) { status = 'CONDUCTING'; statusColor = '#10B981'; }
+    else if (voltage >= 0.3) { status = 'NEAR THRESHOLD'; statusColor = '#F59E0B'; }
+    document.getElementById('mStatus').textContent = status;
+    document.getElementById('mStatus').style.color = statusColor;
+
+    // Observation card
+    updateObs(voltage, bias);
+  }
+
+  function updateObs(v, b) {
+    let title, color, borderColor, bgColor, points;
+    if (b === 'reverse') {
+      title = '⬅ Reverse Bias'; color='#F43F5E'; borderColor='rgba(244,63,94,.35)'; bgColor='rgba(244,63,94,.05)';
+      points = ['Depletion region widens — barrier increases.', 'Only tiny leakage current (nA range).', 'Diode acts as open switch.'];
+    } else if (v < 0.3) {
+      title = '⬜ Cut-off Region'; color='#475569'; borderColor='rgba(0,0,0,.15)'; bgColor='rgba(255,255,255,.6)';
+      points = ['Applied voltage below threshold.', 'Depletion barrier not overcome.', 'No significant current flow.'];
+    } else if (v < 0.7) {
+      title = '🔶 Near Threshold (0.7V knee)'; color='#F59E0B'; borderColor='rgba(245,158,11,.35)'; bgColor='rgba(245,158,11,.05)';
+      points = ['Approaching knee voltage for silicon.', 'Current beginning to rise exponentially.', 'Depletion region narrowing.'];
+    } else {
+      title = '✅ Active Conduction'; color='#10B981'; borderColor='rgba(16,185,129,.35)'; bgColor='rgba(16,185,129,.05)';
+      points = ['Knee voltage exceeded — diode conducting.', 'Current rises sharply (exponential).', 'Forward voltage drop ≈ 0.7 V.'];
+    }
+    const card = document.getElementById('obsCard');
+    card.style.borderColor = borderColor; card.style.background = bgColor;
+    document.getElementById('obsTitle').textContent = title;
+    document.getElementById('obsTitle').style.color = color;
+    document.getElementById('obsPoints').innerHTML = points.map(p =>
+      `<div class="obs-point"><span style="color:${color};flex-shrink:0;font-weight:700">→</span><span>${p}</span></div>`
+    ).join('');
+  }
+
+  // ── Event handlers ───────────────────────────────────────────
+  function onVChange(v) {
+    voltage = parseFloat(v);
+    const isF = bias === 'forward';
+    document.getElementById('vSlider').style.background =
+      `linear-gradient(to right, #1A56DB ${((voltage - (isF?-0.5:-2))/(isF?1.5:2.4)*100)}%, rgba(0,0,0,0.1) ${((voltage-(isF?-0.5:-2))/(isF?1.5:2.4)*100)}%)`;
+    updateAll();
+  }
+
+  function onTChange(v) {
+    temperature = parseInt(v);
+    document.getElementById('tSlider').style.background =
+      `linear-gradient(to right, #F59E0B ${v}%, rgba(0,0,0,0.1) ${v}%)`;
+    updateAll();
+  }
+
+  function setBias(mode) {
+    bias = mode;
+    document.getElementById('fwdBtn').classList.toggle('active', mode === 'forward');
+    document.getElementById('revBtn').classList.toggle('active', mode === 'reverse');
+    document.getElementById('biasDesc').textContent = mode === 'forward'
+      ? 'P-side positive → current flows above 0.7V'
+      : 'P-side negative → depletion region widens';
+    
+    const isF = mode === 'forward';
+    document.getElementById('vSlider').min = isF ? -0.5 : -2;
+    document.getElementById('vSlider').max = isF ? 1.2 : 0.5;
+    document.getElementById('vMin').textContent = isF ? '-0.5V' : '-2.0V';
+    document.getElementById('vMax').textContent = isF ? '+1.2V' : '+0.5V';
+    voltage = 0;
+    document.getElementById('vSlider').value = 0;
+    
+    // Reset gradient tracks
+    document.getElementById('vSlider').style.background = `linear-gradient(to right, #1A56DB ${((0 - (isF?-0.5:-2))/(isF?1.5:2.4)*100)}%, rgba(0,0,0,0.1) ${((0-(isF?-0.5:-2))/(isF?1.5:2.4)*100)}%)`;
+    
+    updateAll();
+  }
+
+  function resetLab() {
+    bias = 'forward'; voltage = 0; temperature = 25;
+    document.getElementById('vSlider').value = 0;
+    document.getElementById('tSlider').value = 25;
+    document.getElementById('tSlider').style.background = `linear-gradient(to right, #F59E0B 25%, rgba(0,0,0,0.1) 25%)`;
+    setBias('forward');
+  }
+
+  function printReport() {
+    const iA = idiode(voltage, temperature);
+    const iMa = (iA * 1000).toFixed(3);
+    const w = window.open('', '_blank');
+    w.document.write(`
+      <html><head><title>Lab Report — PN Junction Diode</title>
+      <style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;color:#111}
+      h1{color:#1A56DB;border-bottom:2px solid #1A56DB;padding-bottom:8px}
+      .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+      .box{border:1px solid #ddd;border-radius:6px;padding:12px}
+      .box h3{font-size:.8rem;color:#666;margin-bottom:4px}
+      .box p{font-size:1.1rem;font-weight:700;color:#111}
+      table{width:100%;border-collapse:collapse;margin:16px 0}
+      th{background:#1A56DB;color:#fff;padding:8px;text-align:left;font-size:.8rem}
+      td{padding:7px 8px;border-bottom:1px solid #eee;font-size:.82rem}
+      </style></head><body>
+      <h1>LogicFlow — Lab Report</h1>
+      <p><strong>Experiment:</strong> PN Junction Diode Characteristics</p>
+      <p><strong>Date:</strong> ${new Date().toLocaleDateString('en-IN')} &nbsp; <strong>Bias Mode:</strong> ${bias.toUpperCase()}</p>
+      <h2>Current Operating Point</h2>
+      <div class="grid">
+        <div class="box"><h3>Voltage</h3><p>${parseFloat(voltage).toFixed(3)} V</p></div>
+        <div class="box"><h3>Current</h3><p>${iMa} mA</p></div>
+        <div class="box"><h3>Power</h3><p>${Math.abs(voltage*iA*1000).toFixed(3)} mW</p></div>
+        <div class="box"><h3>Temperature</h3><p>${temperature} °C</p></div>
+      </div>
+      <h2>Observation Table</h2>
+      <table><tr><th>V (Volts)</th><th>I (mA)</th><th>Region</th></tr>
+      ${[0,.1,.2,.3,.4,.5,.6,.65,.7,.75].map(v=>{
+        const i=(idiode(v,temperature)*1000);
+        const r=v<0.3?'Cut-off':v<0.7?'Near Threshold':'Forward Active';
+        return `<tr><td>${v.toFixed(2)}</td><td>${Math.min(i,150).toFixed(4)}</td><td>${r}</td></tr>`;
+      }).join('')}
+      </table>
+      <h2>Conclusion</h2>
+      <p>The V-I characteristics of the PN junction diode were successfully plotted. The exponential nature of forward conduction confirms the Shockley equation. Knee voltage observed at approximately 0.7V.</p>
+      <br><hr><p>Student Signature: _________________ &nbsp; Faculty Signature: _________________</p>
+      </body></html>`);
+    w.document.close(); w.print();
+  }
+
+  // Init
+  document.getElementById('tSlider').style.background = `linear-gradient(to right, #F59E0B 25%, rgba(0,0,0,0.1) 25%)`;
+  updateAll();
+</script>
+</body>
+</html>

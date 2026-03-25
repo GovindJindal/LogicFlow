@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LogicFlow — Interactive Electronics Lab</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="Logo.png" type="image/png">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-color: #eceeff;
+    }
+
+    /* NAV - Glassy to contrast with the colorful background */
+    nav {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50px;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 17px;
+      color: #111;
+      text-decoration: none;
+    }
+
+    .logo-img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #222;
+      text-decoration: none;
+      font-size: 14.5px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: #000;
+    }
+
+    .dropdown {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .dropdown-content {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translate(-50%, 10px);
+      padding-top: 24px;
+      min-width: 240px;
+      z-index: 101;
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    }
+
+    .dropdown-content.show {
+      visibility: visible;
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .dropdown-menu {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 16px;
+      padding: 8px 0;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-links .dropdown-menu a {
+      padding: 10px 22px;
+      color: #333;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+      white-space: nowrap;
+      display: block;
+    }
+
+    .nav-links .dropdown-menu a:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color: #000;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-enter {
+      background: #111;
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 9px 22px;
+      border-radius: 50px;
+      transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-enter:hover {
+      background: #333;
+      transform: scale(1.03);
+    }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-content {
+      text-align: center;
+      z-index: 10;
+      pointer-events: none;
+      max-width: 950px;
+      padding: 0 20px;
+      /* Adjust vertical centering */
+      margin-top: -5vh;
+    }
+
+    .hero-head h1 {
+      /* Massive sizing for LogicFlow */
+      font-size: clamp(54px, 17vw, 100px);
+      font-family: "OpenAI Sans", sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.06em;
+      line-height: 1;
+      user-select: none;
+      margin-bottom: 8px;
+      color: #000000;
+      /* Logic is explicitly completely black */
+    }
+
+    .highlight-text {
+      /* Updated gradient to match the vibrant blue/purple in your image */
+      background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      padding-right: 0.09em;
+    }
+
+    .hero-content .base-head {
+      font-size: 18px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      font-weight: 400;
+      color: #444;
+      margin-top: 10px;
+      margin-bottom: 28px;
+      letter-spacing: -0.01em;
+    }
+
+    .btn-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+      color: #fff;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 650;
+      padding: 14px 34px;
+      border-radius: 50px;
+      pointer-events: all;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 28px rgba(99, 102, 241, 0.45);
+      letter-spacing: -0.01em;
+    }
+
+    .btn-cta:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 36px rgba(99, 102, 241, 0.6);
+    }
+
+    /* FLOATING ICONS */
+    .icons-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .app-icon {
+      position: absolute;
+      border-radius: 22.37%;
+      will-change: transform;
+      animation: float var(--duration, 8s) var(--delay, 0s) ease-in-out infinite alternate;
+      opacity: 0;
+      animation-fill-mode: forwards;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      pointer-events: all;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .app-icon:hover {
+      transform: scale(1.12) !important;
+      z-index: 50;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .icon-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42%;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.02em;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .icon-inner svg {
+      width: 65%;
+      height: 65%;
+      display: block;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0px, 0px) rotate(0deg);
+        opacity: 1;
+      }
+
+      25% {
+        transform: translate(var(--tx1), var(--ty1)) rotate(var(--r1));
+      }
+
+      50% {
+        transform: translate(var(--tx2), var(--ty2)) rotate(var(--r2));
+      }
+
+      75% {
+        transform: translate(var(--tx3), var(--ty3)) rotate(var(--r3));
+      }
+
+      100% {
+        transform: translate(var(--tx4), var(--ty4)) rotate(var(--r4));
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="Logo.png" alt="LogicFlow Logo" class="logo-img">
+      LogicFlow
+    </a>
+    <ul class="nav-links">
+      <li class="dropdown">
+        <a href="#" id="experimentDropdownBtn">Experiments ▼</a>
+        <div class="dropdown-content" id="experimentDropdown">
+          <div class="dropdown-menu">
+            <a href="exp1_components.html">1. Component Familiarization</a>
+            <a href="exp2_equipments.html">2. Measurement Equipment</a>
+            <a href="exp3_diode.html">3. PN Junction Diode</a>
+            <a href="exp4_zener.html">4. Zener Diode</a>
+            <a href="exp5_rectifier.html">5. Rectifiers</a>
+            <a href="exp6_flipflops.html">6. Flip-Flops</a>
+            <a href="exp7_bcd_decoder.html">7. BCD Decoder</a>
+          </div>
+        </div>
+      </li>
+      <li><a href="sandbox.html">Logic Gates</a></li>
+      <li><a href="coa.html">COA</a></li>
+      <li><a href="curriculum.html">Curriculum</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="exp3_diode.html" class="btn-enter">Enter Lab →</a>
+    </div>
+  </nav>
+
+  <canvas id="bgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+
+  <main class="hero" style="background:transparent;">
+    <div class="icons-layer" id="iconsLayer"></div>
+    <br><br><br><br><br><br>
+    <div class="hero-content">
+      <div class="hero-head">
+        <h1>Logic<span class="highlight-text"><em>Flow</em></span></h1>
+      </div>
+      <div class="base-head">
+        <p>The interactive electronics lab that never runs out of equipment.</p>
+      </div>
+      <a href="curriculum.html" class="btn-cta">Start Exploring →</a>
+    </div>
+  </main>
+
+  <script>
+    // ── Dropdown Logic ───────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      const expBtn = document.getElementById('experimentDropdownBtn');
+      const expDropdown = document.getElementById('experimentDropdown');
+
+      if (expBtn && expDropdown) {
+        expBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          expDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.dropdown')) {
+            expDropdown.classList.remove('show');
+          }
+        });
+      }
+    });
+
+    // ── Animated blob background (Codex-style) ───────────────────────────────────
+    (function () {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let W, H;
+      const blobs = [
+        { xf: .15, yf: .15, rf: .45, color: [120, 100, 255], speed: 0.00018, phase: 0 },
+        { xf: .78, yf: .10, rf: .40, color: [90, 140, 255], speed: 0.00013, phase: 1.2 },
+        { xf: .50, yf: .55, rf: .38, color: [160, 80, 240], speed: 0.00021, phase: 2.4 },
+        { xf: .08, yf: .68, rf: .33, color: [200, 160, 255], speed: 0.00016, phase: 0.7 },
+        { xf: .88, yf: .72, rf: .32, color: [100, 120, 255], speed: 0.00019, phase: 3.1 },
+        { xf: .42, yf: .85, rf: .28, color: [130, 90, 255], speed: 0.00014, phase: 4.5 },
+      ];
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      function draw(ts) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#eceeff'; ctx.fillRect(0, 0, W, H);
+        for (const b of blobs) {
+          const angle = ts * b.speed + b.phase;
+          const cx = (b.xf + Math.sin(angle * 1.3) * 0.12) * W;
+          const cy = (b.yf + Math.cos(angle * 0.9) * 0.10) * H;
+          const r = b.rf * Math.min(W, H) * (0.9 + 0.1 * Math.sin(angle * 2.1));
+          const [R, G, B] = b.color;
+          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+          g.addColorStop(0, `rgba(${R},${G},${B},0.58)`);
+          g.addColorStop(0.5, `rgba(${R},${G},${B},0.20)`);
+          g.addColorStop(1, `rgba(${R},${G},${B},0)`);
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fillStyle = g; ctx.fill();
+        }
+        // subtle white vignette at edges
+        const vx = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.3, W / 2, H / 2, Math.min(W, H) * 0.9);
+        vx.addColorStop(0, 'rgba(255,255,255,0)');
+        vx.addColorStop(1, 'rgba(255,255,255,0.30)');
+        ctx.fillStyle = vx; ctx.fillRect(0, 0, W, H);
+        requestAnimationFrame(draw);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+      requestAnimationFrame(draw);
+    })();
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    const apps = [
+      // { label, bg, textColor, shape, size, initX%, initY%, r (border-radius) }
+      { label: 'CRE\nME', bg: '#111', textColor: '#fff', size: 80, x: 16, y: 24, r: '22%' },
+      { label: 'DB', bg: '#0061FF', textColor: '#fff', size: 72, x: 34, y: 30, r: '22.37%' },
+      { label: 'GPT', bg: '#10a37f', textColor: '#fff', size: 68, x: 57, y: 22, r: '22.37%' },
+      { label: '●●●', bg: '#f0f0f0', textColor: '#888', size: 74, x: 65, y: 37, r: '22.37%' },
+      { label: 'MC', bg: '#FFD800', textColor: '#222', size: 76, x: 22, y: 52, r: '22.37%' },
+      { label: 'AIR', bg: '#FF385C', textColor: '#fff', size: 78, x: 74, y: 54, r: '22.37%' },
+      { label: 'P', bg: 'linear-gradient(135deg,#fa3b5e,#fc914e)', textColor: '#fff', size: 72, x: 5, y: 66, r: '22.37%' },
+      { label: '▶️', bg: '#111', textColor: '#fff', size: 78, x: 93, y: 66, r: '18%' },
+      { label: 'TW', bg: '#9146FF', textColor: '#fff', size: 68, x: 27, y: 80, r: '22.37%' },
+      { label: '47', bg: '#2ECC40', textColor: '#fff', size: 70, x: 50, y: 82, r: '22.37%' },
+      { label: 'NIKE', bg: '#fff', textColor: '#111', size: 64, x: 73, y: 83, r: '12px', border: true },
+
+      // Transistor Icon
+      { label: '◆', bg: '#F58A2B', textColor: '#fff', size: 64, x: 88, y: 27, r: '22.37%' },
+
+      { label: 'SL', bg: '#4A154B', textColor: '#fff', size: 66, x: 82, y: 43, r: '22.37%' },
+      { label: 'YT', bg: '#FF0000', textColor: '#fff', size: 70, x: 10, y: 40, r: '22.37%' },
+
+      // Adjusted positions to fix overlaps
+      { label: 'SP', bg: '#1DB954', textColor: '#fff', size: 62, x: 38, y: 75, r: '22.37%' },
+      { label: 'NOT', bg: '#fff', textColor: '#111', size: 58, x: 48, y: 18, r: '14px', border: true },
+
+      { label: 'FB', bg: '#1877F2', textColor: '#fff', size: 68, x: 60, y: 70, r: '22.37%' },
+      { label: 'IG', bg: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', textColor: '#fff', size: 66, x: 38, y: 14, r: '22.37%' },
+      { label: 'FIG', bg: '#1E1E1E', textColor: '#fff', size: 60, x: 78, y: 15, r: '22.37%' },
+    ];
+
+    const electronicIcons = {
+      // --- MAPPED GATES ---
+      'IG': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M 16 12 L 32 12 C 44 12 52 20 52 32 C 52 44 44 52 32 52 L 16 52 Z"/><line x1="4" y1="22" x2="16" y2="22"/><line x1="4" y1="42" x2="16" y2="42"/><line x1="52" y1="32" x2="60" y2="32"/></svg>`,
+      'YT': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M 12 12 C 24 12 40 16 52 32 C 40 48 24 52 12 52 C 20 40 20 24 12 12 Z"/><line x1="4" y1="22" x2="14" y2="22"/><line x1="4" y1="42" x2="14" y2="42"/><line x1="52" y1="32" x2="60" y2="32"/></svg>`,
+      'DB': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"><path d="M 20 16 L 44 32 L 20 48 Z"/><circle cx="48" cy="32" r="4"/><line x1="4" y1="32" x2="20" y2="32"/><line x1="52" y1="32" x2="60" y2="32"/></svg>`,
+      'FB': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M 16 12 C 28 12 44 16 56 32 C 44 48 28 52 16 52 C 24 40 24 24 16 12 Z"/><path d="M 8 12 C 16 24 16 40 8 52"/><line x1="0" y1="22" x2="10" y2="22"/><line x1="0" y1="42" x2="10" y2="42"/><line x1="56" y1="32" x2="64" y2="32"/></svg>`,
+      'FIG': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M 12 12 C 24 12 40 16 48 32 C 40 48 24 52 12 52 C 20 40 20 24 12 12 Z"/><circle cx="52" cy="32" r="4"/><line x1="4" y1="22" x2="14" y2="22"/><line x1="4" y1="42" x2="14" y2="42"/><line x1="56" y1="32" x2="64" y2="32"/></svg>`,
+      'CRE\nME': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M 16 12 C 28 12 40 16 48 32 C 40 48 28 52 16 52 C 24 40 24 24 16 12 Z"/><path d="M 8 12 C 16 24 16 40 8 52"/><circle cx="52" cy="32" r="4"/><line x1="0" y1="22" x2="10" y2="22"/><line x1="0" y1="42" x2="10" y2="42"/><line x1="56" y1="32" x2="64" y2="32"/></svg>`,
+      'SP': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4"><circle cx="32" cy="32" r="16"/><line x1="20" y1="20" x2="44" y2="44"/><line x1="44" y1="20" x2="20" y2="44"/><line x1="32" y1="48" x2="32" y2="60"/></svg>`,
+      '47': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M 12 12 L 28 12 C 40 12 48 20 48 32 C 48 44 40 52 28 52 L 12 52 Z"/><circle cx="52" cy="32" r="4"/><line x1="0" y1="22" x2="12" y2="22"/><line x1="0" y1="42" x2="12" y2="42"/><line x1="56" y1="32" x2="64" y2="32"/></svg>`,
+      // --- REMAINING COMPONENTS ---
+      'GPT': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4"><line x1="4" y1="32" x2="16" y2="32"/><path d="M 16 32 C 16 16 24 16 24 32 C 24 16 32 16 32 32 C 32 16 40 16 40 32 C 40 16 48 16 48 32"/><line x1="48" y1="32" x2="60" y2="32"/></svg>`,
+      '●●●': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4"><line x1="10" y1="32" x2="28" y2="32"/><line x1="28" y1="16" x2="28" y2="48"/><line x1="36" y1="16" x2="36" y2="48"/><line x1="36" y1="32" x2="54" y2="32"/></svg>`,
+      'MC': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"><line x1="4" y1="32" x2="14" y2="32"/><polyline points="14,32 18,20 26,44 34,20 42,44 46,32"/><line x1="46" y1="32" x2="60" y2="32"/></svg>`,
+      'AIR': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4"><polygon points="20,16 44,32 20,48" stroke-linejoin="round"/><line x1="44" y1="16" x2="44" y2="48"/><line x1="8" y1="32" x2="20" y2="32"/><line x1="44" y1="32" x2="56" y2="32"/></svg>`,
+      'P': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4"><line x1="28" y1="16" x2="28" y2="48"/><line x1="36" y1="24" x2="36" y2="40"/><line x1="12" y1="32" x2="28" y2="32"/><line x1="36" y1="32" x2="52" y2="32"/></svg>`,
+      '▶️': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4"><line x1="32" y1="16" x2="32" y2="36"/><line x1="16" y1="36" x2="48" y2="36"/><line x1="24" y1="44" x2="40" y2="44"/><line x1="30" y1="52" x2="34" y2="52"/></svg>`,
+      'TW': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4"><line x1="8" y1="32" x2="20" y2="32"/><circle cx="22" cy="32" r="2"/><line x1="24" y1="30" x2="40" y2="20"/><circle cx="42" cy="32" r="2"/><line x1="44" y1="32" x2="56" y2="32"/></svg>`,
+      'NIKE': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"><polygon points="20,16 52,32 20,48" /><line x1="4" y1="24" x2="20" y2="24"/><line x1="4" y1="40" x2="20" y2="40"/><line x1="52" y1="32" x2="60" y2="32"/></svg>`,
+
+      // Refined Transistor Symbol 
+      '◆': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="32" cy="32" r="24"/>
+          <line x1="24" y1="20" x2="24" y2="44"/>
+          <line x1="8" y1="32" x2="24" y2="32"/>
+          <line x1="24" y1="26" x2="42" y2="14"/>
+          <line x1="24" y1="38" x2="42" y2="50"/>
+          <polygon points="44,52 32,48 40,38" fill="currentColor" stroke="none"/>
+        </svg>`,
+
+      'SL': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"><line x1="32" y1="24" x2="32" y2="56"/><polygon points="32,24 16,8 48,8"/><line x1="16" y1="8" x2="48" y2="8"/></svg>`,
+      'NOT': `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4"><rect x="20" y="16" width="24" height="32" rx="2"/><line x1="12" y1="22" x2="20" y2="22"/><line x1="12" y1="32" x2="20" y2="32"/><line x1="12" y1="42" x2="20" y2="42"/><line x1="44" y1="22" x2="52" y2="22"/><line x1="44" y1="32" x2="52" y2="32"/><line x1="44" y1="42" x2="52" y2="42"/></svg>`
+    };
+
+    const layer = document.getElementById('iconsLayer');
+
+    apps.forEach((app, i) => {
+      const el = document.createElement('div');
+      el.className = 'app-icon';
+
+      const s = app.size;
+      el.style.width = s + 'px';
+      el.style.height = s + 'px';
+      el.style.left = `calc(${app.x}% - ${s / 2}px)`;
+      el.style.top = `calc(${app.y}% - ${s / 2}px)`;
+
+      // This now applies '22.37%' (rounded square) for the transistor, and defaults for others
+      el.style.borderRadius = app.r || '22.37%';
+
+      if (app.border) el.style.border = '1px solid rgba(0,0,0,0.1)';
+
+      el.style.background = app.bg;
+
+      // floating animation params (unique per icon)
+      const seed = i * 137.508;
+      const r = (min, max) => min + ((seed * (i + 1)) % (max - min));
+      const dur = 6 + (i % 7) * 1.1;
+      const del = (i * 0.35) % 3;
+
+      el.style.setProperty('--duration', dur + 's');
+      el.style.setProperty('--delay', del + 's');
+      el.style.setProperty('--tx1', (r(-14, 14)).toFixed(1) + 'px');
+      el.style.setProperty('--ty1', (r(-14, 14)).toFixed(1) + 'px');
+      el.style.setProperty('--tx2', (r(-18, 18)).toFixed(1) + 'px');
+      el.style.setProperty('--ty2', (r(-18, 18)).toFixed(1) + 'px');
+      el.style.setProperty('--tx3', (r(-12, 12)).toFixed(1) + 'px');
+      el.style.setProperty('--ty3', (r(-20, 20)).toFixed(1) + 'px');
+      el.style.setProperty('--tx4', (r(-16, 16)).toFixed(1) + 'px');
+      el.style.setProperty('--ty4', (r(-16, 16)).toFixed(1) + 'px');
+      el.style.setProperty('--r1', (r(-4, 4)).toFixed(1) + 'deg');
+      el.style.setProperty('--r2', (r(-6, 6)).toFixed(1) + 'deg');
+      el.style.setProperty('--r3', (r(-3, 3)).toFixed(1) + 'deg');
+      el.style.setProperty('--r4', (r(-5, 5)).toFixed(1) + 'deg');
+
+      // Content
+      const inner = document.createElement('div');
+      inner.className = 'icon-inner';
+      inner.style.color = app.textColor;
+      inner.style.background = app.bg;
+      inner.style.borderRadius = 'inherit';
+
+      // Apply mapped electronic symbols if they exist, else default to label
+      if (electronicIcons[app.label]) {
+        inner.innerHTML = electronicIcons[app.label];
+      } else {
+        inner.textContent = app.label;
+      }
+
+      el.appendChild(inner);
+
+      // Staggered fade-in
+      el.style.opacity = '0';
+      el.style.animation = `float ${dur}s ${del}s ease-in-out infinite alternate`;
+      setTimeout(() => {
+        el.style.transition = 'opacity 0.6s ease';
+        el.style.opacity = '1';
+      }, 100 + i * 80);
+
+      layer.appendChild(el);
+    });
+
+    // Subtle parallax on mousemove
+    document.addEventListener('mousemove', (e) => {
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      const dx = (e.clientX - cx) / cx;
+      const dy = (e.clientY - cy) / cy;
+
+      const icons = document.querySelectorAll('.app-icon');
+      icons.forEach((icon, i) => {
+        const depth = 0.5 + (i % 5) * 0.2;
+        const px = dx * depth * 8;
+        const py = dy * depth * 8;
+        icon.style.marginLeft = px + 'px';
+        icon.style.marginTop = py + 'px';
+      });
+    });
+  </script>
+</body>
+
+</html>

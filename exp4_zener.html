@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="Logo.png" type="image/png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Zener Diode Lab — LogicFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#eceeff;
+      --surface:rgba(255, 255, 255, 0.55);
+      --border:rgba(255, 255, 255, 0.6);
+      --border-dark:rgba(0, 0, 0, 0.08);
+      --green:#10B981;--cyan:#06b6d4;--purple:#7C3AED;--amber:#F59E0B;--blue:#1A56DB;--rose:#F43F5E;
+      --text:#0f0f1a;--muted:#475569;
+      --font-display:'Syne',sans-serif;
+      --font-body:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      --font-mono:'JetBrains Mono',monospace;
+    }
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh}
+    
+    /* NAV */
+    nav { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 100; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50px; padding: 10px 20px; display: flex; align-items: center; gap: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; color: #111; text-decoration: none; }
+    .logo-img { width: 28px; height: 28px; object-fit: contain; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { color: #222; text-decoration: none; font-size: 14.5px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: #000; }
+    .nav-links a.active { color: var(--blue); font-weight: 700; }
+
+    /* LAYOUT */
+    .page{padding-top:100px;max-width:1300px;margin:0 auto;padding-left:2rem;padding-right:2rem;position:relative;z-index:10}
+    .page-header{padding:1.75rem 0 1.25rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+    .breadcrumb{display:flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.65rem;color:var(--muted);margin-bottom:.6rem}
+    .breadcrumb .badge{background:rgba(26,86,219,.15);border:1px solid rgba(26,86,219,.3);color:var(--blue);padding:.15rem .5rem;border-radius:999px}
+    .page-header h1{font-family:var(--font-display);font-size:2.2rem;color:var(--text);margin-bottom:.35rem;letter-spacing:-0.03em}
+    .page-header p{font-size:.9rem;color:var(--muted);max-width:550px;line-height:1.6}
+    
+    .lab-grid{display:grid;grid-template-columns:360px 1fr;gap:1.5rem;padding-bottom:3rem}
+    
+    /* PANEL */
+    .panel{background:var(--surface);backdrop-filter:blur(20px);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.03);border-radius:16px;padding:1.5rem}
+    .panel-label{font-family:var(--font-mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.25rem;font-weight:700}
+    
+    /* SLIDERS */
+    .slider-wrap{margin-bottom:1.25rem}
+    .slider-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+    .slider-title{font-size:.8rem;font-weight:600;color:var(--text)}
+    .slider-val{font-family:var(--font-mono);font-size:1rem;font-weight:700;color:var(--rose)}
+    input[type=range]{width:100%;height:6px;border-radius:3px;outline:none;-webkit-appearance:none;background:rgba(0,0,0,.1)}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--rose);box-shadow:0 0 8px rgba(244,63,94,.4);border:2px solid #fff;cursor:pointer}
+    .slider-range{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.6rem;color:var(--muted);margin-top:.4rem}
+    
+    /* DETAILS */
+    .param-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border-dark)}
+    .param-row:last-child{border-bottom:none}
+    .param-key{font-size:.78rem;color:var(--muted);font-weight:500}
+    .param-val{font-family:var(--font-mono);font-size:.85rem;font-weight:700;color:var(--text)}
+    
+    /* METERS */
+    .meter-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+    .meter-card{background:rgba(255,255,255,0.7);border:1px solid var(--border);border-radius:10px;padding:1rem;box-shadow:0 2px 12px rgba(0,0,0,0.02)}
+    .meter-key{font-family:var(--font-mono);font-size:.65rem;color:var(--muted);margin-bottom:.4rem;font-weight:700}
+    .meter-val{font-family:var(--font-mono);font-size:1.3rem;font-weight:700}
+
+    /* STATUS CARD */
+    .status-card{margin-top:1.25rem;padding:1rem;border-radius:10px;border:1px solid;font-family:var(--font-mono);font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:.75rem}
+
+    /* CHART AREA */
+    .chart-panel{display:flex;flex-direction:column;gap:1.5rem}
+    .chart-box{height:300px;position:relative;background:rgba(255,255,255,0.4);border-radius:12px;padding:10px;border:1px solid var(--border)}
+    
+    /* CIRCUIT */
+    .circuit-box{background:rgba(255,255,255,0.7);border:1px solid var(--border);border-radius:12px;padding:1.5rem;display:flex;justify-content:center;align-items:center}
+    
+    @media(max-width:900px){.lab-grid{grid-template-columns:1fr}.nav-links{display:none}}
+  </style>
+</head>
+<body>
+
+<canvas id="bgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="Logo.png" alt="LogicFlow Logo" class="logo-img">
+    LogicFlow
+  </a>
+  <ul class="nav-links">
+    <li><a href="exp1_components.html" class="active">Experiments</a></li>
+    <li><a href="sandbox.html">Logic Gates</a></li>
+    <li><a href="coa.html">COA</a></li>
+    <li><a href="curriculum.html">Curriculum</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span class="badge">Experiment 04</span>
+        <span>›</span><span>Diode Applications</span>
+      </div>
+      <h1>Zener Diode Voltage Regulator</h1>
+      <p>Analyze how a Zener diode maintains a constant output voltage despite variations in input voltage (Line Regulation) and load resistance (Load Regulation).</p>
+    </div>
+  </div>
+
+  <div class="lab-grid">
+    <div style="display:flex;flex-direction:column;gap:1.5rem">
+      <div class="panel">
+        <div class="panel-label">Circuit Parameters</div>
+        
+        <div class="slider-wrap">
+          <div class="slider-head"><span class="slider-title">Input Voltage (Vin)</span><span class="slider-val" id="lbl-vin">0.0 V</span></div>
+          <input type="range" id="sid-vin" min="0" max="15" step="0.1" value="0" oninput="updateLab()">
+          <div class="slider-range"><span>0V</span><span>15V</span></div>
+        </div>
+
+        <div class="slider-wrap">
+          <div class="slider-head"><span class="slider-title">Series Resistance (Rs)</span><span class="slider-val" id="lbl-rs" style="color:var(--amber)">220 Ω</span></div>
+          <input type="range" id="sid-rs" min="50" max="1000" step="10" value="220" oninput="updateLab()" style="accent-color:var(--amber)">
+          <div class="slider-range"><span>50Ω</span><span>1kΩ</span></div>
+        </div>
+
+        <div class="slider-wrap">
+          <div class="slider-head"><span class="slider-title">Load Resistance (RL)</span><span class="slider-val" id="lbl-rl" style="color:var(--blue)">1000 Ω</span></div>
+          <input type="range" id="sid-rl" min="100" max="10000" step="100" value="1000" oninput="updateLab()" style="accent-color:var(--blue)">
+          <div class="slider-range"><span>100Ω</span><span>10kΩ</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">Component Data</div>
+        <div class="param-row"><span class="param-key">Zener Breakdown (Vz)</span><span class="param-val">5.1 V</span></div>
+        <div class="param-row"><span class="param-key">Max Power Dissipation</span><span class="param-val">500 mW</span></div>
+        <div class="param-row"><span class="param-key">Knee Current (Iz_min)</span><span class="param-val">1 mA</span></div>
+      </div>
+    </div>
+
+    <div class="chart-panel">
+      <!-- CIRCUIT METERS -->
+      <div class="panel" style="padding:1.25rem">
+        <div class="meter-grid">
+          <div class="meter-card">
+            <div class="meter-key">LOAD VOLTAGE (Vout)</div>
+            <div class="meter-val" id="m-vout" style="color:var(--green)">0.00 V</div>
+          </div>
+          <div class="meter-card">
+            <div class="meter-key">ZENER CURRENT (Iz)</div>
+            <div class="meter-val" id="m-iz" style="color:var(--purple)">0.00 mA</div>
+          </div>
+          <div class="meter-card">
+            <div class="meter-key">LOAD CURRENT (IL)</div>
+            <div class="meter-val" id="m-il" style="color:var(--blue)">0.00 mA</div>
+          </div>
+          <div class="meter-card">
+            <div class="meter-key">POWER DISSIPATION (Pz)</div>
+            <div class="meter-val" id="m-power" style="color:var(--amber)">0.00 mW</div>
+          </div>
+        </div>
+
+        <div class="status-card" id="statusCard">
+            <!-- Dynamic State -->
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <!-- CIRCUIT DIAGRAM -->
+        <div class="circuit-box">
+          <svg viewBox="0 0 300 160" width="100%">
+            <!-- Input Vin -->
+            <circle cx="20" cy="40" r="3" fill="#F43F5E"/><circle cx="20" cy="120" r="3" fill="#111"/>
+            <text x="10" y="85" fill="#F43F5E" font-family="JetBrains Mono" font-size="12" font-weight="bold">Vin</text>
+            <text x="5" y="44" fill="#F43F5E" font-family="JetBrains Mono" font-size="14">+</text>
+            <text x="5" y="124" fill="#111" font-family="JetBrains Mono" font-size="14">-</text>
+
+            <!-- Wiring -->
+            <line x1="20" y1="40" x2="80" y2="40" stroke="#111" stroke-width="2"/>
+            <line x1="20" y1="120" x2="260" y2="120" stroke="#111" stroke-width="2"/>
+            
+            <!-- Rs -->
+            <rect x="80" y="32" width="40" height="16" rx="2" fill="#fff" stroke="#F59E0B" stroke-width="2"/>
+            <text x="100" y="44" fill="#F59E0B" font-family="JetBrains Mono" font-size="10" font-weight="bold" text-anchor="middle">Rs</text>
+            <line x1="120" y1="40" x2="180" y2="40" stroke="#111" stroke-width="2"/>
+            
+            <!-- Zener Branch -->
+            <line x1="180" y1="40" x2="180" y2="60" stroke="#111" stroke-width="2"/>
+            <line x1="180" y1="100" x2="180" y2="120" stroke="#111" stroke-width="2"/>
+            <!-- Zener Symbol -->
+            <polygon points="180,100 170,80 190,80" fill="#7C3AED"/>
+            <line x1="165" y1="75" x2="170" y2="80" stroke="#7C3AED" stroke-width="2"/>
+            <line x1="170" y1="80" x2="190" y2="80" stroke="#7C3AED" stroke-width="2"/>
+            <line x1="190" y1="80" x2="195" y2="85" stroke="#7C3AED" stroke-width="2"/>
+            <text x="160" y="93" fill="#7C3AED" font-family="JetBrains Mono" font-size="10" font-weight="bold">Dz</text>
+
+            <line x1="180" y1="40" x2="260" y2="40" stroke="#111" stroke-width="2"/>
+            
+            <!-- RL -->
+            <line x1="260" y1="40" x2="260" y2="60" stroke="#111" stroke-width="2"/>
+            <line x1="260" y1="100" x2="260" y2="120" stroke="#111" stroke-width="2"/>
+            <rect x="252" y="60" width="16" height="40" rx="2" fill="#fff" stroke="#1A56DB" stroke-width="2"/>
+            <text x="275" y="84" fill="#1A56DB" font-family="JetBrains Mono" font-size="10" font-weight="bold">RL</text>
+
+            <!-- Vout -->
+            <text x="280" y="44" fill="#10B981" font-family="JetBrains Mono" font-size="12" font-weight="bold">+</text>
+            <text x="285" y="84" fill="#10B981" font-family="JetBrains Mono" font-size="10" font-weight="bold" text-anchor="middle">Vout</text>
+            <text x="280" y="124" fill="#111" font-family="JetBrains Mono" font-size="14">-</text>
+          </svg>
+        </div>
+
+        <!-- GRAPH -->
+        <div class="chart-box">
+          <div class="panel-label" style="position:absolute;top:15px;left:15px;z-index:10">Voltage Transfer Curve</div>
+          <canvas id="regChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Animated Background ──────────────────────────────────────────
+  (function () {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let W, H;
+      const blobs = [
+        { xf: .15, yf: .15, rf: .45, color: [120, 100, 255], speed: 0.00018, phase: 0 },
+        { xf: .78, yf: .10, rf: .40, color: [90, 140, 255], speed: 0.00013, phase: 1.2 },
+        { xf: .50, yf: .55, rf: .38, color: [160, 80, 240], speed: 0.00021, phase: 2.4 },
+        { xf: .08, yf: .68, rf: .33, color: [200, 160, 255], speed: 0.00016, phase: 0.7 }
+      ];
+      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+      function draw(ts) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#eceeff'; ctx.fillRect(0, 0, W, H);
+        for (const b of blobs) {
+          const angle = ts * b.speed + b.phase;
+          const cx = (b.xf + Math.sin(angle * 1.3) * 0.12) * W;
+          const cy = (b.yf + Math.cos(angle * 0.9) * 0.10) * H;
+          const r = b.rf * Math.min(W, H) * (0.9 + 0.1 * Math.sin(angle * 2.1));
+          const [R, G, B] = b.color;
+          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+          g.addColorStop(0, `rgba(${R},${G},${B},0.58)`);
+          g.addColorStop(1, `rgba(${R},${G},${B},0)`);
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fillStyle = g; ctx.fill();
+        }
+        requestAnimationFrame(draw);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+      requestAnimationFrame(draw);
+  })();
+
+  // ── Physics ────────────────────────────────────────────────────────
+  const VZ = 5.1;
+  const P_MAX = 500; // mW
+  
+  // ── Chart setup ──────────────────────────────────────────────
+  const ctxChart = document.getElementById('regChart').getContext('2d');
+  const chart = new Chart(ctxChart, {
+    type: 'line',
+    data: {
+      datasets: [
+        { label: 'Vout', data: [], borderColor: '#10B981', borderWidth: 2.5, pointRadius: 0, tension: 0 },
+        { label: 'Op Point', data: [], borderColor: '#F43F5E', backgroundColor: '#F43F5E', pointRadius: 6, pointHoverRadius: 8, showLine: false },
+        { label: 'Ideal Unregulated', data: [], borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1.5, borderDash: [5,5], pointRadius: 0, tension: 0 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: {
+        x: { type: 'linear', min: 0, max: 15, title: { display: true, text: 'Vin (V)', color: '#475569', font:{family:'JetBrains Mono',size:10,weight:600} },
+             ticks:{color:'#64748B',font:{family:'JetBrains Mono',size:9}}, grid:{color:'rgba(0,0,0,0.05)'}, border:{color:'rgba(0,0,0,0.1)'} },
+        y: { min: 0, max: 8, title: { display: true, text: 'Vout (V)', color: '#475569', font:{family:'JetBrains Mono',size:10,weight:600} },
+             ticks:{color:'#64748B',font:{family:'JetBrains Mono',size:9}}, grid:{color:'rgba(0,0,0,0.05)'}, border:{color:'rgba(0,0,0,0.1)'} }
+      }
+    }
+  });
+
+  function solveCircuit(vin, rs, rl) {
+    // If Zener is OFF, it acts as an open circuit. Voltage divider controls Vout.
+    let vout = vin * (rl / (rs + rl));
+    let iz = 0;
+    
+    // If voltage divider voltage exceeds VZ, Zener turns ON and clamps voltage.
+    if (vout > VZ) {
+      vout = VZ;
+      // KCL at node Vout: (Vin - Vz)/Rs = Iz + Vz/RL  =>  Iz = (Vin - Vz)/Rs - Vz/RL
+      iz = ((vin - VZ) / rs) - (VZ / rl);
+    }
+    
+    const il = vout / rl;
+    const pz = vout * iz * 1000; // mW
+    
+    return { vout, iz, il, pz, openVout: vin * (rl/(rs+rl)) };
+  }
+
+  function updateLab() {
+    const vin = parseFloat(document.getElementById('sid-vin').value);
+    const rs = parseFloat(document.getElementById('sid-rs').value);
+    const rl = parseFloat(document.getElementById('sid-rl').value);
+    
+    // UI Updates
+    document.getElementById('lbl-vin').textContent = vin.toFixed(1) + ' V';
+    document.getElementById('lbl-rs').textContent = rs + ' Ω';
+    document.getElementById('lbl-rl').textContent = rl >= 1000 ? (rl/1000).toFixed(1) + ' kΩ' : rl + ' Ω';
+    
+    // Slider tracks
+    document.getElementById('sid-vin').style.background = `linear-gradient(to right, #F43F5E ${(vin/15)*100}%, rgba(0,0,0,0.1) ${(vin/15)*100}%)`;
+    document.getElementById('sid-rs').style.background = `linear-gradient(to right, #F59E0B ${((rs-50)/950)*100}%, rgba(0,0,0,0.1) ${((rs-50)/950)*100}%)`;
+    document.getElementById('sid-rl').style.background = `linear-gradient(to right, #1A56DB ${((rl-100)/9900)*100}%, rgba(0,0,0,0.1) ${((rl-100)/9900)*100}%)`;
+
+    // Calculation
+    const state = solveCircuit(vin, rs, rl);
+    
+    document.getElementById('m-vout').textContent = state.vout.toFixed(2) + ' V';
+    document.getElementById('m-iz').textContent = (state.iz * 1000).toFixed(2) + ' mA';
+    document.getElementById('m-il').textContent = (state.il * 1000).toFixed(2) + ' mA';
+    document.getElementById('m-power').textContent = state.pz.toFixed(1) + ' mW';
+    
+    // Status Card
+    const sc = document.getElementById('statusCard');
+    if (state.pz > P_MAX) {
+      sc.style.background = 'rgba(244,63,94,0.1)'; sc.style.borderColor = 'rgba(244,63,94,0.4)'; sc.style.color = '#e11d48';
+      sc.innerHTML = '🔥 WARNING: Zener power dissipation exceeded! Diode will burn out.';
+    } else if (state.iz > 0.001) {
+      sc.style.background = 'rgba(16,185,129,0.1)'; sc.style.borderColor = 'rgba(16,185,129,0.4)'; sc.style.color = '#059669';
+      sc.innerHTML = '✅ REGULATING: Zener is in breakdown region maintaining ~5.1V.';
+    } else {
+      sc.style.background = 'rgba(100,116,139,0.1)'; sc.style.borderColor = 'rgba(100,116,139,0.3)'; sc.style.color = '#475569';
+      sc.innerHTML = '⭕ OFF: Input voltage too low to reach breakdown voltage (Open circuit).';
+    }
+
+    // Chart Update
+    const pts = [], idealPts = [];
+    for (let v = 0; v <= 15; v += 0.5) {
+      const s = solveCircuit(v, rs, rl);
+      pts.push({x: v, y: s.vout});
+      idealPts.push({x: v, y: s.openVout});
+    }
+    chart.data.datasets[0].data = pts;
+    chart.data.datasets[1].data = [{x: vin, y: state.vout}];
+    chart.data.datasets[2].data = idealPts;
+    chart.update();
+  }
+
+  updateLab();
+</script>
+</body>
+</html>

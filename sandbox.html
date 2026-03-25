@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="Logo.png" type="image/png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Logic Gate Sandbox — LogicFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#eceeff;
+      --surface:rgba(255, 255, 255, 0.55);
+      --border:rgba(255, 255, 255, 0.6);
+      --border-dark:rgba(0, 0, 0, 0.08);
+      --green:#10B981;--cyan:#06b6d4;--purple:#7C3AED;--amber:#F59E0B;--blue:#1A56DB;
+      --text:#0f0f1a;--muted:#475569;
+      --font-display:'Syne',sans-serif;
+      --font-body:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      --font-mono:'JetBrains Mono',monospace;
+    }
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;display:flex;flex-direction:column}
+
+    /* NAV */
+    nav { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 100; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50px; padding: 10px 20px; display: flex; align-items: center; gap: 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; color: #111; text-decoration: none; }
+    .logo-img { width: 28px; height: 28px; object-fit: contain; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { color: #222; text-decoration: none; font-size: 14.5px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: #000; }
+    .nav-links a.active { color: var(--green); font-weight: 700; }
+
+    /* CENTER HERO */
+    .center-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 120px 2rem 4rem;
+      position: relative;
+      z-index: 10;
+      text-align: center;
+    }
+
+    .coming-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .4rem 1.1rem;
+      border-radius: 999px;
+      background: rgba(16,185,129,.12);
+      border: 1px solid rgba(16,185,129,.3);
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      font-weight: 700;
+      color: #059669;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+
+    .sandbox-icon {
+      width: 96px;
+      height: 96px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(16,185,129,.15), rgba(6,182,212,.15));
+      border: 1px solid rgba(16,185,129,.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.2rem;
+      box-shadow: 0 16px 48px rgba(16,185,129,.12);
+      animation: float 5s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      0%   { transform: translateY(0px); }
+      100% { transform: translateY(-14px); }
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3rem);
+      letter-spacing: -0.04em;
+      color: var(--text);
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+    }
+
+    .gate-preview {
+      display: flex;
+      gap: .75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: .5rem;
+    }
+
+    .gate-chip {
+      padding: .45rem 1rem;
+      border-radius: 8px;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--muted);
+      transition: all .2s;
+    }
+
+    .gate-chip:hover { color: var(--text); background: rgba(255,255,255,.9); transform: translateY(-2px); }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .65rem 1.4rem;
+      border-radius: 50px;
+      background: rgba(0,0,0,.06);
+      border: 1px solid rgba(0,0,0,.1);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 600;
+      transition: all .2s;
+    }
+
+    .btn-back:hover { background: rgba(0,0,0,.1); color: var(--text); transform: translateY(-1px); }
+
+    .progress-hint {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      color: var(--muted);
+      background: var(--surface);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .75rem 1.5rem;
+      max-width: 480px;
+    }
+
+    .progress-bar-wrap {
+      height: 6px;
+      background: rgba(0,0,0,.07);
+      border-radius: 3px;
+      margin-top: .5rem;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--green), var(--cyan));
+      width: 65%;
+      animation: grow 2.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes grow {
+      from { width: 58%; }
+      to   { width: 72%; }
+    }
+
+    @media(max-width:700px){ .nav-links { display: none; } }
+  </style>
+</head>
+<body>
+
+<canvas id="bgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="Logo.png" alt="LogicFlow Logo" class="logo-img">
+    LogicFlow
+  </a>
+  <ul class="nav-links">
+    <li><a href="exp3_diode.html">Experiments</a></li>
+    <li><a href="sandbox.html" class="active">Logic Gates</a></li>
+    <li><a href="coa.html">COA</a></li>
+    <li><a href="curriculum.html">Curriculum</a></li>
+  </ul>
+</nav>
+
+<div class="center-wrap">
+  <div class="coming-badge">🔧 In Development</div>
+
+  <div class="sandbox-icon">🔀</div>
+
+  <h1>Logic Gate Sandbox</h1>
+
+  <p class="subtitle">
+    An interactive drag-and-drop circuit builder for AND, OR, NOT, XOR, NAND, NOR gates — 
+    with real-time truth table evaluation and shareable circuit links. Coming soon.
+  </p>
+
+  <div class="gate-preview">
+    <div class="gate-chip">AND</div>
+    <div class="gate-chip">OR</div>
+    <div class="gate-chip">NOT</div>
+    <div class="gate-chip">XOR</div>
+    <div class="gate-chip">NAND</div>
+    <div class="gate-chip">NOR</div>
+    <div class="gate-chip">Half Adder</div>
+    <div class="gate-chip">Full Adder</div>
+    <div class="gate-chip">Flip-Flops</div>
+  </div>
+
+  <div class="progress-hint">
+    Development Progress — 65% Complete
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill"></div>
+    </div>
+  </div>
+
+  <a href="exp3_diode.html" class="btn-back">← Explore Experiments in the meantime</a>
+</div>
+
+<script>
+(function () {
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  const blobs = [
+    { xf: .15, yf: .15, rf: .45, color: [120, 100, 255], speed: 0.00018, phase: 0 },
+    { xf: .78, yf: .10, rf: .40, color: [90, 140, 255], speed: 0.00013, phase: 1.2 },
+    { xf: .50, yf: .55, rf: .38, color: [160, 80, 240], speed: 0.00021, phase: 2.4 },
+    { xf: .08, yf: .68, rf: .33, color: [200, 160, 255], speed: 0.00016, phase: 0.7 },
+    { xf: .88, yf: .72, rf: .32, color: [100, 120, 255], speed: 0.00019, phase: 3.1 },
+    { xf: .42, yf: .85, rf: .28, color: [130, 90, 255], speed: 0.00014, phase: 4.5 },
+  ];
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  function draw(ts) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#eceeff'; ctx.fillRect(0, 0, W, H);
+    for (const b of blobs) {
+      const angle = ts * b.speed + b.phase;
+      const cx = (b.xf + Math.sin(angle * 1.3) * 0.12) * W;
+      const cy = (b.yf + Math.cos(angle * 0.9) * 0.10) * H;
+      const r  = b.rf * Math.min(W, H) * (0.9 + 0.1 * Math.sin(angle * 2.1));
+      const [R, G, B] = b.color;
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0,   `rgba(${R},${G},${B},0.58)`);
+      g.addColorStop(0.5, `rgba(${R},${G},${B},0.20)`);
+      g.addColorStop(1,   `rgba(${R},${G},${B},0)`);
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = g; ctx.fill();
+    }
+    const vx = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*.3, W/2, H/2, Math.min(W,H)*.9);
+    vx.addColorStop(0, 'rgba(255,255,255,0)');
+    vx.addColorStop(1, 'rgba(255,255,255,0.30)');
+    ctx.fillStyle = vx; ctx.fillRect(0, 0, W, H);
+    requestAnimationFrame(draw);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
