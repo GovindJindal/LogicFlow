@@ -1,0 +1,231 @@
+/* ===== GLOBAL THEME — LogicFlow ===== */
+/* Shared dark indigo mesh background + glassmorphic pill navbar */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: #0d1222;
+}
+
+/* ── MESH GRADIENT BACKGROUND ── */
+.bg-mesh {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.9;
+  animation: drift 15s infinite alternate ease-in-out;
+}
+
+.blob-1 {
+  width: 80vw;
+  height: 80vh;
+  background: #7dd3fc;
+  top: -10vh;
+  left: 10vw;
+  animation-delay: 0s;
+}
+
+.blob-2 {
+  width: 60vw;
+  height: 60vw;
+  background: #2563eb;
+  top: -20vh;
+  left: -20vw;
+  animation-delay: -5s;
+  animation-duration: 20s;
+  opacity: 0.7;
+}
+
+.blob-3 {
+  width: 70vw;
+  height: 55vh;
+  background: #4338ca;
+  bottom: -15vh;
+  right: -10vw;
+  animation-delay: -10s;
+  animation-duration: 22s;
+}
+
+.blob-4 {
+  width: 40vw;
+  height: 40vh;
+  background: #ffffff;
+  top: 30vh;
+  left: 30vw;
+  filter: blur(100px);
+  opacity: 0.8;
+  animation-duration: 18s;
+}
+
+@keyframes drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(2vw, 3vh) scale(1.05); }
+  100% { transform: translate(-2vw, -2vh) scale(0.95); }
+}
+
+/* ── NAVBAR — Glassmorphic Pill ── */
+nav {
+  position: fixed;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  width: 85%;
+  max-width: 1000px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 50px;
+  padding: 8px 8px 8px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+}
+
+.nav-logo {
+  font-family: 'Times New Roman', Times, serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: #111;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: #111;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: #000;
+  opacity: 0.7;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-enter {
+  background: #111628;
+  color: #fff;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 14px 34px;
+  border-radius: 50px;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-enter:hover {
+  background: #1d2540;
+  transform: scale(1.02);
+}
+
+/* ── Dropdown ── */
+.dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 10px);
+  padding-top: 24px;
+  min-width: 240px;
+  z-index: 101;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+.dropdown-content.show {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.dropdown-menu {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  padding: 8px 0;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-links .dropdown-menu a {
+  padding: 10px 22px;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+  display: block;
+}
+
+.nav-links .dropdown-menu a:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: #000;
+}
+
+/* ── Page content area (shared padding for content below fixed nav) ── */
+.page {
+  position: relative;
+  z-index: 10;
+}
+
+@media(max-width: 900px) {
+  .nav-links {
+    display: none;
+  }
+}

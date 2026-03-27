@@ -10,6 +10,7 @@
 
 (function () {
   const canvas = document.getElementById('bgCanvas');
+  if (!canvas) return; // bgCanvas removed, skip old animation
   const ctx = canvas.getContext('2d');
   let W, H;
   const blobs = [

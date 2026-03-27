@@ -8,22 +8,30 @@
   <title>Curriculum — LogicFlow</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
-    rel="stylesheet" />
+    rel="stylesheet" />  <link rel="stylesheet" href="css/global.css">
+
   <link rel="stylesheet" href="css/curriculum.css">
 </head>
 
 <body>
 
-  <canvas id="bgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+  <div class="bg-mesh">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+  </div>
 
   <nav>
     <a href="index.html" class="nav-logo">
-      <img src="Logo.png" alt="LogicFlow Logo" class="logo-img">
       LogicFlow
     </a>
     <ul class="nav-links">
+      <li><a href="curriculum.html">Curriculum</a></li>
+      <li><a href="sandbox.html">Logic Gates</a></li>
+      <li><a href="coa.html">Computer Architecture</a></li>
       <li class="dropdown">
-        <a href="#" id="experimentDropdownBtn">Experiments ▼</a>
+        <a id="experimentDropdownBtn">Experiments</a>
         <div class="dropdown-content" id="experimentDropdown">
           <div class="dropdown-menu">
             <a href="exp1_components.html">1. Component Familiarization</a>
@@ -36,10 +44,10 @@
           </div>
         </div>
       </li>
-      <li><a href="sandbox.html">Logic Gates</a></li>
-      <li><a href="coa.html">COA</a></li>
-      <li><a href="curriculum.html" class="active">Curriculum</a></li>
     </ul>
+    <div class="nav-actions">
+      <a href="exp3_diode.html" class="btn-enter">Enter Lab ↗</a>
+    </div>
   </nav>
 
   <div class="page">
@@ -123,6 +131,7 @@
   </div>
 
   <script src="js/curriculum.js"></script>
+
 </body>
 
 </html>
