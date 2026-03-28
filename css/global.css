@@ -75,12 +75,20 @@ body {
 }
 
 @keyframes drift {
-  0%   { transform: translate(0, 0) scale(1); }
-  50%  { transform: translate(2vw, 3vh) scale(1.05); }
-  100% { transform: translate(-2vw, -2vh) scale(0.95); }
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(2vw, 3vh) scale(1.05);
+  }
+
+  100% {
+    transform: translate(-2vw, -2vh) scale(0.95);
+  }
 }
 
-/* ── NAVBAR — Glassmorphic Pill ── */
+/* ── NAVBAR — same glass pill as index.html (landing) ── */
 nav {
   position: fixed;
   top: 32px;
@@ -89,17 +97,16 @@ nav {
   z-index: 100;
   width: 85%;
   max-width: 1000px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.05) 100%);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 50px;
   padding: 8px 8px 8px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
 }
 
 .nav-logo {
@@ -142,26 +149,31 @@ nav {
   opacity: 0.7;
 }
 
+.nav-links a.active {
+  color: #1a56db;
+  font-weight: 700;
+}
+
 .nav-actions {
   display: flex;
   align-items: center;
 }
 
 .btn-enter {
-  background: #111628;
+  background: #111;
   color: #fff;
   text-decoration: none;
-  font-size: 13.5px;
-  font-weight: 500;
-  padding: 14px 34px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 9px 20px;
   border-radius: 50px;
   transition: background 0.2s, transform 0.15s;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .btn-enter:hover {
-  background: #1d2540;
-  transform: scale(1.02);
+  background: #333;
+  transform: scale(1.03);
 }
 
 /* ── Dropdown ── */
