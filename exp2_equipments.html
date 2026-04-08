@@ -5,8 +5,8 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Basic Equipments Lab — LogicFlow</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>  <link rel="stylesheet" href="css/global.css">
-
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/exp2_equipments.css">
 </head>
 <body>
@@ -19,9 +19,7 @@
   </div>
 
   <nav>
-    <a href="index.html" class="nav-logo">
-      LogicFlow
-    </a>
+    <a href="index.html" class="nav-logo">LogicFlow</a>
     <ul class="nav-links">
       <li><a href="curriculum.html">Curriculum</a></li>
       <li id="navTasksItem" hidden><a href="student-tasks.html">My tasks</a></li>
@@ -32,7 +30,7 @@
         <div class="dropdown-content" id="experimentDropdown">
           <div class="dropdown-menu">
             <a href="exp1_components.html">1. Component Familiarization</a>
-            <a href="exp2_equipments.html">2. Measurement Equipment</a>
+            <a href="exp2_equipments.html" class="active">2. Measurement Equipment</a>
             <a href="exp3_diode.html">3. PN Junction Diode</a>
             <a href="exp4_zener.html">4. Zener Diode</a>
             <a href="exp5_rectifier.html">5. Rectifiers</a>
@@ -56,93 +54,395 @@
         <span>›</span><span>Measurement Equipment</span>
       </div>
       <h1>Virtual Oscilloscope & Function Generator</h1>
-      <p>Connect a virtual function generator to a Cathode Ray Oscilloscope (CRO). Adjust amplitude, frequency, and waveform shapes, and learn how to use the Time/Div and Volts/Div dials to interpret electrical signals visually.</p>
+      <p>Explore two lab modes: a clean single-channel view or a full wiring simulation with dual-channel CRO. Adjust controls, wire inputs, and observe real waveform physics in real time.</p>
+    </div>
+    <div class="header-btns">
+      <!-- Mode Toggle -->
+      <div class="mode-toggle-wrap">
+        <button class="mode-btn active" id="modeBtnSimple" onclick="setMode('simple')">📊 Simple Mode</button>
+        <button class="mode-btn" id="modeBtnWired" onclick="setMode('wired')">🔌 Wiring Mode</button>
+      </div>
     </div>
   </div>
 
-  <div class="lab-grid">
-    <!-- FUNCTION GENERATOR -->
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-icon">🎛️</span>
-        <h2 class="panel-title">Function Generator</h2>
-      </div>
-
-      <div>
-        <div class="panel-label" style="margin-bottom:.5rem">Waveform Select</div>
-        <div class="wave-btns">
-          <button class="wave-btn active" onclick="setWave('sine')" id="btn-sine">
-            <svg viewBox="0 0 24 24"><path d="M2 12c4-8 6-8 10 0s6 8 10 0"/></svg> Sine
-          </button>
-          <button class="wave-btn" onclick="setWave('square')" id="btn-square">
-            <svg viewBox="0 0 24 24"><path d="M2 12h5v-6h10v12h5v-6"/></svg> Square
-          </button>
-          <button class="wave-btn" onclick="setWave('triangle')" id="btn-triangle">
-            <svg viewBox="0 0 24 24"><path d="M2 12l5-8 10 16 5-8"/></svg> Triangle
-          </button>
+  <!-- ═══════════════ SIMPLE MODE ═══════════════ -->
+  <div id="modeSimple">
+    <div class="lab-grid">
+      <!-- LEFT: Function Generator -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-icon">🎛️</span>
+          <h2 class="panel-title">Function Generator</h2>
         </div>
-      </div>
 
-      <div class="slider-wrap">
-        <div class="slider-head">
-          <span class="panel-label">Frequency</span>
-          <span class="slider-val" id="lbl-freq">1000 Hz</span>
-        </div>
-        <input type="range" id="sid-freq" min="10" max="5000" step="10" value="1000" oninput="updateGen()">
-      </div>
-
-      <div class="slider-wrap">
-        <div class="slider-head">
-          <span class="panel-label">Amplitude (Vpp)</span>
-          <span class="slider-val" id="lbl-amp">5.0 V</span>
-        </div>
-        <input type="range" id="sid-amp" min="0.1" max="20" step="0.1" value="5" oninput="updateGen()">
-      </div>
-      
-      <div class="slider-wrap">
-        <div class="slider-head">
-          <span class="panel-label">DC Offset</span>
-          <span class="slider-val" id="lbl-offset">0.0 V</span>
-        </div>
-        <input type="range" id="sid-offset" min="-10" max="10" step="0.1" value="0" oninput="updateGen()">
-      </div>
-    </div>
-
-    <!-- OSCILLOSCOPE -->
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-icon">📺</span>
-        <h2 class="panel-title">Cathode Ray Oscilloscope (CRO)</h2>
-      </div>
-
-      <div class="cro-screen-wrap">
-        <div class="status-panel">
-          <div id="cro-ch1">CH1: 2.0 V/DIV</div>
-          <div id="cro-time">TIME: 0.5 ms/DIV</div>
-        </div>
-        <canvas id="croCanvas" class="cro-canvas"></canvas>
-      </div>
-
-      <div class="cro-controls">
-        <div class="knob-row">
-          <div class="slider-head">
-            <span class="panel-label">VOLTS / DIV (Ch 1)</span>
-            <span class="slider-val" id="lbl-vdiv" style="background:var(--surface)">2 V</span>
+        <div>
+          <div class="panel-label" style="margin-bottom:.5rem">Waveform Select</div>
+          <div class="wave-btns">
+            <button class="wave-btn active" onclick="setWave('sine','s')" id="s-btn-sine">
+              <svg viewBox="0 0 24 12"><path d="M0 6 C2 0, 6 0, 8 6 S14 12, 16 6 S22 0, 24 6" fill="none" stroke="currentColor" stroke-width="2"/></svg> Sine
+            </button>
+            <button class="wave-btn" onclick="setWave('square','s')" id="s-btn-square">
+              <svg viewBox="0 0 24 12"><polyline points="0,10 6,10 6,2 18,2 18,10 24,10" fill="none" stroke="currentColor" stroke-width="2"/></svg> Square
+            </button>
+            <button class="wave-btn" onclick="setWave('triangle','s')" id="s-btn-triangle">
+              <svg viewBox="0 0 24 12"><polyline points="0,10 6,2 18,10 24,2" fill="none" stroke="currentColor" stroke-width="2"/></svg> Triangle
+            </button>
+            <button class="wave-btn" onclick="setWave('sawtooth','s')" id="s-btn-sawtooth">
+              <svg viewBox="0 0 24 12"><polyline points="0,10 12,2 12,10 24,2" fill="none" stroke="currentColor" stroke-width="2"/></svg> Sawtooth
+            </button>
           </div>
-          <input type="range" id="sid-vdiv" min="0.5" max="10" step="0.5" value="2" oninput="updateCRO()" style="accent-color:var(--amber)">
         </div>
 
-        <div class="knob-row">
+        <div class="slider-wrap">
           <div class="slider-head">
-            <span class="panel-label">TIME / DIV</span>
-            <span class="slider-val" id="lbl-tdiv" style="background:var(--surface)">0.5 ms</span>
+            <span class="panel-label">Frequency</span>
+            <span class="slider-val" id="s-lbl-freq">1000 Hz</span>
           </div>
-          <input type="range" id="sid-tdiv" min="0.1" max="5" step="0.1" value="0.5" oninput="updateCRO()" style="accent-color:var(--amber)">
+          <input type="range" id="s-sid-freq" min="1" max="50000" step="1" value="1000" oninput="updateSimple()">
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.6rem;color:var(--muted);margin-top:.3rem"><span>1 Hz</span><span>50 kHz</span></div>
+        </div>
+
+        <div class="slider-wrap">
+          <div class="slider-head">
+            <span class="panel-label">Amplitude (Peak)</span>
+            <span class="slider-val" id="s-lbl-amp">5.0 V</span>
+          </div>
+          <input type="range" id="s-sid-amp" min="0.1" max="20" step="0.1" value="5" oninput="updateSimple()">
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.6rem;color:var(--muted);margin-top:.3rem"><span>0.1 V</span><span>20 V</span></div>
+        </div>
+        
+        <div class="slider-wrap">
+          <div class="slider-head">
+            <span class="panel-label">DC Offset</span>
+            <span class="slider-val" id="s-lbl-offset">0.0 V</span>
+          </div>
+          <input type="range" id="s-sid-offset" min="-10" max="10" step="0.1" value="0" oninput="updateSimple()">
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.6rem;color:var(--muted);margin-top:.3rem"><span>-10 V</span><span>+10 V</span></div>
+        </div>
+
+        <div class="slider-wrap">
+          <div class="slider-head">
+            <span class="panel-label">Phase (°)</span>
+            <span class="slider-val" id="s-lbl-phase" style="color:var(--purple)">0°</span>
+          </div>
+          <input type="range" id="s-sid-phase" min="0" max="360" step="1" value="0" oninput="updateSimple()" style="accent-color:var(--purple)">
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.6rem;color:var(--muted);margin-top:.3rem"><span>0°</span><span>360°</span></div>
+        </div>
+
+        <!-- Signal info card -->
+        <div class="sig-info-card">
+          <div class="sig-row"><span>Period (T)</span><span id="s-info-period">1.000 ms</span></div>
+          <div class="sig-row"><span>Vpp</span><span id="s-info-vpp">10.00 V</span></div>
+          <div class="sig-row"><span>Vrms</span><span id="s-info-vrms">3.536 V</span></div>
+          <div class="sig-row"><span>ω (rad/s)</span><span id="s-info-omega">6283.2</span></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: CRO -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-icon">📺</span>
+          <h2 class="panel-title">Cathode Ray Oscilloscope (CRO)</h2>
+          <div class="cro-status-pills">
+            <span class="status-pill" id="s-trig-status">TRIG: AUTO</span>
+            <span class="status-pill green" id="s-ch1-pill">CH1: ON</span>
+          </div>
+        </div>
+
+        <!-- CRO Screen -->
+        <div class="cro-screen-wrap">
+          <div class="status-panel">
+            <div id="s-cro-ch1">CH1: 2.0V/DIV</div>
+            <div id="s-cro-time">TIME: 0.5ms/DIV</div>
+            <div id="s-cro-freq-meas">~1.000kHz</div>
+          </div>
+          <canvas id="s-croCanvas" class="cro-canvas"></canvas>
+          <!-- Cursor overlay measurements -->
+          <div class="cro-cursors" id="s-cursors" style="display:none">
+            <div class="cursor-readout" id="s-cursor-readout">ΔV = 0.00V | ΔT = 0.00ms</div>
+          </div>
+        </div>
+
+        <!-- CRO Controls -->
+        <div class="cro-controls">
+          <!-- Left column -->
+          <div style="display:flex;flex-direction:column;gap:.75rem">
+            <div class="knob-row">
+              <div class="slider-head">
+                <span class="panel-label">VOLTS/DIV</span>
+                <span class="slider-val" id="s-lbl-vdiv" style="color:var(--amber)">2 V</span>
+              </div>
+              <input type="range" id="s-sid-vdiv" min="0" max="9" step="1" value="4" oninput="updateSimple()" style="accent-color:var(--amber)">
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.58rem;color:var(--muted);margin-top:.25rem"><span>5mV</span><span>50V</span></div>
+            </div>
+            <div class="knob-row">
+              <div class="slider-head">
+                <span class="panel-label">TIME/DIV</span>
+                <span class="slider-val" id="s-lbl-tdiv" style="color:var(--cyan)">0.5ms</span>
+              </div>
+              <input type="range" id="s-sid-tdiv" min="0" max="17" step="1" value="9" oninput="updateSimple()" style="accent-color:var(--cyan)">
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.58rem;color:var(--muted);margin-top:.25rem"><span>1µs</span><span>1s</span></div>
+            </div>
+          </div>
+          <!-- Right column -->
+          <div style="display:flex;flex-direction:column;gap:.75rem">
+            <div class="knob-row">
+              <div class="slider-head">
+                <span class="panel-label">Y POSITION</span>
+                <span class="slider-val" id="s-lbl-ypos" style="color:var(--green)">0 div</span>
+              </div>
+              <input type="range" id="s-sid-ypos" min="-4" max="4" step="0.1" value="0" oninput="updateSimple()" style="accent-color:var(--green)">
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.58rem;color:var(--muted);margin-top:.25rem"><span>-4 div</span><span>+4 div</span></div>
+            </div>
+            <div class="knob-row">
+              <div class="slider-head">
+                <span class="panel-label">X POSITION</span>
+                <span class="slider-val" id="s-lbl-xpos" style="color:var(--rose)">0 div</span>
+              </div>
+              <input type="range" id="s-sid-xpos" min="-5" max="5" step="0.1" value="0" oninput="updateSimple()" style="accent-color:var(--rose)">
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.58rem;color:var(--muted);margin-top:.25rem"><span>-5 div</span><span>+5 div</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trigger & coupling row -->
+        <div class="trigger-row">
+          <div class="trig-group">
+            <span class="panel-label">TRIGGER</span>
+            <div class="btn-row">
+              <button class="trig-btn active" id="s-trig-auto" onclick="setTrigger('auto','s')">Auto</button>
+              <button class="trig-btn" id="s-trig-normal" onclick="setTrigger('normal','s')">Normal</button>
+              <button class="trig-btn" id="s-trig-single" onclick="setTrigger('single','s')">Single</button>
+            </div>
+          </div>
+          <div class="trig-group">
+            <span class="panel-label">COUPLING</span>
+            <div class="btn-row">
+              <button class="coup-btn active" id="s-coup-ac" onclick="setCoupling('ac','s')">AC</button>
+              <button class="coup-btn" id="s-coup-dc" onclick="setCoupling('dc','s')">DC</button>
+              <button class="coup-btn" id="s-coup-gnd" onclick="setCoupling('gnd','s')">GND</button>
+            </div>
+          </div>
+          <div class="trig-group">
+            <span class="panel-label">INVERT</span>
+            <div class="btn-row">
+              <button class="coup-btn" id="s-inv-btn" onclick="toggleInvert('s')">OFF</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Measurements readout -->
+        <div class="meas-row">
+          <div class="meas-card"><div class="meas-k">FREQ</div><div class="meas-v" id="s-meas-freq" style="color:var(--cyan)">1.000 kHz</div></div>
+          <div class="meas-card"><div class="meas-k">PERIOD</div><div class="meas-v" id="s-meas-period">1.000 ms</div></div>
+          <div class="meas-card"><div class="meas-k">Vpp</div><div class="meas-v" id="s-meas-vpp" style="color:var(--amber)">10.00 V</div></div>
+          <div class="meas-card"><div class="meas-k">Vrms</div><div class="meas-v" id="s-meas-vrms" style="color:var(--green)">3.536 V</div></div>
         </div>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- ═══════════════ WIRING MODE ═══════════════ -->
+  <div id="modeWired" style="display:none">
+    <div class="wiring-info-bar">
+      <span class="wire-hint" id="wireHint">🔌 Click a FG output → click a CRO input to connect. Click any connected terminal (or right-click) to unplug.</span>
+      <button class="btn-clear-wires" onclick="clearAllWires()">✕ Clear All Wires</button>
+    </div>
+
+    <div class="wired-grid">
+      <!-- LEFT: Dual Function Generator -->
+      <div class="panel wired-fg">
+        <div class="panel-header">
+          <span class="panel-icon">🎛️</span>
+          <h2 class="panel-title">Dual Function Generator</h2>
+        </div>
+
+        <!-- CH1 Generator -->
+        <div class="fg-channel" id="fg-ch1-panel">
+          <div class="fg-ch-header">
+            <span class="ch-badge ch1">CH 1</span>
+            <span style="font-size:.75rem;color:var(--muted);font-weight:600">Signal A</span>
+          </div>
+          <div class="wave-btns small">
+            <button class="wave-btn active" onclick="setWave('sine','w1')" id="w1-btn-sine"><svg viewBox="0 0 24 12"><path d="M0 6 C2 0, 6 0, 8 6 S14 12, 16 6 S22 0, 24 6" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+            <button class="wave-btn" onclick="setWave('square','w1')" id="w1-btn-square"><svg viewBox="0 0 24 12"><polyline points="0,10 6,10 6,2 18,2 18,10 24,10" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+            <button class="wave-btn" onclick="setWave('triangle','w1')" id="w1-btn-triangle"><svg viewBox="0 0 24 12"><polyline points="0,10 6,2 18,10 24,2" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+            <button class="wave-btn" onclick="setWave('sawtooth','w1')" id="w1-btn-sawtooth"><svg viewBox="0 0 24 12"><polyline points="0,10 12,2 12,10 24,2" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-head"><span class="panel-label">Freq</span><span class="slider-val" id="w1-lbl-freq" style="color:var(--cyan)">1 kHz</span></div>
+            <input type="range" id="w1-freq" min="1" max="50000" step="1" value="1000" oninput="updateWired()">
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-head"><span class="panel-label">Amp (pk)</span><span class="slider-val" id="w1-lbl-amp" style="color:var(--cyan)">5.0 V</span></div>
+            <input type="range" id="w1-amp" min="0.1" max="20" step="0.1" value="5" oninput="updateWired()">
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-head"><span class="panel-label">DC Offset</span><span class="slider-val" id="w1-lbl-off" style="color:var(--cyan)">0.0 V</span></div>
+            <input type="range" id="w1-off" min="-10" max="10" step="0.1" value="0" oninput="updateWired()">
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-head"><span class="panel-label">Phase (°)</span><span class="slider-val" id="w1-lbl-phase" style="color:var(--cyan)">0°</span></div>
+            <input type="range" id="w1-phase" min="0" max="360" step="1" value="0" oninput="updateWired()">
+          </div>
+          <!-- Output terminal -->
+          <div class="fg-output-row">
+            <span class="panel-label">OUTPUT</span>
+            <button class="terminal-btn ch1-term" id="fg-out-1" onclick="selectFgOutput(1)" title="Click to select CH1 output, then click a CRO input">
+              <span class="term-dot"></span> OUT 1
+            </button>
+          </div>
+        </div>
+
+        <div class="fg-divider"></div>
+
+        <!-- CH2 Generator -->
+        <div class="fg-channel" id="fg-ch2-panel">
+          <div class="fg-ch-header">
+            <span class="ch-badge ch2">CH 2</span>
+            <span style="font-size:.75rem;color:var(--muted);font-weight:600">Signal B</span>
+          </div>
+          <div class="wave-btns small">
+            <button class="wave-btn active" onclick="setWave('sine','w2')" id="w2-btn-sine"><svg viewBox="0 0 24 12"><path d="M0 6 C2 0, 6 0, 8 6 S14 12, 16 6 S22 0, 24 6" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+            <button class="wave-btn" onclick="setWave('square','w2')" id="w2-btn-square"><svg viewBox="0 0 24 12"><polyline points="0,10 6,10 6,2 18,2 18,10 24,10" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+            <button class="wave-btn" onclick="setWave('triangle','w2')" id="w2-btn-triangle"><svg viewBox="0 0 24 12"><polyline points="0,10 6,2 18,10 24,2" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+            <button class="wave-btn" onclick="setWave('sawtooth','w2')" id="w2-btn-sawtooth"><svg viewBox="0 0 24 12"><polyline points="0,10 12,2 12,10 24,2" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-head"><span class="panel-label">Freq</span><span class="slider-val" id="w2-lbl-freq" style="color:var(--amber)">2 kHz</span></div>
+            <input type="range" id="w2-freq" min="1" max="50000" step="1" value="2000" oninput="updateWired()">
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-head"><span class="panel-label">Amp (pk)</span><span class="slider-val" id="w2-lbl-amp" style="color:var(--amber)">3.0 V</span></div>
+            <input type="range" id="w2-amp" min="0.1" max="20" step="0.1" value="3" oninput="updateWired()">
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-head"><span class="panel-label">DC Offset</span><span class="slider-val" id="w2-lbl-off" style="color:var(--amber)">0.0 V</span></div>
+            <input type="range" id="w2-off" min="-10" max="10" step="0.1" value="0" oninput="updateWired()">
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-head"><span class="panel-label">Phase (°)</span><span class="slider-val" id="w2-lbl-phase" style="color:var(--amber)">0°</span></div>
+            <input type="range" id="w2-phase" min="0" max="360" step="1" value="0" oninput="updateWired()">
+          </div>
+          <div class="fg-output-row">
+            <span class="panel-label">OUTPUT</span>
+            <button class="terminal-btn ch2-term" id="fg-out-2" onclick="selectFgOutput(2)" title="Click to select CH2 output, then click a CRO input">
+              <span class="term-dot"></span> OUT 2
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MIDDLE: Wire SVG canvas -->
+      <div class="wire-canvas-col">
+        <svg id="wireSvg" class="wire-svg" preserveAspectRatio="none">
+          <!-- Wires drawn here dynamically -->
+        </svg>
+        <div class="wire-label-center">
+          <span id="wireStatusLabel">No connections</span>
+        </div>
+      </div>
+
+      <!-- RIGHT: Dual CRO -->
+      <div class="panel wired-cro">
+        <div class="panel-header">
+          <span class="panel-icon">📺</span>
+          <h2 class="panel-title">Dual-Channel CRO</h2>
+          <div class="cro-status-pills">
+            <span class="status-pill" id="w-trig-status">TRIG: AUTO</span>
+          </div>
+        </div>
+
+        <div class="cro-screen-wrap">
+          <div class="status-panel">
+            <div id="w-cro-ch1" style="color:var(--cyan)">CH1: 2V/DIV</div>
+            <div id="w-cro-ch2" style="color:var(--amber)">CH2: 2V/DIV</div>
+            <div id="w-cro-time">TIME: 0.5ms/DIV</div>
+          </div>
+          <canvas id="w-croCanvas" class="cro-canvas"></canvas>
+        </div>
+
+        <!-- CRO Controls -->
+        <div class="cro-controls" style="grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin-top:.75rem">
+          <div class="knob-row">
+            <div class="slider-head"><span class="panel-label">TIME/DIV</span><span class="slider-val" id="w-lbl-tdiv" style="color:var(--cyan)">0.5ms</span></div>
+            <input type="range" id="w-sid-tdiv" min="0" max="17" step="1" value="9" oninput="updateWired()" style="accent-color:var(--cyan)">
+          </div>
+          <div class="knob-row">
+            <div class="slider-head"><span class="panel-label">CH1 V/DIV</span><span class="slider-val" id="w-lbl-vdiv1" style="color:var(--cyan)">2V</span></div>
+            <input type="range" id="w-sid-vdiv1" min="0" max="9" step="1" value="4" oninput="updateWired()" style="accent-color:var(--cyan)">
+          </div>
+          <div class="knob-row">
+            <div class="slider-head"><span class="panel-label">CH2 V/DIV</span><span class="slider-val" id="w-lbl-vdiv2" style="color:var(--amber)">2V</span></div>
+            <input type="range" id="w-sid-vdiv2" min="0" max="9" step="1" value="4" oninput="updateWired()" style="accent-color:var(--amber)">
+          </div>
+          <div class="knob-row">
+            <div class="slider-head"><span class="panel-label">CH1 Y POS</span><span class="slider-val" id="w-lbl-ypos1" style="color:var(--cyan)">0</span></div>
+            <input type="range" id="w-sid-ypos1" min="-4" max="4" step="0.1" value="1.5" oninput="updateWired()" style="accent-color:var(--cyan)">
+          </div>
+          <div class="knob-row">
+            <div class="slider-head"><span class="panel-label">CH2 Y POS</span><span class="slider-val" id="w-lbl-ypos2" style="color:var(--amber)">0</span></div>
+            <input type="range" id="w-sid-ypos2" min="-4" max="4" step="0.1" value="-1.5" oninput="updateWired()" style="accent-color:var(--amber)">
+          </div>
+          <div class="knob-row">
+            <div class="slider-head"><span class="panel-label">X POSITION</span><span class="slider-val" id="w-lbl-xpos" style="color:var(--rose)">0</span></div>
+            <input type="range" id="w-sid-xpos" min="-5" max="5" step="0.1" value="0" oninput="updateWired()" style="accent-color:var(--rose)">
+          </div>
+        </div>
+
+        <!-- CRO Input Terminals (for wiring) -->
+        <div class="cro-terminals">
+          <div class="cro-input-term">
+            <button class="terminal-btn cro-ch1-in" id="cro-in-1" onclick="selectCroInput(1)">
+              <span class="term-dot cyan-dot"></span> CH1 IN
+            </button>
+            <div class="term-status" id="cro-in-1-status">Not connected</div>
+          </div>
+          <div class="cro-input-term">
+            <button class="terminal-btn cro-ch2-in" id="cro-in-2" onclick="selectCroInput(2)">
+              <span class="term-dot amber-dot"></span> CH2 IN
+            </button>
+            <div class="term-status" id="cro-in-2-status">Not connected</div>
+          </div>
+        </div>
+
+        <!-- CH visibility toggles -->
+        <div class="ch-toggle-row">
+          <label class="ch-toggle"><input type="checkbox" id="w-ch1-en" checked onchange="updateWired()"><span class="ch-toggle-label ch1">CH1 Show</span></label>
+          <label class="ch-toggle"><input type="checkbox" id="w-ch2-en" checked onchange="updateWired()"><span class="ch-toggle-label ch2">CH2 Show</span></label>
+          <label class="ch-toggle"><input type="checkbox" id="w-ch-add" onchange="updateWired()"><span class="ch-toggle-label" style="color:var(--green)">ADD (CH1+CH2)</span></label>
+        </div>
+
+        <!-- Trigger row -->
+        <div class="trigger-row" style="margin-top:.5rem">
+          <div class="trig-group">
+            <span class="panel-label">TRIGGER</span>
+            <div class="btn-row">
+              <button class="trig-btn active" id="w-trig-auto" onclick="setTrigger('auto','w')">Auto</button>
+              <button class="trig-btn" id="w-trig-normal" onclick="setTrigger('normal','w')">Normal</button>
+            </div>
+          </div>
+          <div class="trig-group">
+            <span class="panel-label">TRIG SRC</span>
+            <div class="btn-row">
+              <button class="trig-btn active" id="w-trig-src1" onclick="setTrigSrc(1)">CH1</button>
+              <button class="trig-btn" id="w-trig-src2" onclick="setTrigSrc(2)">CH2</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Measurements -->
+        <div class="meas-row" style="grid-template-columns:repeat(4,1fr)">
+          <div class="meas-card"><div class="meas-k" style="color:var(--cyan)">CH1 Freq</div><div class="meas-v" id="w-meas-f1" style="color:var(--cyan)">—</div></div>
+          <div class="meas-card"><div class="meas-k" style="color:var(--cyan)">CH1 Vpp</div><div class="meas-v" id="w-meas-vpp1" style="color:var(--cyan)">—</div></div>
+          <div class="meas-card"><div class="meas-k" style="color:var(--amber)">CH2 Freq</div><div class="meas-v" id="w-meas-f2" style="color:var(--amber)">—</div></div>
+          <div class="meas-card"><div class="meas-k" style="color:var(--amber)">CH2 Vpp</div><div class="meas-v" id="w-meas-vpp2" style="color:var(--amber)">—</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
 
 <script defer src="js/nav-shared.js"></script>
 <script defer src="js/exp2_equipments.js"></script>
