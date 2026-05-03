@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exp 8: Multiplexer & Demultiplexer | LogicFlow</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/exp8_mux_demux.css">
+</head>
+<body>
+  <!-- Global Background -->
+  <div class="bg-mesh">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+  </div>
+
+  <!-- Main Navigation -->
+  <nav>
+    <a href="index.html" class="nav-logo">LogicFlow</a>
+    <ul class="nav-links">
+      <li><a href="curriculum.html">Curriculum</a></li>
+      <li id="navTasksItem" hidden><a href="student-tasks.html">My tasks</a></li>
+      <li><a href="sandbox.html">Logic Gates</a></li>
+      <li><a href="coa.html">Computer Architecture</a></li>
+      <li class="dropdown">
+        <a href="#" id="experimentDropdownBtn">Experiments</a>
+        <div class="dropdown-content" id="experimentDropdown">
+          <div class="dropdown-menu">
+            <a href="exp1_components.html">1. Component Familiarization</a>
+            <a href="exp2_equipments.html">2. Measurement Equipment</a>
+            <a href="exp3_diode.html">3. PN Junction Diode</a>
+            <a href="exp4_zener.html">4. Zener Diode</a>
+            <a href="exp5_rectifier.html">5. Rectifiers</a>
+            <a href="exp6_flipflops.html">6. Flip-Flops</a>
+            <a href="exp7_bcd_decoder.html">7. BCD Decoder</a>
+            <a href="exp8_mux_demux.html" class="active">8. Data Routing & Distribution</a>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <div class="nav-actions">
+      <a href="exp8_mux_demux.html" class="btn-enter">Enter Lab ↗</a>
+      <button type="button" class="nav-sign-out" id="btnSignOut" hidden>Sign out</button>
+    </div>
+  </nav>
+
+  <main class="page">
+    <header class="page-header">
+       <div class="breadcrumb">
+           <span class="badge">Experiment 08</span>
+           <span>›</span>
+           <span>Data Routing & Distribution</span>
+       </div>
+       <h1>4:1 Multiplexer & 1:4 Demultiplexer</h1>
+       <p>Implement and study 4:1 multiplexer and 1:4 demultiplexer using basic logic gates.</p>
+    </header>
+
+    <div class="zones-container">
+       <!-- ZONE 1: Navigation & Controls -->
+       <aside class="zone zone-1 glass-card">
+          <div class="card-label">LAB LIFECYCLE</div>
+          <ul class="lab-nav" id="tabNav">
+             <li><a data-target="tab-aim">Aim</a></li>
+             <li><a data-target="tab-theory">Theory</a></li>
+             <li><a data-target="tab-pretest">Pretest</a></li>
+             <li><a data-target="tab-procedure">Procedure</a></li>
+             <li><a data-target="tab-simulation" class="active">Simulation</a></li>
+             <li><a data-target="tab-posttest">Posttest</a></li>
+             <li><a data-target="tab-feedback">Feedback</a></li>
+          </ul>
+          
+          <div class="controls-divider"></div>
+          
+          <div class="card-label">CONTROLS</div>
+          <div class="mode-toggle-wrap">
+             <span class="mode-label" id="lblMux">4:1 MUX</span>
+             <label class="switch">
+               <input type="checkbox" id="modeSwitch">
+               <span class="slider round"></span>
+             </label>
+             <span class="mode-label" id="lblDemux">1:4 DEMUX</span>
+          </div>
+
+          <div class="btn-group-vertical">
+             <button id="resetBtn" class="btn btn-outline">Reset Simulation</button>
+             <button id="exportBtn" class="btn btn-primary">Export Lab Report</button>
+          </div>
+       </aside>
+
+       <!-- ZONE 2: Tab Panels Container -->
+       <section class="zone zone-2">
+
+          <!-- Aim Tab -->
+          <div id="tab-aim" class="core-tab-panel glass-card read-content">
+             <div class="card-label">AIM</div>
+             <h2>Objective</h2>
+             <p>To essentially implement and study the behavior of a 4:1 Multiplexer and a 1:4 Demultiplexer using basic logic gates (AND, OR, NOT) within an interactive virtual environment.</p>
+             <p>A multiplexer helps route multiple signals into a single output, while a demultiplexer routes a single signal into multiple outputs.</p>
+          </div>
+
+          <!-- Theory Tab -->
+          <div id="tab-theory" class="core-tab-panel glass-card read-content">
+             <div class="card-label">THEORY</div>
+             <h2>Working Principles</h2>
+             <h3>4:1 Multiplexer</h3>
+             <p>A multiplexer (MUX) is a combinational logic circuit that selects one of several analog or digital input signals and forwards the selected input into a single line. A 4:1 MUX has 4 data inputs (D0, D1, D2, D3), 2 select lines (S1, S0), and 1 output (Y). The select lines determine which input passes to the output. Internally, AND gates lock/unlock specific pathways.</p>
+             <h3>1:4 Demultiplexer</h3>
+             <p>A demultiplexer (DEMUX) operates in reverse, taking a single input data line (D) and routing it to any one of several output lines. A 1:4 demultiplexer has 1 data input, 2 select lines, and 4 possible outputs (Y0-Y3). The select lines dictate which output receives the data.</p>
+          </div>
+
+          <!-- Pretest Tab -->
+          <div id="tab-pretest" class="core-tab-panel glass-card read-content">
+             <div class="card-label">PRETEST</div>
+             <h2>Assess Your Knowledge</h2>
+             <ol>
+                <li><strong>How many select lines are required for an 8:1 multiplexer?</strong><br>
+                <input type="radio" name="pt1"> 2 <br><input type="radio" name="pt1"> 3 <br><input type="radio" name="pt1"> 4</li>
+                <li><strong>A Demultiplexer performs the role of...</strong><br>
+                <input type="radio" name="pt2"> Data Selector <br><input type="radio" name="pt2"> Data Distributor <br><input type="radio" name="pt2"> Multiplier</li>
+             </ol>
+             <!-- Form fields are purely visual structural elements as requested -->
+          </div>
+
+          <!-- Procedure Tab -->
+          <div id="tab-procedure" class="core-tab-panel glass-card read-content">
+             <div class="card-label">PROCEDURE</div>
+             <h2>How to Perform the Experiment</h2>
+             <ul>
+                <li>Navigate to the <strong>Simulation</strong> tab.</li>
+                <li>Toggle the center switch to select between the MUX or DEMUX circuit.</li>
+                <li>In the interactive panel below the simulation, toggle the Select Lines (S0, S1) and Data Inputs (D0-D3 or D).</li>
+                <li>Observe the path that turns green. Green indicates an active (high/1) pathway, while Red represents inactive (low/0).</li>
+                <li>Hover over the logic gates to read their functional roles.</li>
+                <li>Click <strong>ADD READING</strong> to record your inputs and output into the observation table.</li>
+                <li>Once you have all combinations, click <strong>Export Lab Report</strong>.</li>
+             </ul>
+          </div>
+
+          <!-- Simulation Tab (Main) -->
+          <div id="tab-simulation" class="core-tab-panel active glass-card" style="display:flex; flex-direction:column;">
+             <div class="card-label sim-heading">
+                 <span id="simModeTitle">Circuit: 4:1 MULTIPLEXER</span>
+                 <div class="sim-status s-ok">SIMULATION ACTIVE</div>
+             </div>
+             
+             <div class="simulator-canvas" id="simCanvas">
+                <!-- SVG Circuit drawn by JS -->
+             </div>
+
+             <!-- Bottom interactive switches -->
+             <div class="io-panel">
+                <div class="io-group" id="dataInputGroup">
+                   <!-- Select switches injected by JS -->
+                </div>
+                <div class="io-group" id="selectGroup">
+                   <!-- Select switches injected by JS -->
+                </div>
+                <div class="io-group io-group-out" id="outputGroup">
+                   <!-- outputs display -->
+                </div>
+             </div>
+          </div>
+
+          <!-- Posttest Tab -->
+          <div id="tab-posttest" class="core-tab-panel glass-card read-content">
+             <div class="card-label">POSTTEST</div>
+             <h2>Final Assessment</h2>
+             <ol>
+                <li><strong>If Select lines are S1=1, S0=0 in a 4:1 Mux, which input is routed to the output?</strong><br>
+                <input type="radio" name="po1"> D1 <br><input type="radio" name="po1"> D2 <br><input type="radio" name="po1"> D3</li>
+                <li><strong>Which logic gate is explicitly used to sum the outputs of the multiple conditional branches in a Multiplexer?</strong><br>
+                <input type="radio" name="po2"> AND Gate <br><input type="radio" name="po2"> OR Gate <br><input type="radio" name="po2"> XOR Gate</li>
+             </ol>
+          </div>
+
+          <!-- Feedback Tab -->
+          <div id="tab-feedback" class="core-tab-panel glass-card read-content">
+             <div class="card-label">FEEDBACK</div>
+             <h2>Leave Feedback</h2>
+             
+             <div style="margin-bottom: 1.5rem;">
+                <p style="margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Rate your experience</p>
+                <div style="display: flex; gap: 0.5rem; cursor: pointer; font-size: 1.5rem;">
+                   <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+                </div>
+             </div>
+
+             <p>Did you encounter any bugs in the simulation logic? Please describe your issue.</p>
+             <textarea style="width:100%; height:80px; border-radius:8px; border:1px solid #ccc; padding:8px; font-family:var(--font-body);"></textarea>
+             <button class="btn btn-primary" style="margin-top:10px;">Submit Feedback</button>
+          </div>
+
+       </section>
+
+       <!-- ZONE 3: Theory & Truth Table -->
+       <aside class="zone zone-3">
+          <div class="glass-card mb-4 theory-box">
+             <div class="card-label">PROGRESSIVE THEORY</div>
+             <p id="theoryContent" class="theory-text">Adjust the Select Lines (S1, S0) to see dynamic, easy-to-understand explanations of the circuit routing here!</p>
+          </div>
+
+          <div class="glass-card table-box">
+             <div class="card-label">OBSERVATION TABLE</div>
+             <div class="table-scroll">
+                 <table class="truth-table" id="truthTable">
+                    <thead>
+                       <tr id="ttHeader">
+                          <!-- Injected by JS -->
+                       </tr>
+                    </thead>
+                    <tbody id="ttBody">
+                    </tbody>
+                 </table>
+             </div>
+             <button id="addReadingBtn" class="btn btn-green full-w">ADD READING</button>
+             <button id="exportCsvBtn" class="btn btn-primary full-w" style="margin-top: 0.5rem;">Download CSV</button>
+          </div>
+       </aside>
+    </div>
+  </main>
+
+  <!-- PRINTABLE REPORT -->
+  <div id="printReport">
+      <div class="print-header">
+          <h1 class="print-title">LogicFlow — Lab Report</h1>
+          <div class="print-meta">
+              <p><strong>Experiment:</strong> <span id="prMode">4:1 Multiplexer</span> using Logic Gates</p>
+              <p><strong>Date:</strong> <span id="prDate"></span></p>
+          </div>
+      </div>
+      <h2 class="print-section-title">Observation Table</h2>
+      <table class="print-table" id="prTable"></table>
+      <h2 class="print-section-title">Conclusion</h2>
+      <p id="prConclusion" class="print-conclusion">The routing logic was successfully verified. The observed outputs correctly followed the expected routing combinations.</p>
+      <div class="print-signatures">
+          <div class="sig-box">
+              <span class="sig-line"></span>
+              <p>Student Signature</p>
+          </div>
+          <div class="sig-box">
+              <span class="sig-line"></span>
+              <p>Faculty Signature</p>
+          </div>
+      </div>
+  </div>
+
+  <script defer src="js/nav-shared.js"></script>
+  <script src="js/exp8_mux_demux.js"></script>
+</body>
+</html>
