@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>ALU Simulation — LogicFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/exp10_alu.css">
+</head>
+<body>
+
+  <!-- Background Mesh -->
+  <div class="bg-mesh">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+  </div>
+
+  <!-- Navbar (Shared) -->
+  <nav class="no-print">
+    <a href="index.html" class="nav-logo">LogicFlow</a>
+    <ul class="nav-links">
+      <li><a href="curriculum.html">Curriculum</a></li>
+      <li id="navTasksItem" hidden><a href="student-tasks.html">My tasks</a></li>
+      <li><a href="sandbox.html">Logic Gates</a></li>
+      <li><a href="coa.html">Computer Architecture</a></li>
+      <li class="dropdown">
+        <a href="#" id="experimentDropdownBtn" class="active">Experiments</a>
+        <div class="dropdown-content" id="experimentDropdown">
+          <div class="dropdown-menu">
+            <a href="exp1_components.html">1. Component Familiarization</a>
+            <a href="exp2_equipments.html">2. Measurement Equipment</a>
+            <a href="exp3_diode.html">3. PN Junction Diode</a>
+            <a href="exp4_zener.html">4. Zener Diode</a>
+            <a href="exp5_rectifier.html">5. Rectifiers</a>
+            <a href="exp6_flipflops.html">6. Flip-Flops</a>
+            <a href="exp7_bcd_decoder.html">7. BCD Decoder</a>
+            <a href="exp9_motherboard.html">9. Computer Architecture</a>
+            <a href="exp10_alu.html" class="active">10. ALU Simulation</a>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <div class="nav-actions">
+      <button type="button" class="nav-sign-out" id="btnSignOut" hidden>Sign out</button>
+    </div>
+  </nav>
+
+  <!-- Page Content -->
+  <main class="page-container">
+    <div class="page-header no-print">
+      <div class="breadcrumb">
+        <span class="badge">Experiment 10</span>
+        <span>›</span><span>Combinational Logic</span>
+      </div>
+      <h1>Arithmetic Logic Unit (ALU)</h1>
+      <p>Design and Simulation of an Arithmetic Logic Unit. Configure inputs and select modes to observe data routing through arithmetic and logic sub-units via the multiplexer.</p>
+    </div>
+
+    <!-- 3-ZONE LAYOUT -->
+    <div class="workspace-grid">
+      
+      <!-- ZONE 1: Left Navigation & Controls -->
+      <aside class="zone-left no-print">
+        <div class="panel nav-panel">
+          <h3>Lab Steps</h3>
+          <ul class="lab-nav">
+            <li><a href="#" class="active">Aim</a></li>
+            <li><a href="#">Theory</a></li>
+            <li><a href="#">Pretest</a></li>
+            <li><a href="#">Procedure</a></li>
+            <li><a href="#">Simulation</a></li>
+            <li><a href="#">Posttest</a></li>
+            <li><a href="#">References</a></li>
+            <li><a href="#">Feedback</a></li>
+          </ul>
+        </div>
+        <div class="panel controls-panel">
+          <h3>Controls</h3>
+          <div class="btn-group">
+            <button class="btn btn-reset" id="btnResetAlu">↺ Reset ALU</button>
+            <button class="btn btn-export" id="btnExportReport">↓ Export Lab Report</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ZONE 2: Center Stage (The Macro Glass Box ALU) -->
+      <section class="zone-center no-print">
+        <div class="panel alu-stage">
+          <div class="panel-header">ALU Macro Architecture</div>
+          
+          <div class="alu-interactive-area">
+            
+            <!-- SVG Routing and Blocks -->
+            <svg class="alu-routing" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="currentColor" />
+                </marker>
+                <marker id="arrow-active" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="var(--cyan)" />
+                </marker>
+              </defs>
+
+              <!-- Static Traces (4 individual wires for Inputs to Blocks) -->
+              <g class="bus-a" id="busA_arith">
+                <path class="trace bit-trace" id="t-a-3-arith" d="M 120,85 L 250,85" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-a-2-arith" d="M 120,95 L 250,95" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-a-1-arith" d="M 120,105 L 250,105" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-a-0-arith" d="M 120,115 L 250,115" marker-end="url(#arrow)" />
+              </g>
+              <g class="bus-b" id="busB_arith">
+                <path class="trace bit-trace" id="t-b-3-arith" d="M 120,125 L 250,125" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-b-2-arith" d="M 120,135 L 250,135" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-b-1-arith" d="M 120,145 L 250,145" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-b-0-arith" d="M 120,155 L 250,155" marker-end="url(#arrow)" />
+              </g>
+
+              <g class="bus-a" id="busA_logic">
+                <path class="trace bit-trace" id="t-a-3-logic" d="M 120,245 L 250,245" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-a-2-logic" d="M 120,255 L 250,255" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-a-1-logic" d="M 120,265 L 250,265" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-a-0-logic" d="M 120,275 L 250,275" marker-end="url(#arrow)" />
+              </g>
+              <g class="bus-b" id="busB_logic">
+                <path class="trace bit-trace" id="t-b-3-logic" d="M 120,285 L 250,285" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-b-2-logic" d="M 120,295 L 250,295" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-b-1-logic" d="M 120,305 L 250,305" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-b-0-logic" d="M 120,315 L 250,315" marker-end="url(#arrow)" />
+              </g>
+              
+              <!-- Select Line Traces (4 individual wires) -->
+              <g class="bus-s" id="busS_arith">
+                <path class="trace bit-trace" id="t-s-3-arith" d="M 120,185 L 185,185 L 185,65 L 300,65" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-s-2-arith" d="M 120,195 L 195,195 L 195,75 L 300,75" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-s-1-arith" d="M 120,205 L 205,205 L 205,85 L 300,85" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-s-0-arith" d="M 120,215 L 215,215 L 215,95 L 300,95" marker-end="url(#arrow)" />
+              </g>
+              <g class="bus-s" id="busS_logic">
+                <path class="trace bit-trace" id="t-s-3-logic" d="M 185,185 L 185,325 L 300,325" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-s-2-logic" d="M 195,195 L 195,335 L 300,335" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-s-1-logic" d="M 205,205 L 205,345 L 300,345" marker-end="url(#arrow)" />
+                <path class="trace bit-trace" id="t-s-0-logic" d="M 215,215 L 215,355 L 300,355" marker-end="url(#arrow)" />
+              </g>
+
+              <!-- Dynamic Traces (Blocks to MUX) -->
+              <path class="trace dynamic-trace trace-arith" id="traceArith" d="M 350,120 L 420,120 L 420,180" marker-end="url(#arrow)" />
+              <path class="trace dynamic-trace trace-logic" id="traceLogic" d="M 350,280 L 420,280 L 420,220" marker-end="url(#arrow)" />
+              
+              <!-- Mode Line to MUX -->
+              <path class="trace trace-mode" id="traceMode" d="M 450,80 L 450,160" marker-end="url(#arrow)" />
+              
+              <!-- Output Trace -->
+              <path class="trace trace-out" id="traceOut" d="M 450,240 L 450,320 L 520,320" marker-end="url(#arrow)" />
+
+              <!-- Blocks -->
+              <rect class="svg-block" x="250" y="80" width="100" height="80" rx="8" />
+              <text class="svg-text" x="300" y="125">Arithmetic Unit</text>
+
+              <rect class="svg-block" x="250" y="240" width="100" height="80" rx="8" />
+              <text class="svg-text" x="300" y="285">Logic Unit</text>
+
+              <!-- MUX Block -->
+              <polygon class="svg-block" points="400,160 500,160 480,240 420,240" />
+              <text class="svg-text" x="450" y="205">2:1 MUX</text>
+            </svg>
+
+            <!-- HTML Overlays for Inputs/Outputs -->
+            <div class="io-overlay overlay-a">
+              <span class="io-label">Input A [3:0]</span>
+              <div class="toggle-array" id="inputA">
+                <button class="toggle-btn" data-bit="3" data-val="0">0</button>
+                <button class="toggle-btn" data-bit="2" data-val="0">0</button>
+                <button class="toggle-btn" data-bit="1" data-val="0">0</button>
+                <button class="toggle-btn" data-bit="0" data-val="0">0</button>
+              </div>
+            </div>
+
+            <div class="io-overlay overlay-b">
+              <span class="io-label">Input B [3:0]</span>
+              <div class="toggle-array" id="inputB">
+                <button class="toggle-btn" data-bit="3" data-val="0">0</button>
+                <button class="toggle-btn" data-bit="2" data-val="0">0</button>
+                <button class="toggle-btn" data-bit="1" data-val="0">0</button>
+                <button class="toggle-btn" data-bit="0" data-val="0">0</button>
+              </div>
+            </div>
+
+            <div class="io-overlay overlay-s">
+              <span class="io-label">Select S [3:0]</span>
+              <div class="toggle-array array-purple" id="inputS">
+                <button class="toggle-btn" data-bit="3" data-val="0">0</button>
+                <button class="toggle-btn" data-bit="2" data-val="0">0</button>
+                <button class="toggle-btn" data-bit="1" data-val="0">0</button>
+                <button class="toggle-btn" data-bit="0" data-val="0">0</button>
+              </div>
+            </div>
+
+            <div class="io-overlay overlay-m">
+              <span class="io-label">Mode (M)</span>
+              <div class="toggle-array array-cyan" id="inputM">
+                <button class="toggle-btn mode-btn" data-bit="0" data-val="0">0</button>
+              </div>
+            </div>
+
+            <div class="io-overlay overlay-y">
+              <span class="io-label">Output Y [3:0]</span>
+              <div class="display-array" id="outputY">
+                <span class="disp-bit" id="y3">0</span>
+                <span class="disp-bit" id="y2">0</span>
+                <span class="disp-bit" id="y1">0</span>
+                <span class="disp-bit" id="y0">0</span>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+      <!-- ZONE 3: Right Contextual Panel -->
+      <aside class="zone-right">
+        <div class="panel flashcard-panel no-print">
+          <div class="panel-header">Contextual Operation</div>
+          <div class="flashcard" id="operationFlashcard">
+            <span class="flash-mode" id="flashMode">Mode: Arithmetic (M=0)</span>
+            <span class="flash-op" id="flashOp">Operation: A + B</span>
+            <p class="flash-desc" id="flashDesc">The ALU is currently adding A and B, and routing the sum through the multiplexer.</p>
+          </div>
+        </div>
+
+        <div class="panel truth-table-panel print-full-width">
+          <div class="panel-header no-print">Data Collection</div>
+          <div class="table-actions no-print">
+            <button class="btn btn-add-reading" id="btnAddReading">+ ADD READING</button>
+          </div>
+          
+          <div class="table-container print-only-table">
+            <table class="logic-table" id="dataTable">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>M</th>
+                  <th>S<sub>3-0</sub></th>
+                  <th>A<sub>3-0</sub></th>
+                  <th>B<sub>3-0</sub></th>
+                  <th>Y<sub>3-0</sub></th>
+                  <th>Operation</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <!-- Data rows injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- Print Header (Hidden normally) -->
+    <div class="print-header">
+      <h2>LogicFlow Virtual Lab Report</h2>
+      <h3>Experiment 10: Arithmetic Logic Unit</h3>
+      <div class="print-meta">
+        <span>Date: <span id="printDate"></span></span>
+        <span>Signature: ______________________</span>
+      </div>
+    </div>
+  </main>
+
+  <script defer src="js/nav-shared.js"></script>
+  <script defer src="js/exp10_alu.js"></script>
+</body>
+</html>

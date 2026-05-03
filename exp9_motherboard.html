@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Motherboard Anatomy — LogicFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/motherboard.css">
+  
+  <!-- Import the model-viewer web component (v2.2.1 supports KHR_materials_pbrSpecularGlossiness used by this GLB) -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/2.2.1/model-viewer.min.js"></script>
+</head>
+<body>
+
+  <div class="bg-mesh">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+  </div>
+
+  <nav>
+    <a href="index.html" class="nav-logo">LogicFlow</a>
+    <ul class="nav-links">
+      <li><a href="curriculum.html">Curriculum</a></li>
+      <li id="navTasksItem" hidden><a href="student-tasks.html">My tasks</a></li>
+      <li><a href="sandbox.html">Logic Gates</a></li>
+      <li><a href="coa.html">Computer Architecture</a></li>
+      <li class="dropdown">
+        <a href="#" id="experimentDropdownBtn" class="active">Experiments</a>
+        <div class="dropdown-content" id="experimentDropdown">
+          <div class="dropdown-menu">
+            <a href="exp1_components.html">1. Component Familiarization</a>
+            <a href="exp2_equipments.html">2. Measurement Equipment</a>
+            <a href="exp3_diode.html">3. PN Junction Diode</a>
+            <a href="exp4_zener.html">4. Zener Diode</a>
+            <a href="exp5_rectifier.html">5. Rectifiers</a>
+            <a href="exp6_flipflops.html">6. Flip-Flops</a>
+            <a href="exp7_bcd_decoder.html">7. BCD Decoder</a>
+            <a href="exp9_motherboard.html" class="active">9. Computer Architecture</a>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <div class="nav-actions">
+      <button type="button" class="nav-sign-out" id="btnSignOut" hidden>Sign out</button>
+    </div>
+  </nav>
+
+  <main class="page viewer-page">
+    <div class="viewer-container">
+      <model-viewer 
+        id="motherboard-viewer"
+        src="motherboard.glb" 
+        camera-controls 
+        interaction-prompt="none"
+        environment-image="neutral"
+        shadow-intensity="1"
+        exposure="1"
+        camera-orbit="45deg 55deg auto"
+      >
+        <!-- Generate exact mathematically perfect coordinates using the official Model Viewer Editor (https://modelviewer.dev/editor/) and paste them here. -->
+        <button class="hotspot" slot="hotspot-processor" data-position="0 0.05 0" data-normal="0 1 0" data-target="processor">
+          <div class="hotspot-dot"></div>
+          <div class="hotspot-label">Processor</div>
+        </button>
+
+        <button class="hotspot" slot="hotspot-memory" data-position="0.2 0.05 0" data-normal="0 1 0" data-target="memory">
+          <div class="hotspot-dot"></div>
+          <div class="hotspot-label">Memory</div>
+        </button>
+
+        <button class="hotspot" slot="hotspot-pci" data-position="-0.2 0.05 -0.1" data-normal="0 1 0" data-target="pci">
+          <div class="hotspot-dot"></div>
+          <div class="hotspot-label">PCI Slots</div>
+        </button>
+
+        <button class="hotspot" slot="hotspot-cmos" data-position="0 0.05 -0.3" data-normal="0 1 0" data-target="cmos">
+          <div class="hotspot-dot"></div>
+          <div class="hotspot-label">CMOS</div>
+        </button>
+
+        <button class="hotspot" slot="hotspot-ports" data-position="-0.3 0.1 0.3" data-normal="-1 0 0" data-target="ports">
+          <div class="hotspot-dot"></div>
+          <div class="hotspot-label">I/O Ports</div>
+        </button>
+      </model-viewer>
+
+      <!-- Overlay UI -->
+      <div class="viewer-header">
+        <div class="breadcrumb">
+          <a href="coa.html">COA</a>
+          <span>›</span>
+          <span class="badge badge-blue">Exp 09</span>
+        </div>
+        <h1>Motherboard Anatomy</h1>
+        <p>Explore the physical foundation of computer architecture.</p>
+      </div>
+
+      <div class="controls-overlay">
+        <button class="btn btn-secondary" id="btnReset">↺ Reset View</button>
+      </div>
+
+      <div class="info-card" id="infoCard">
+        <button class="close-card" id="btnCloseCard">×</button>
+        <span class="info-badge" id="infoBadge">Component</span>
+        <h2 id="infoTitle">Title</h2>
+        <p id="infoDesc">Description</p>
+      </div>
+
+    </div>
+  </main>
+
+  <script defer src="js/nav-shared.js"></script>
+  <script defer src="js/motherboard.js"></script>
+</body>
+</html>
