@@ -1,0 +1,532 @@
+/* css/exp10_alu.css */
+
+/* Global and structural overrides */
+.page-container {
+  padding-top: calc(var(--lf-nav-fixed-top, 32px) + 5rem);
+  max-width: 1600px;
+  margin: 0 auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 3rem;
+  position: relative;
+  z-index: 10;
+}
+
+.page-header {
+  padding: 1rem 0 1.5rem;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--lf-font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.75rem;
+  color: var(--muted, #475569);
+  margin-bottom: 0.5rem;
+}
+
+.breadcrumb .badge {
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  color: var(--purple, #7c3aed);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.page-header h1 {
+  font-family: var(--lf-font-display, 'Playfair Display', serif);
+  font-size: 2.2rem;
+  color: var(--text, #0f0f1a);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.page-header p {
+  font-size: 0.95rem;
+  color: var(--muted, #475569);
+  max-width: 700px;
+  line-height: 1.6;
+}
+
+/* 3-ZONE LAYOUT */
+.workspace-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr 380px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* Glassmorphism Panels */
+.panel {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 32px rgba(15, 15, 26, 0.05);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.panel-header, .panel h3 {
+  font-family: var(--lf-font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.75rem;
+  color: var(--muted, #475569);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  margin: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(15, 15, 26, 0.08);
+}
+
+/* ZONE 1: Left Navigation */
+.zone-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.lab-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.lab-nav a {
+  text-decoration: none;
+  color: var(--muted, #475569);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: block;
+}
+
+.lab-nav a:hover {
+  background: rgba(15, 15, 26, 0.04);
+  color: var(--text, #0f0f1a);
+}
+
+.lab-nav a.active {
+  background: rgba(26, 86, 219, 0.1);
+  color: var(--blue, #1a56db);
+  font-weight: 600;
+}
+
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btn {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-family: var(--lf-font-body, sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.btn-reset {
+  background: rgba(15, 15, 26, 0.05);
+  color: var(--text, #0f0f1a);
+  border-color: rgba(15, 15, 26, 0.1);
+}
+
+.btn-reset:hover {
+  background: rgba(15, 15, 26, 0.1);
+}
+
+.btn-export {
+  background: var(--blue, #1a56db);
+  color: #fff;
+}
+
+.btn-export:hover {
+  background: #1e3a8a;
+}
+
+/* ZONE 2: Center Stage ALU */
+.alu-stage {
+  min-height: 500px;
+  padding: 0; /* Let interactive area fill it */
+  overflow: hidden;
+}
+
+.alu-stage .panel-header {
+  margin: 1.25rem 1.25rem 0;
+}
+
+.alu-interactive-area {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.alu-routing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* SVG Styling */
+.trace {
+  fill: none;
+  stroke: rgba(15, 15, 26, 0.2);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  transition: stroke 0.3s, opacity 0.3s, filter 0.3s, stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bit-trace {
+  stroke-width: 2.5;
+  stroke-dasharray: 400; /* Long enough to cover the whole path */
+  stroke-dashoffset: 400; /* Start empty */
+  transition: stroke 0.3s, filter 0.3s, stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.trace-active {
+  stroke: var(--cyan, #06b6d4);
+  filter: drop-shadow(0 0 6px var(--cyan, #06b6d4));
+  stroke-dasharray: 400;
+  stroke-dashoffset: 0;
+  transition: stroke 0.3s, filter 0.3s, stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.trace-active-a {
+  stroke: var(--blue, #1a56db);
+  filter: drop-shadow(0 0 4px var(--blue, #1a56db));
+  stroke-dashoffset: 0; /* Fill up! */
+}
+
+.trace-active-b {
+  stroke: var(--cyan, #06b6d4);
+  filter: drop-shadow(0 0 4px var(--cyan, #06b6d4));
+  stroke-dashoffset: 0; /* Fill up! */
+}
+
+.trace-active-s {
+  stroke: var(--green, #10B981);
+  filter: drop-shadow(0 0 4px var(--green, #10B981));
+  stroke-dashoffset: 0; /* Fill up! */
+}
+
+.trace-dimmed {
+  stroke: rgba(15, 15, 26, 0.1);
+  opacity: 0.4;
+}
+
+/* Base trace-dimmed for individual bits ensures they retract */
+.bit-trace.trace-dimmed {
+  stroke-dashoffset: 400; /* Empty out */
+  opacity: 0.2;
+}
+
+.svg-block {
+  fill: rgba(255, 255, 255, 0.8);
+  stroke: rgba(15, 15, 26, 0.15);
+  stroke-width: 2;
+}
+
+.svg-text {
+  font-family: var(--lf-font-mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  fill: var(--text, #0f0f1a);
+  text-anchor: middle;
+}
+
+/* HTML Overlays for Inputs */
+.io-overlay {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.io-label {
+  font-family: var(--lf-font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--muted, #475569);
+  text-transform: uppercase;
+}
+
+.toggle-array {
+  display: flex;
+  gap: 4px;
+  background: rgba(15, 15, 26, 0.05);
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px solid rgba(15, 15, 26, 0.05);
+}
+
+.toggle-btn {
+  width: 24px;
+  height: 32px;
+  border: 1px solid rgba(15, 15, 26, 0.1);
+  border-radius: 4px;
+  background: #fff;
+  font-family: var(--lf-font-mono, monospace);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted, #475569);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.toggle-btn[data-val="1"] {
+  background: var(--text, #0f0f1a);
+  color: #fff;
+  border-color: #000;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Specific colors for specific inputs */
+.array-purple .toggle-btn[data-val="1"] { background: var(--purple, #7c3aed); border-color: var(--purple, #7c3aed); }
+.array-cyan .toggle-btn[data-val="1"] { background: var(--cyan, #06b6d4); border-color: var(--cyan, #06b6d4); }
+
+.display-array {
+  display: flex;
+  gap: 4px;
+  background: rgba(15, 15, 26, 0.8);
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.disp-bit {
+  font-family: var(--lf-font-mono, monospace);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  width: 20px;
+  text-align: center;
+}
+
+/* Positioning the Overlays (matching SVG coordinates) */
+/* SVG uses viewBox 0 0 600 400. Overlays use % for absolute pos. */
+.overlay-a { top: 20%; left: 1%; }
+.overlay-b { top: 30%; left: 1%; }
+.overlay-s { top: 46%; left: 1%; }
+.overlay-m { top: 18%; left: 74%; align-items: center; }
+.overlay-y { top: 76%; left: 86%; align-items: flex-start; }
+
+/* ZONE 3: Right Contextual Panel */
+.zone-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.flashcard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.flash-mode {
+  font-family: var(--lf-font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--cyan, #06b6d4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.flash-op {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text, #0f0f1a);
+  font-family: var(--lf-font-mono, monospace);
+}
+
+.flash-desc {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--muted, #475569);
+}
+
+.truth-table-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.truth-table-panel .panel-header {
+  margin: 1.25rem 1.25rem 0;
+}
+
+.table-actions {
+  padding: 0 1.25rem 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-add-reading {
+  background: rgba(16, 185, 129, 0.15);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-add-reading:hover {
+  background: #10b981;
+  color: #fff;
+}
+
+.table-container {
+  overflow-y: auto;
+  max-height: 250px;
+  border-top: 1px solid rgba(15, 15, 26, 0.08);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.logic-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--lf-font-mono, monospace);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.logic-table th {
+  background: rgba(15, 15, 26, 0.04);
+  padding: 0.75rem 0.5rem;
+  color: var(--text, #0f0f1a);
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  border-bottom: 2px solid rgba(15, 15, 26, 0.1);
+}
+
+.logic-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(15, 15, 26, 0.05);
+  color: var(--muted, #475569);
+}
+
+.logic-table tr:hover td {
+  background: rgba(15, 15, 26, 0.02);
+  color: var(--text, #0f0f1a);
+}
+
+/* Print Styles for Lab Report */
+.print-header {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 1.5cm;
+  }
+  
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .no-print, .bg-mesh {
+    display: none !important;
+  }
+
+  .page-container {
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .print-header {
+    display: block;
+    border-bottom: 2px solid #000;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .print-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .print-header h3 {
+    font-size: 1.1rem;
+    font-weight: normal;
+    color: #444;
+  }
+
+  .print-meta {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    font-family: monospace;
+    font-size: 0.9rem;
+  }
+
+  .workspace-grid {
+    display: block;
+  }
+
+  .print-full-width {
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  .table-container {
+    max-height: none;
+    overflow: visible;
+    border: 1px solid #000;
+  }
+
+  .logic-table th, .logic-table td {
+    border: 1px solid #000;
+    color: #000;
+    background: #fff;
+    padding: 0.5rem;
+  }
+}
+
+/* Responsive constraints */
+@media(max-width: 1200px) {
+  .workspace-grid {
+    grid-template-columns: 200px 1fr;
+  }
+  .zone-right {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media(max-width: 900px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+  .zone-right {
+    grid-template-columns: 1fr;
+  }
+}
