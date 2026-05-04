@@ -255,8 +255,105 @@
     });
   }
 
+  // ─── Faculty Profile Display ───────────────────────────────
+  function initFacultyProfile() {
+    const facultyEmail = sessionStorage.getItem('logicflow_faculty_email');
+    if (!facultyEmail) return;
+
+    // Get first letter of email for avatar
+    const firstLetter = facultyEmail.charAt(0).toUpperCase();
+    
+    // Update sidebar profile
+    const sidebarAvatar = document.getElementById('sidebar-avatar');
+    const sidebarName = document.getElementById('sidebar-name');
+    const sidebarEmail = document.getElementById('sidebar-email');
+    
+    if (sidebarAvatar) sidebarAvatar.textContent = firstLetter;
+    if (sidebarName) sidebarName.textContent = 'Faculty User';
+    if (sidebarEmail) sidebarEmail.textContent = facultyEmail;
+    
+    // Update header avatar
+    const headerAvatar = document.getElementById('header-avatar');
+    if (headerAvatar) headerAvatar.textContent = firstLetter;
+  }
+
+  // ─── Sign Out Functionality ─────────────────────────────────
+  function initSignOut() {
+    const signOutBtn = document.getElementById('btn-sign-out');
+    if (!signOutBtn) return;
+
+    signOutBtn.addEventListener('click', () => {
+      // Clear session storage
+      sessionStorage.removeItem('logicflow_session');
+      sessionStorage.removeItem('logicflow_faculty_email');
+      sessionStorage.removeItem('logicflow_student_email');
+      sessionStorage.removeItem('logicflow_student_display');
+      
+      // Clear localStorage current user
+      clearCurrentUser();
+
+      // Redirect to index.html
+      window.location.href = '../index.html';
+    });
+  }
+
+  // ─── Browser Back Button Interception ───────────────────────
+  function initBackButtonIntercept() {
+    const modal = document.getElementById('signout-modal');
+    const confirmBtn = document.getElementById('signout-confirm');
+    const cancelBtn = document.getElementById('signout-cancel');
+    
+    if (!modal || !confirmBtn || !cancelBtn) return;
+
+    // Push initial state to enable popstate detection
+    history.pushState(null, '', window.location.href);
+
+    window.addEventListener('popstate', (e) => {
+      // Prevent navigation and show custom modal
+      e.preventDefault();
+      
+      // Push state back to stay on current page
+      history.pushState(null, '', window.location.href);
+      
+      // Show custom modal
+      modal.style.display = 'flex';
+    });
+
+    // Handle cancel button
+    cancelBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    // Handle confirm button
+    confirmBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+      
+      // Clear session storage and localStorage
+      sessionStorage.removeItem('logicflow_session');
+      sessionStorage.removeItem('logicflow_faculty_email');
+      sessionStorage.removeItem('logicflow_student_email');
+      sessionStorage.removeItem('logicflow_student_display');
+      clearCurrentUser();
+      
+      // Redirect to index.html
+      window.location.href = '../index.html';
+    });
+
+    // Close modal on overlay click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  }
+
   // ─── Init All ─────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
+    // Auth guard - only faculty can access admin panel
+    if (!requireAuth('faculty')) {
+      return;
+    }
+
     setActiveNav();
     initSidebar();
     initSearch();
@@ -270,6 +367,9 @@
     initFadeIn();
     initScoreInputs();
     initModals();
+    initFacultyProfile();
+    initSignOut();
+    initBackButtonIntercept();
   });
 
 })();

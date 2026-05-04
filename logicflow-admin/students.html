@@ -39,14 +39,18 @@
     <a href="evaluation.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">assignment_turned_in</span> Evaluation</a>
     <a href="assign-task.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">send</span> Assign Task</a>
     <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:16px 10px 4px;">System</div>
+    <a href="faculty.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">school</span> Faculty</a>
     <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">history_edu</span> System Logs</a>
     <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">contact_support</span> Support</a>
   </nav>
   <div style="padding:16px 20px;border-top:1px solid #eceef3;">
     <div style="display:flex;align-items:center;gap:10px;">
-      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;">AD</div>
-      <div><div style="font-weight:700;font-size:13px;color:#191c20;">Admin User</div><div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">admin@lab.edu</div></div>
+      <div id="sidebar-avatar" class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;">AD</div>
+      <div><div id="sidebar-name" style="font-weight:700;font-size:13px;color:#191c20;">Admin User</div><div id="sidebar-email" style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">admin@lab.edu</div></div>
     </div>
+    <button id="btn-sign-out" style="width:100%;margin-top:12px;padding:8px;background:#f2f3f9;border:1px solid #e1e2e8;border-radius:8px;font-size:12px;font-weight:600;color:#424848;cursor:pointer;transition:all 0.2s;" onmouseenter="this.style.background='#e1e2e8'" onmouseleave="this.style.background='#f2f3f9'">
+      Sign Out
+    </button>
   </div>
 </aside>
 
@@ -62,7 +66,7 @@
       <button class="btn-ghost btn-notification" style="position:relative;"><span class="material-symbols-outlined" style="font-size:22px;">notifications</span><span class="notif-badge"></span></button>
       <button class="btn-ghost btn-settings"><span class="material-symbols-outlined" style="font-size:22px;">settings</span></button>
       <div style="width:1px;height:24px;background:#e1e2e8;margin:0 6px;"></div>
-      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;cursor:pointer;">AD</div>
+      <div id="header-avatar" class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;cursor:pointer;">AD</div>
     </div>
   </header>
 
@@ -79,14 +83,13 @@
     </div>
 
     <!-- Filter row -->
-    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
-      <select id="batch-filter" data-filter style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
-        <option value="">All Batches</option><option>Batch A</option><option>Batch B</option><option>Batch C</option><option>Batch D</option>
+    <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
+      <input id="student-search" class="search-input" type="text" placeholder="Search students… (Ctrl+K)" style="flex:1;min-width:200px;" />
+      <select id="batch-filter" class="form-select" style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
+        <option value="">All Batches</option>
       </select>
-      <select id="status-filter" data-filter style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
-        <option value="">All Status</option><option>Active</option><option>At Risk</option><option>Inactive</option>
-      </select>
-      <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;margin-left:auto;" id="student-count">Showing 8 students</div>
+      <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;margin-left:auto;" id="student-count">0 students</div>
+      <button class="btn-primary" data-modal="student-modal" style="font-size:13px;padding:8px 16px;"><span class="material-symbols-outlined" style="font-size:16px;">add</span> Add Student</button>
     </div>
 
     <!-- Table -->
@@ -106,133 +109,280 @@
             </tr>
           </thead>
           <tbody id="students-tbody">
-            <tr class="student-row">
-              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#d7e5e7;color:#334042;font-size:12px;font-weight:700;">AC</div><div style="font-weight:600;font-size:14px;color:#191c20;">Alex Chen</div></div></td>
-              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-001</td>
-              <td style="font-size:13px;color:#424848;">Batch A</td>
-              <td>
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="80%" style="width:0;"></div></div>
-                  <span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">8/10</span>
-                </div>
-              </td>
-              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#516353;">98</span></td>
-              <td><span class="chip chip-active">Active</span></td>
-              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#4a5759;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #4a5759;border-radius:6px;">Grade</a></td>
-            </tr>
-            <tr class="student-row">
-              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#ffd9de;color:#5c3139;font-size:12px;font-weight:700;">SP</div><div style="font-weight:600;font-size:14px;color:#191c20;">Samir Patel</div></div></td>
-              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-018</td>
-              <td style="font-size:13px;color:#424848;">Batch A</td>
-              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="60%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">6/10</span></div></td>
-              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#8b6508;">72</span></td>
-              <td><span class="chip chip-active">Active</span></td>
-              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#4a5759;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #4a5759;border-radius:6px;">Grade</a></td>
-            </tr>
-            <tr class="student-row">
-              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#ffdad6;color:#93000a;font-size:12px;font-weight:700;">JL</div><div style="font-weight:600;font-size:14px;color:#191c20;">Jordan Lee</div></div></td>
-              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-089</td>
-              <td style="font-size:13px;color:#424848;">Batch B</td>
-              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill progress-fill-tertiary" data-width="30%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">3/10</span></div></td>
-              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#ba1a1a;">45</span></td>
-              <td><span class="chip chip-review">At Risk</span></td>
-              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#ba1a1a;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #ba1a1a;border-radius:6px;">Review</a></td>
-            </tr>
-            <tr class="student-row">
-              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#e1e2e8;color:#424848;font-size:12px;font-weight:700;">TC</div><div style="font-weight:600;font-size:14px;color:#191c20;">Taylor Chen</div></div></td>
-              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-112</td>
-              <td style="font-size:13px;color:#424848;">Batch A</td>
-              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="50%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">5/10</span></div></td>
-              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#737879;">—</span></td>
-              <td><span class="chip chip-pending">Pending</span></td>
-              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#4a5759;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #4a5759;border-radius:6px;">Grade</a></td>
-            </tr>
-            <tr class="student-row">
-              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#d3e8d4;color:#394b3c;font-size:12px;font-weight:700;">MK</div><div style="font-weight:600;font-size:14px;color:#191c20;">Maya Kim</div></div></td>
-              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-023</td>
-              <td style="font-size:13px;color:#424848;">Batch C</td>
-              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="100%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">10/10</span></div></td>
-              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#516353;">95</span></td>
-              <td><span class="chip chip-active">Active</span></td>
-              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#4a5759;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #4a5759;border-radius:6px;">Grade</a></td>
-            </tr>
-            <tr class="student-row">
-              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#bbc9cb;color:#111e1f;font-size:12px;font-weight:700;">RN</div><div style="font-weight:600;font-size:14px;color:#191c20;">Raj Nair</div></div></td>
-              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-041</td>
-              <td style="font-size:13px;color:#424848;">Batch D</td>
-              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="70%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">7/10</span></div></td>
-              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#516353;">84</span></td>
-              <td><span class="chip chip-active">Active</span></td>
-              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#4a5759;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #4a5759;border-radius:6px;">Grade</a></td>
-            </tr>
-            <tr class="student-row">
-              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#ffd9de;color:#330f17;font-size:12px;font-weight:700;">LW</div><div style="font-weight:600;font-size:14px;color:#191c20;">Lily Wang</div></div></td>
-              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-067</td>
-              <td style="font-size:13px;color:#424848;">Batch B</td>
-              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill progress-fill-tertiary" data-width="20%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">2/10</span></div></td>
-              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#ba1a1a;">38</span></td>
-              <td><span class="chip chip-review">At Risk</span></td>
-              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#ba1a1a;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #ba1a1a;border-radius:6px;">Review</a></td>
-            </tr>
-            <tr class="student-row">
-              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#d7e5e7;color:#111e1f;font-size:12px;font-weight:700;">DO</div><div style="font-weight:600;font-size:14px;color:#191c20;">David Osei</div></div></td>
-              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-082</td>
-              <td style="font-size:13px;color:#424848;">Batch C</td>
-              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="90%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">9/10</span></div></td>
-              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#516353;">91</span></td>
-              <td><span class="chip chip-active">Active</span></td>
-              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#4a5759;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #4a5759;border-radius:6px;">Grade</a></td>
-            </tr>
+            <!-- Students will be dynamically loaded here -->
           </tbody>
         </table>
       </div>
-
-      <!-- Pagination -->
-      <div style="padding:14px 20px;border-top:1px solid #f2f3f9;display:flex;align-items:center;justify-content:space-between;background:rgba(242,243,249,0.3);">
-        <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;">Showing 1–8 of 342 students</div>
-        <div class="pagination">
-          <button class="page-btn" disabled><span class="material-symbols-outlined" style="font-size:18px;">chevron_left</span></button>
-          <button class="page-btn active">1</button>
-          <button class="page-btn" onclick="window.showToast('Navigating to page 2','info')">2</button>
-          <button class="page-btn" onclick="window.showToast('Navigating to page 3','info')">3</button>
-          <button class="page-btn" style="color:#737879;cursor:default;font-size:13px;">…</button>
-          <button class="page-btn" onclick="window.showToast('Navigating to last page','info')">43</button>
-          <button class="page-btn" onclick="window.showToast('Navigating to page 2','info')"><span class="material-symbols-outlined" style="font-size:18px;">chevron_right</span></button>
+      
+      <!-- Empty State -->
+      <div id="empty-state" style="display:none;text-align:center;padding:60px 20px;">
+        <div style="width:80px;height:80px;border-radius:50%;background:#f2f3f9;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+          <span class="material-symbols-outlined" style="font-size:40px;color:#737879;">group</span>
         </div>
+        <div style="font-size:18px;font-weight:700;color:#191c20;margin-bottom:8px;">No students yet</div>
+        <div style="font-size:14px;color:#737879;font-family:'Space Grotesk',sans-serif;margin-bottom:20px;">Add students to start tracking their progress.</div>
+        <button class="btn-primary" data-modal="student-modal" style="display:inline-flex;"><span class="material-symbols-outlined" style="font-size:16px;">add</span> Add First Student</button>
+      </div>
       </div>
     </div>
 
   </main>
 </div>
 
-<script src="js/app.js"></script>
-<script>
-  // Client-side search
-  const searchInput = document.getElementById('student-search');
-  const batchFilter = document.getElementById('batch-filter');
-  const statusFilter = document.getElementById('status-filter');
-  const tbody = document.getElementById('students-tbody');
-  const countEl = document.getElementById('student-count');
+<!-- Student Modal -->
+<div id="student-modal" role="dialog" class="hidden" style="position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(25,28,32,0.5);backdrop-filter:blur(4px);" onclick="if(event.target===this){this.classList.add('hidden');this.style.display='none';document.body.style.overflow='';}">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:500px;margin:16px;box-shadow:0 24px 64px rgba(0,0,0,0.2);" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <div id="student-modal-title" style="font-size:18px;font-weight:800;color:#191c20;">Add Student</div>
+      <button data-modal-close style="background:none;border:none;cursor:pointer;color:#737879;" onclick="document.getElementById('student-modal').classList.add('hidden');document.getElementById('student-modal').style.display='none';document.body.style.overflow='';">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form id="student-form" style="display:flex;flex-direction:column;gap:16px;">
+      <input type="hidden" id="student-id">
+      <div><label class="form-label">Full Name</label><input id="student-name" class="form-input" type="text" placeholder="Enter student name" required /></div>
+      <div><label class="form-label">Roll Number</label><input id="student-roll" class="form-input" type="text" placeholder="e.g., EL-24-001" required /></div>
+      <div><label class="form-label">Email</label><input id="student-email" class="form-input" type="email" placeholder="student@chitkara.edu.in" required /></div>
+      <div><label class="form-label">Password</label><input id="student-password" class="form-input" type="text" placeholder="Auto-generated from roll number" /></div>
+      <div><label class="form-label">Assign to Batch</label><select id="student-batch" class="form-input form-select" required>
+        <option value="">Select Batch</option>
+      </select></div>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button type="button" onclick="document.getElementById('student-modal').classList.add('hidden');document.getElementById('student-modal').style.display='none';document.body.style.overflow='';" class="btn-outline" style="flex:1;justify-content:center;">Cancel</button>
+        <button type="submit" class="btn-primary" style="flex:1;justify-content:center;">Save Student</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-  function filterTable() {
-    const q = searchInput.value.toLowerCase();
-    const batch = batchFilter.value.toLowerCase();
-    const status = statusFilter.value.toLowerCase();
-    let shown = 0;
-    tbody.querySelectorAll('tr').forEach(row => {
-      const text = row.textContent.toLowerCase();
-      const matchQ = !q || text.includes(q);
-      const matchB = !batch || text.includes(batch);
-      const matchS = !status || text.includes(status);
-      row.style.display = matchQ && matchB && matchS ? '' : 'none';
-      if (matchQ && matchB && matchS) shown++;
-    });
-    countEl.textContent = `Showing ${shown} student${shown !== 1 ? 's' : ''}`;
+<!-- Delete Confirmation Modal -->
+<div id="delete-modal" role="dialog" class="hidden" style="position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(25,28,32,0.5);backdrop-filter:blur(4px);" onclick="if(event.target===this){this.classList.add('hidden');this.style.display='none';document.body.style.overflow='';}">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:400px;margin:16px;box-shadow:0 24px 64px rgba(0,0,0,0.2);" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="width:40px;height:40px;border-radius:50%;background:#ffd9de;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span class="material-symbols-outlined" style="font-size:24px;color:#93000a;">delete</span>
+      </div>
+      <div>
+        <div style="font-weight:800;font-size:16px;color:#191c20;">Delete Student</div>
+        <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;">Confirm your action</div>
+      </div>
+    </div>
+    <p style="font-size:14px;color:#424848;line-height:1.5;margin-bottom:20px;">Are you sure you want to delete this student? This action cannot be undone.</p>
+    <div style="display:flex;gap:12px;justify-content:flex-end;">
+      <button onclick="document.getElementById('delete-modal').classList.add('hidden');document.getElementById('delete-modal').style.display='none';document.body.style.overflow='';" class="btn-outline" style="padding:10px 20px;">Cancel</button>
+      <button id="confirm-delete" class="btn-primary" style="padding:10px 20px;background:#dc3545;">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── Student Management ───────────────────────────────────────────
+  let studentToDelete = null;
+
+  function loadBatchesDropdown() {
+    const batches = getBatches();
+    const select = document.getElementById('student-batch');
+    const filterSelect = document.getElementById('batch-filter');
+    
+    const options = '<option value="">Select Batch</option>' + 
+      batches.map(b => `<option value="${b.batchId}">${b.name} - ${b.year} ${b.section}</option>`).join('');
+    
+    select.innerHTML = options;
+    filterSelect.innerHTML = '<option value="">All Batches</option>' + 
+      batches.map(b => `<option value="${b.batchId}">${b.name}</option>`).join('');
   }
 
-  searchInput.addEventListener('input', filterTable);
-  batchFilter.addEventListener('change', filterTable);
-  statusFilter.addEventListener('change', filterTable);
+  function loadStudents() {
+    const students = getStudents();
+    const batches = getBatches();
+    const searchQuery = document.getElementById('student-search').value.toLowerCase();
+    const batchFilter = document.getElementById('batch-filter').value;
+
+    let filtered = students;
+    if (searchQuery) {
+      filtered = filtered.filter(s => 
+        s.name.toLowerCase().includes(searchQuery) || 
+        s.rollNumber.toLowerCase().includes(searchQuery)
+      );
+    }
+    if (batchFilter) {
+      filtered = filtered.filter(s => s.batchId === parseInt(batchFilter));
+    }
+
+    const tbody = document.getElementById('students-tbody');
+    const emptyState = document.getElementById('empty-state');
+    const countEl = document.getElementById('student-count');
+    const tableContainer = document.querySelector('.table-container');
+
+    countEl.textContent = `${filtered.length} student${filtered.length !== 1 ? 's' : ''}`;
+
+    if (filtered.length === 0) {
+      tableContainer.style.display = 'none';
+      emptyState.style.display = 'block';
+      return;
+    }
+
+    tableContainer.style.display = 'block';
+    emptyState.style.display = 'none';
+
+    tbody.innerHTML = filtered.map(student => {
+      const batch = batches.find(b => b.batchId === student.batchId);
+      const batchName = batch ? batch.name : 'Unassigned';
+      const progress = getStudentProgress(student.studentId);
+      const initials = student.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+      
+      return `
+        <tr class="student-row">
+          <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#d7e5e7;color:#334042;font-size:12px;font-weight:700;">${initials}</div><div style="font-weight:600;font-size:14px;color:#191c20;">${student.name}</div></div></td>
+          <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">${student.rollNumber}</td>
+          <td style="font-size:13px;color:#424848;">${batchName}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="${Math.min(progress.experimentsCompleted * 10, 100)}%" style="width:0;"></div></div>
+              <span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">${progress.experimentsCompleted}</span>
+            </div>
+          </td>
+          <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#516353;">${progress.averageScore || '—'}</span></td>
+          <td><span class="chip chip-active">Active</span></td>
+          <td style="text-align:right;">
+            <button onclick="editStudent(${student.studentId})" class="btn-ghost" style="padding:4px;" title="Edit">
+              <span class="material-symbols-outlined" style="font-size:18px;">edit</span>
+            </button>
+            <button onclick="confirmDeleteStudent(${student.studentId})" class="btn-ghost" style="padding:4px;" title="Delete">
+              <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function openStudentModal(studentId = null) {
+    const modal = document.getElementById('student-modal');
+    const title = document.getElementById('student-modal-title');
+    const form = document.getElementById('student-form');
+
+    form.reset();
+    document.getElementById('student-id').value = '';
+
+    if (studentId) {
+      const student = getStudentById(studentId);
+      if (student) {
+        title.textContent = 'Edit Student';
+        document.getElementById('student-id').value = student.studentId;
+        document.getElementById('student-name').value = student.name;
+        document.getElementById('student-roll').value = student.rollNumber;
+        document.getElementById('student-email').value = student.email;
+        document.getElementById('student-password').value = student.password;
+        document.getElementById('student-batch').value = student.batchId || '';
+      }
+    } else {
+      title.textContent = 'Add Student';
+    }
+
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function editStudent(studentId) {
+    openStudentModal(studentId);
+  }
+
+  function confirmDeleteStudent(studentId) {
+    studentToDelete = studentId;
+    const modal = document.getElementById('delete-modal');
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  // ─── Event Listeners ─────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    loadBatchesDropdown();
+    loadStudents();
+
+    // Auto-generate password from roll number
+    document.getElementById('student-roll').addEventListener('input', (e) => {
+      document.getElementById('student-password').value = e.target.value;
+    });
+
+    // Add student button
+    document.querySelector('[data-modal="student-modal"]')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      openStudentModal();
+    });
+
+    // Student form submit
+    document.getElementById('student-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const studentId = document.getElementById('student-id').value;
+      const studentData = {
+        name: document.getElementById('student-name').value,
+        rollNumber: document.getElementById('student-roll').value,
+        email: document.getElementById('student-email').value,
+        password: document.getElementById('student-password').value || document.getElementById('student-roll').value,
+        batchId: document.getElementById('student-batch').value ? parseInt(document.getElementById('student-batch').value) : null
+      };
+
+      if (studentId) {
+        updateStudent(parseInt(studentId), studentData);
+        window.showToast('Student updated successfully!', 'success');
+      } else {
+        saveStudent(studentData);
+        window.showToast('Student added successfully!', 'success');
+      }
+
+      document.getElementById('student-modal').classList.add('hidden');
+      document.getElementById('student-modal').style.display = 'none';
+      document.body.style.overflow = '';
+      loadStudents();
+    });
+
+    // Confirm delete
+    document.getElementById('confirm-delete').addEventListener('click', () => {
+      if (studentToDelete) {
+        deleteStudent(studentToDelete);
+        window.showToast('Student deleted successfully!', 'success');
+        studentToDelete = null;
+        document.getElementById('delete-modal').classList.add('hidden');
+        document.getElementById('delete-modal').style.display = 'none';
+        document.body.style.overflow = '';
+        loadStudents();
+      }
+    });
+
+    // Search and filter
+    document.getElementById('student-search').addEventListener('input', loadStudents);
+    document.getElementById('batch-filter').addEventListener('change', loadStudents);
+  });
 </script>
+
+<!-- Sign Out Confirmation Modal -->
+<div id="signout-modal" class="modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+  <div class="modal-content" style="background:#fff;border-radius:12px;padding:24px;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="width:40px;height:40px;border-radius:50%;background:#ffd9de;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span class="material-symbols-outlined" style="font-size:24px;color:#93000a;">logout</span>
+      </div>
+      <div>
+        <div style="font-weight:800;font-size:16px;color:#191c20;">Sign Out</div>
+        <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;">Confirm your action</div>
+      </div>
+    </div>
+    <p style="font-size:14px;color:#424848;line-height:1.5;margin-bottom:20px;">Are you sure you want to sign out? You will be redirected to the homepage.</p>
+    <div style="display:flex;gap:12px;justify-content:flex-end;">
+      <button id="signout-cancel" style="padding:10px 20px;border:1px solid #e1e2e8;border-radius:8px;font-size:13px;font-weight:600;color:#424848;background:#fff;cursor:pointer;transition:all 0.2s;" onmouseenter="this.style.background='#f2f3f9'" onmouseleave="this.style.background='#fff'">
+        Cancel
+      </button>
+      <button id="signout-confirm" style="padding:10px 20px;border:none;border-radius:8px;font-size:13px;font-weight:600;color:#fff;background:#dc3545;cursor:pointer;transition:all 0.2s;" onmouseenter="this.style.background='#c82333'" onmouseleave="this.style.background='#dc3545'">
+        Yes, Sign Out
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="js/storage.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

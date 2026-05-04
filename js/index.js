@@ -517,17 +517,77 @@
         e.preventDefault();
         const form = e.target;
         const emailInput = form.querySelector('[name="studentEmail"]');
+        const passwordInput = form.querySelector('[name="studentPassword"]');
         const email = emailInput?.value?.trim();
-        if (email) {
+        const password = passwordInput?.value?.trim();
+        const studentNote = document.getElementById('accessStudentNote');
+        
+        // Validate against localStorage
+        const student = authenticateStudent(email, password);
+        
+        if (student) {
+          // Set current user in localStorage
+          setCurrentUser({
+            role: 'student',
+            id: student.studentId,
+            email: student.email,
+            name: student.name,
+            rollNumber: student.rollNumber,
+            batchId: student.batchId
+          });
+          
+          // Also keep sessionStorage for backward compatibility
           sessionStorage.setItem('logicflow_student_email', email);
           sessionStorage.setItem('logicflow_student_display', formatStudentDisplay(email));
+          
+          completeSession('student');
+          // Redirect to student portal
+          window.location.href = 'student-portal.html';
+        } else {
+          // Show error message
+          if (studentNote) {
+            studentNote.textContent = 'Invalid credentials. Please check your institution email and password.';
+            studentNote.hidden = false;
+            studentNote.style.color = '#dc3545';
+          }
         }
-        completeSession('student');
       });
 
       document.getElementById('formFaculty')?.addEventListener('submit', (e) => {
         e.preventDefault();
-        completeSession('faculty');
+        const form = e.target;
+        const instCode = form.querySelector('[name="instCode"]')?.value?.trim();
+        const facultyEmail = form.querySelector('[name="facultyEmail"]')?.value?.trim();
+        const facultyPassword = form.querySelector('[name="facultyPassword"]')?.value?.trim();
+        const facultyNote = document.getElementById('accessFacultyNote');
+        
+        // Validate against localStorage
+        const faculty = authenticateFaculty(facultyEmail, facultyPassword);
+        
+        if (faculty && faculty.instCode === instCode) {
+          // Set current user in localStorage
+          setCurrentUser({
+            role: 'faculty',
+            id: faculty.facultyId,
+            email: faculty.email,
+            name: faculty.name,
+            instCode: faculty.instCode
+          });
+          
+          // Also keep sessionStorage for backward compatibility
+          sessionStorage.setItem('logicflow_faculty_email', facultyEmail);
+          
+          completeSession('faculty');
+          // Redirect to faculty admin dashboard
+          window.location.href = 'logicflow-admin/index.html';
+        } else {
+          // Show error message
+          if (facultyNote) {
+            facultyNote.textContent = 'Invalid credentials. Please check your institution code, email, and password.';
+            facultyNote.hidden = false;
+            facultyNote.style.color = '#dc3545';
+          }
+        }
       });
 
       document.getElementById('accessStudentGuestBtn')?.addEventListener('click', () => {
