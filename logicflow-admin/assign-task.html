@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assign Task — LogicFlow Admin</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="js/tailwind-config.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <style>
+    .assign-grid { display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start; }
+    @media (max-width:900px) { .assign-grid { grid-template-columns:1fr; } }
+
+    .radio-card { display:none; }
+    .radio-label { display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 12px;border:1px solid rgba(195,199,200,0.5);border-radius:10px;cursor:pointer;transition:all 0.2s;flex:1;text-align:center; }
+    .radio-label:hover { border-color:#4a5759;background:#f8f9ff; }
+    .radio-card:checked + .radio-label { background:rgba(211,232,212,0.25);border-color:#516353;color:#394b3c; }
+    .radio-card:checked + .radio-label .radio-icon { color:#516353; }
+
+    .priority-radio { display:none; }
+    .priority-label { display:flex;align-items:center;justify-content:center;padding:9px 6px;border:1px solid rgba(195,199,200,0.5);border-radius:8px;cursor:pointer;transition:all 0.2s;flex:1;font-size:13px;font-weight:600;color:#737879; }
+    .priority-label:hover { border-color:#4a5759; }
+    .priority-radio:checked + .priority-label { font-weight:700; }
+    #prio-low:checked + .priority-label   { background:#d3e8d4;border-color:#516353;color:#394b3c; }
+    #prio-med:checked + .priority-label   { background:#d7e5e7;border-color:#334042;color:#111e1f; }
+    #prio-high:checked + .priority-label  { background:#ffd9de;border-color:#5c3139;color:#330f17; }
+
+    /* Summary card */
+    .summary-item { background:#f2f3f9;border-radius:10px;padding:14px 16px;border:1px solid rgba(195,199,200,0.3); }
+    .summary-label { font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#737879;margin-bottom:5px; }
+    .summary-value { font-size:14px;font-weight:600;color:#191c20; }
+
+    .search-dropdown { position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid rgba(195,199,200,0.5);border-radius:10px;box-shadow:0 8px 24px rgba(74,87,89,0.12);z-index:30;overflow:hidden; }
+    .search-dropdown-item { display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;font-size:13px;color:#191c20;transition:background 0.15s; }
+    .search-dropdown-item:hover { background:#f2f3f9; }
+  </style>
+</head>
+<body>
+
+<div id="sidebar-overlay"></div>
+
+<aside id="sidebar">
+  <div style="padding:20px 20px 16px;border-bottom:1px solid #eceef3;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#334042,#4a5759);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span class="material-symbols-outlined" style="color:#d7e5e7;font-size:22px;">developer_board</span>
+      </div>
+      <div><div style="font-weight:800;font-size:15px;color:#191c20;line-height:1.2;">Electronics Lab</div><div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Department Admin</div></div>
+    </div>
+    <button data-action="new-assignment" class="btn-primary" style="width:100%;margin-top:16px;justify-content:center;font-size:13px;padding:9px;">
+      <span class="material-symbols-outlined" style="font-size:16px;">add</span> New Assignment
+    </button>
+  </div>
+  <nav style="flex:1;padding:12px 10px;overflow-y:auto;">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:8px 10px 4px;">Main Menu</div>
+    <a href="index.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">dashboard</span> Overview</a>
+    <a href="batches.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">grid_view</span> Batches</a>
+    <a href="students.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">group</span> Students</a>
+    <a href="experiments.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">biotech</span> Experiments</a>
+    <a href="evaluation.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">assignment_turned_in</span> Evaluation</a>
+    <a href="assign-task.html" class="nav-link"><span class="material-symbols-outlined icon-fill" style="font-size:20px;">send</span> Assign Task</a>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:16px 10px 4px;">System</div>
+    <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">history_edu</span> System Logs</a>
+    <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">contact_support</span> Support</a>
+  </nav>
+  <div style="padding:16px 20px;border-top:1px solid #eceef3;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;">AD</div>
+      <div><div style="font-weight:700;font-size:13px;color:#191c20;">Admin User</div><div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">admin@lab.edu</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="content-area">
+  <header class="top-header">
+    <button id="sidebar-toggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
+    <span style="font-size:16px;font-weight:800;color:#191c20;letter-spacing:-0.01em;white-space:nowrap;">CircuitLab Admin</span>
+    <div style="flex:1;max-width:340px;position:relative;margin-left:8px;">
+      <span class="material-symbols-outlined" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:18px;color:#737879;pointer-events:none;">search</span>
+      <input class="search-input" type="text" placeholder="Search… (Ctrl+K)" style="padding-left:36px;" />
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;margin-left:auto;">
+      <button class="btn-ghost btn-notification" style="position:relative;"><span class="material-symbols-outlined" style="font-size:22px;">notifications</span><span class="notif-badge"></span></button>
+      <button class="btn-ghost btn-settings"><span class="material-symbols-outlined" style="font-size:22px;">settings</span></button>
+      <div style="width:1px;height:24px;background:#e1e2e8;margin:0 6px;"></div>
+      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;cursor:pointer;">AD</div>
+    </div>
+  </header>
+
+  <main style="flex:1;padding:0 24px 40px;max-width:1440px;margin:0 auto;width:100%;">
+
+    <div class="page-header">
+      <h2>Assign Task</h2>
+      <p>Configure and dispatch lab experiments to specific batches or individual students.</p>
+    </div>
+
+    <div class="assign-grid">
+
+      <!-- ── Left: Form ── -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Card 1: Target Selection -->
+        <div class="card" style="padding:24px;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#d3e8d4,#f5b6bf);border-radius:12px 12px 0 0;"></div>
+          <h3 style="font-size:15px;font-weight:800;color:#191c20;margin:0 0 20px;display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:20px;color:#4a5759;">group_add</span> Select Target
+          </h3>
+
+          <!-- Assignment Type -->
+          <div style="margin-bottom:20px;">
+            <label class="form-label">Assignment Type</label>
+            <div style="display:flex;gap:12px;">
+              <input type="radio" name="assignment_type" id="type-batch" class="radio-card" checked />
+              <label for="type-batch" class="radio-label" id="lbl-batch">
+                <span class="material-symbols-outlined radio-icon" style="font-size:24px;color:#737879;">grid_view</span>
+                <span style="font-size:13px;font-weight:600;">Batch</span>
+              </label>
+              <input type="radio" name="assignment_type" id="type-individual" class="radio-card" />
+              <label for="type-individual" class="radio-label" id="lbl-individual">
+                <span class="material-symbols-outlined radio-icon" style="font-size:24px;color:#737879;">person</span>
+                <span style="font-size:13px;font-weight:600;">Individual Student</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Search with dropdown -->
+          <div style="position:relative;">
+            <label class="form-label">Search Batch / Student</label>
+            <div style="position:relative;">
+              <span class="material-symbols-outlined" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;color:#737879;pointer-events:none;">search</span>
+              <input class="form-input" id="target-search" type="text" placeholder="e.g., Batch B2024 or John Doe…" style="padding-left:38px;" autocomplete="off" />
+            </div>
+            <div class="search-dropdown" id="target-dropdown" style="display:none;">
+              <div class="search-dropdown-item" onclick="selectTarget('Batch 2024 — A','42 Students')">
+                <span class="material-symbols-outlined" style="font-size:16px;color:#737879;">grid_view</span> Batch 2024 — A <span style="color:#737879;margin-left:auto;font-size:11px;">42 students</span>
+              </div>
+              <div class="search-dropdown-item" onclick="selectTarget('Batch 2024 — B','38 Students')">
+                <span class="material-symbols-outlined" style="font-size:16px;color:#737879;">grid_view</span> Batch 2024 — B <span style="color:#737879;margin-left:auto;font-size:11px;">38 students</span>
+              </div>
+              <div class="search-dropdown-item" onclick="selectTarget('Alex Chen','EL-24-001')">
+                <span class="material-symbols-outlined" style="font-size:16px;color:#737879;">person</span> Alex Chen <span style="color:#737879;margin-left:auto;font-size:11px;">EL-24-001</span>
+              </div>
+              <div class="search-dropdown-item" onclick="selectTarget('Samir Patel','EL-24-018')">
+                <span class="material-symbols-outlined" style="font-size:16px;color:#737879;">person</span> Samir Patel <span style="color:#737879;margin-left:auto;font-size:11px;">EL-24-018</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Experiment & Timing -->
+        <div class="card" style="padding:24px;">
+          <h3 style="font-size:15px;font-weight:800;color:#191c20;margin:0 0 20px;display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:20px;color:#4a5759;">science</span> Experiment Details
+          </h3>
+
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <!-- Experiment Select -->
+            <div>
+              <label class="form-label" for="exp-select">Select Experiment</label>
+              <div style="position:relative;">
+                <select class="form-input form-select" id="exp-select" onchange="updateSummary()">
+                  <option value="" disabled selected>Choose an experiment from the library…</option>
+                  <option value="exp1">EXP-01: Basic Logic Gates Analysis</option>
+                  <option value="exp2">EXP-02: Operational Amplifier Characteristics</option>
+                  <option value="exp3">EXP-03: 555 Timer Astable Multivibrator</option>
+                  <option value="exp4">EXP-04: Oscilloscope Basics</option>
+                  <option value="exp5">EXP-05: Active RC Filters</option>
+                </select>
+                <span class="material-symbols-outlined" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:18px;color:#737879;pointer-events:none;">expand_more</span>
+              </div>
+            </div>
+
+            <!-- Deadline + Priority row -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div>
+                <label class="form-label" for="deadline">Deadline</label>
+                <div style="position:relative;">
+                  <span class="material-symbols-outlined" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;color:#737879;pointer-events:none;">calendar_month</span>
+                  <input class="form-input" id="deadline" type="date" style="padding-left:38px;" onchange="updateSummary()" />
+                </div>
+              </div>
+              <div>
+                <label class="form-label">Priority</label>
+                <div style="display:flex;gap:8px;">
+                  <input type="radio" name="priority" id="prio-low" class="priority-radio" value="low" />
+                  <label for="prio-low" class="priority-label">Low</label>
+                  <input type="radio" name="priority" id="prio-med" class="priority-radio" value="medium" checked />
+                  <label for="prio-med" class="priority-label">Med</label>
+                  <input type="radio" name="priority" id="prio-high" class="priority-radio" value="high" />
+                  <label for="prio-high" class="priority-label">High</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Instructions -->
+            <div>
+              <label class="form-label">Additional Instructions <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></label>
+              <textarea class="form-input" id="instructions" rows="3" style="resize:vertical;" placeholder="Add any specific notes or variations for this assignment…"></textarea>
+            </div>
+
+            <!-- Notification toggle -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#f2f3f9;border-radius:10px;border:1px solid rgba(195,199,200,0.3);">
+              <div>
+                <div style="font-weight:600;font-size:14px;color:#191c20;">Send Notifications</div>
+                <div style="font-size:12px;color:#737879;font-family:'Space Grotesk',sans-serif;margin-top:2px;">Notify students via email when task is assigned</div>
+              </div>
+              <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;">
+                <input type="checkbox" id="notify-toggle" style="opacity:0;width:0;height:0;position:absolute;" checked />
+                <div id="toggle-track" style="width:44px;height:24px;background:#4a5759;border-radius:999px;transition:background 0.2s;position:relative;">
+                  <div id="toggle-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform 0.2s;transform:translateX(20px);box-shadow:0 1px 4px rgba(0,0,0,0.2);"></div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Right: Summary + Submit ── -->
+      <div style="display:flex;flex-direction:column;gap:20px;position:sticky;top:80px;">
+
+        <div class="card" style="padding:24px;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#4a5759;border-radius:12px 12px 0 0;"></div>
+          <h3 style="font-size:15px;font-weight:800;color:#191c20;margin:0 0 20px;display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:20px;color:#4a5759;">assignment</span> Summary
+          </h3>
+
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div class="summary-item">
+              <div class="summary-label">Target</div>
+              <div class="summary-value" id="sum-target" style="display:flex;align-items:center;gap:6px;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#516353;display:inline-block;"></span>
+                <span>Batch 2024 — A</span>
+              </div>
+              <div style="font-size:12px;color:#737879;font-family:'Space Grotesk',sans-serif;margin-top:3px;" id="sum-target-sub">42 Students</div>
+            </div>
+
+            <div class="summary-item">
+              <div class="summary-label">Experiment</div>
+              <div class="summary-value" id="sum-experiment">EXP-01: Basic Logic Gates Analysis</div>
+              <div style="display:flex;gap:6px;margin-top:8px;" id="sum-tags">
+                <span style="padding:2px 8px;border-radius:4px;font-size:11px;font-family:'Space Grotesk',sans-serif;background:#e1e2e8;color:#424848;border:1px solid rgba(195,199,200,0.4);">Digital</span>
+                <span style="padding:2px 8px;border-radius:4px;font-size:11px;font-family:'Space Grotesk',sans-serif;background:#d7e5e7;color:#334042;border:1px solid rgba(187,201,203,0.4);">Medium Priority</span>
+              </div>
+            </div>
+
+            <div class="summary-item" id="sum-deadline-block" style="display:none;">
+              <div class="summary-label">Deadline</div>
+              <div class="summary-value" id="sum-deadline">—</div>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div style="margin-top:24px;padding-top:20px;border-top:1px solid #eceef3;">
+            <button id="assign-btn" class="btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:15px;border-radius:10px;">
+              <span class="material-symbols-outlined" style="font-size:18px;">send</span> Assign Task
+            </button>
+            <p style="text-align:center;font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;margin-top:10px;" id="notify-note">Notifications will be sent immediately.</p>
+          </div>
+        </div>
+
+        <!-- Recent Assignments -->
+        <div class="card" style="padding:20px;">
+          <div style="font-weight:700;font-size:14px;color:#191c20;margin-bottom:14px;">Recent Assignments</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;">
+              <span class="material-symbols-outlined" style="font-size:16px;color:#516353;">check_circle</span>
+              <span style="flex:1;color:#191c20;">EXP-02 → Batch B</span>
+              <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;color:#737879;">2h ago</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;">
+              <span class="material-symbols-outlined" style="font-size:16px;color:#516353;">check_circle</span>
+              <span style="flex:1;color:#191c20;">EXP-01 → Batch A</span>
+              <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;color:#737879;">1d ago</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;">
+              <span class="material-symbols-outlined" style="font-size:16px;color:#516353;">check_circle</span>
+              <span style="flex:1;color:#191c20;">EXP-03 → Alex Chen</span>
+              <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;color:#737879;">3d ago</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  // ── Dropdown search ──────────────────────────────
+  const targetSearch = document.getElementById('target-search');
+  const targetDropdown = document.getElementById('target-dropdown');
+
+  targetSearch.addEventListener('focus', () => { targetDropdown.style.display = 'block'; });
+  targetSearch.addEventListener('input', () => {
+    targetDropdown.style.display = targetSearch.value.length >= 0 ? 'block' : 'none';
+  });
+  document.addEventListener('click', (e) => {
+    if (!targetSearch.closest('.card').contains(e.target)) targetDropdown.style.display = 'none';
+  });
+
+  function selectTarget(name, sub) {
+    targetSearch.value = name;
+    targetDropdown.style.display = 'none';
+    document.getElementById('sum-target').innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:#516353;display:inline-block;"></span> ${name}`;
+    document.getElementById('sum-target-sub').textContent = sub;
+  }
+
+  // ── Priority label update ────────────────────────
+  document.querySelectorAll('.priority-radio').forEach(radio => {
+    radio.addEventListener('change', () => {
+      const labels = { low: 'Low Priority', medium: 'Medium Priority', high: 'High Priority' };
+      const colors = { low: 'background:#d3e8d4;color:#394b3c;', medium: 'background:#d7e5e7;color:#334042;', high: 'background:#ffd9de;color:#673a42;' };
+      const v = radio.value;
+      const tagsEl = document.getElementById('sum-tags');
+      const chips = tagsEl.querySelectorAll('span');
+      if (chips[1]) { chips[1].textContent = labels[v]; chips[1].style.cssText = `padding:2px 8px;border-radius:4px;font-size:11px;font-family:'Space Grotesk',sans-serif;border:1px solid rgba(195,199,200,0.4);${colors[v]}`; }
+    });
+  });
+
+  // ── Experiment select → summary ──────────────────
+  function updateSummary() {
+    const expSel = document.getElementById('exp-select');
+    const expText = expSel.options[expSel.selectedIndex]?.text || '—';
+    document.getElementById('sum-experiment').textContent = expSel.value ? expText : '—';
+
+    const dl = document.getElementById('deadline').value;
+    const dlBlock = document.getElementById('sum-deadline-block');
+    if (dl) {
+      dlBlock.style.display = 'block';
+      const d = new Date(dl);
+      document.getElementById('sum-deadline').textContent = d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+    } else {
+      dlBlock.style.display = 'none';
+    }
+  }
+
+  // ── Notification toggle ──────────────────────────
+  const toggle = document.getElementById('notify-toggle');
+  const track = document.getElementById('toggle-track');
+  const thumb = document.getElementById('toggle-thumb');
+  const note = document.getElementById('notify-note');
+  toggle.addEventListener('change', () => {
+    track.style.background = toggle.checked ? '#4a5759' : '#c3c7c8';
+    thumb.style.transform = toggle.checked ? 'translateX(20px)' : 'translateX(0)';
+    note.textContent = toggle.checked ? 'Notifications will be sent immediately.' : 'No notifications will be sent.';
+  });
+
+  // ── Assign button ────────────────────────────────
+  document.getElementById('assign-btn').addEventListener('click', () => {
+    const exp = document.getElementById('exp-select').value;
+    if (!exp) { window.showToast('Please select an experiment first', 'error'); return; }
+    window.showToast('Task assigned successfully! Students notified.', 'success');
+    document.getElementById('assign-btn').textContent = '✓ Task Assigned';
+    document.getElementById('assign-btn').style.background = '#516353';
+    setTimeout(() => {
+      document.getElementById('assign-btn').innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">send</span> Assign Task';
+      document.getElementById('assign-btn').style.background = '';
+    }, 3000);
+  });
+</script>
+</body>
+</html>

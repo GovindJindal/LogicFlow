@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Experiments — LogicFlow Admin</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="js/tailwind-config.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <style>
+    .exp-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px; }
+    .exp-card { background:#fff;border-radius:12px;border:1px solid rgba(195,199,200,0.4);overflow:hidden;display:flex;flex-direction:column;transition:transform 0.25s,box-shadow 0.25s;position:relative; }
+    .exp-card:hover { transform:translateY(-3px);box-shadow:0 12px 40px -8px rgba(74,87,89,0.12); }
+    .exp-card:hover .exp-title { color:#4a5759; }
+    .diff-badge { display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:0.03em;border:1px solid rgba(195,199,200,0.4); }
+    .diff-beginner { background:#d3e8d4;color:#394b3c; }
+    .diff-intermediate { background:#d7e5e7;color:#334042; }
+    .diff-advanced { background:#ffd9de;color:#673a42; }
+  </style>
+</head>
+<body>
+
+<div id="sidebar-overlay"></div>
+
+<aside id="sidebar">
+  <div style="padding:20px 20px 16px;border-bottom:1px solid #eceef3;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#334042,#4a5759);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span class="material-symbols-outlined" style="color:#d7e5e7;font-size:22px;">developer_board</span>
+      </div>
+      <div><div style="font-weight:800;font-size:15px;color:#191c20;line-height:1.2;">Electronics Lab</div><div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Department Admin</div></div>
+    </div>
+    <button data-action="new-assignment" class="btn-primary" style="width:100%;margin-top:16px;justify-content:center;font-size:13px;padding:9px;">
+      <span class="material-symbols-outlined" style="font-size:16px;">add</span> New Assignment
+    </button>
+  </div>
+  <nav style="flex:1;padding:12px 10px;overflow-y:auto;">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:8px 10px 4px;">Main Menu</div>
+    <a href="index.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">dashboard</span> Overview</a>
+    <a href="batches.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">grid_view</span> Batches</a>
+    <a href="students.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">group</span> Students</a>
+    <a href="experiments.html" class="nav-link"><span class="material-symbols-outlined icon-fill" style="font-size:20px;">biotech</span> Experiments</a>
+    <a href="evaluation.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">assignment_turned_in</span> Evaluation</a>
+    <a href="assign-task.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">send</span> Assign Task</a>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:16px 10px 4px;">System</div>
+    <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">history_edu</span> System Logs</a>
+    <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">contact_support</span> Support</a>
+  </nav>
+  <div style="padding:16px 20px;border-top:1px solid #eceef3;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;">AD</div>
+      <div><div style="font-weight:700;font-size:13px;color:#191c20;">Admin User</div><div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">admin@lab.edu</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="content-area">
+  <header class="top-header">
+    <button id="sidebar-toggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
+    <span style="font-size:16px;font-weight:800;color:#191c20;letter-spacing:-0.01em;white-space:nowrap;">CircuitLab Admin</span>
+    <div style="flex:1;max-width:340px;position:relative;margin-left:8px;">
+      <span class="material-symbols-outlined" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:18px;color:#737879;pointer-events:none;">search</span>
+      <input class="search-input" type="text" placeholder="Search experiments… (Ctrl+K)" style="padding-left:36px;" />
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;margin-left:auto;">
+      <button class="btn-ghost btn-notification" style="position:relative;"><span class="material-symbols-outlined" style="font-size:22px;">notifications</span><span class="notif-badge"></span></button>
+      <button class="btn-ghost btn-settings"><span class="material-symbols-outlined" style="font-size:22px;">settings</span></button>
+      <div style="width:1px;height:24px;background:#e1e2e8;margin:0 6px;"></div>
+      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;cursor:pointer;">AD</div>
+    </div>
+  </header>
+
+  <main style="flex:1;padding:0 24px 40px;max-width:1440px;margin:0 auto;width:100%;">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2>Experiment Library</h2>
+        <p>Manage and assign interactive electronics modules to your student batches.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <select data-filter style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
+          <option>All Difficulties</option><option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+        </select>
+        <button class="btn-outline"><span class="material-symbols-outlined" style="font-size:16px;">filter_list</span> Filters</button>
+        <button class="btn-primary" onclick="window.showToast('Creator Studio launching soon!','info')"><span class="material-symbols-outlined" style="font-size:16px;">add</span> New Experiment</button>
+      </div>
+    </div>
+
+    <!-- Experiments Grid -->
+    <div class="exp-grid">
+
+      <!-- EXP-01 -->
+      <div class="exp-card stagger-item fade-in">
+        <div style="height:3px;background:#516353;"></div>
+        <div style="padding:22px;flex:1;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+            <div style="width:48px;height:48px;border-radius:10px;background:#d3e8d4;display:flex;align-items:center;justify-content:center;">
+              <span class="material-symbols-outlined icon-fill" style="font-size:24px;color:#394b3c;">hub</span>
+            </div>
+            <span class="diff-badge diff-beginner">Beginner</span>
+          </div>
+          <div class="exp-title" style="font-size:16px;font-weight:800;color:#191c20;margin-bottom:8px;transition:color 0.2s;">Boolean Logic Gates</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;line-height:1.6;flex:1;margin-bottom:16px;">Introduction to fundamental digital logic. Students wire AND, OR, and NOT gates to construct basic truth tables.</div>
+          <div style="display:flex;gap:16px;font-family:'Space Grotesk',sans-serif;font-size:12px;color:#737879;margin-bottom:18px;">
+            <span style="display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:14px;">schedule</span>45 mins</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:14px;">group</span>120 Assigned</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f2f3f9;padding-top:16px;">
+            <button onclick="window.showToast('Opening preview…','info')" style="background:none;border:none;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:#4a5759;cursor:pointer;display:flex;align-items:center;gap:4px;">Preview <span class="material-symbols-outlined" style="font-size:14px;">visibility</span></button>
+            <a href="assign-task.html" class="btn-primary" style="font-size:12px;padding:7px 14px;">Assign</a>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:0;right:0;width:80px;height:80px;background:rgba(211,232,212,0.3);filter:blur(24px);border-radius:50%;pointer-events:none;"></div>
+      </div>
+
+      <!-- EXP-02 -->
+      <div class="exp-card stagger-item fade-in">
+        <div style="height:3px;background:#334042;"></div>
+        <div style="padding:22px;flex:1;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+            <div style="width:48px;height:48px;border-radius:10px;background:#d7e5e7;display:flex;align-items:center;justify-content:center;">
+              <span class="material-symbols-outlined icon-fill" style="font-size:24px;color:#334042;">monitor_heart</span>
+            </div>
+            <span class="diff-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="exp-title" style="font-size:16px;font-weight:800;color:#191c20;margin-bottom:8px;transition:color 0.2s;">Oscilloscope Basics</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;line-height:1.6;flex:1;margin-bottom:16px;">Learn to visualize AC signals. Measure amplitude, frequency, and phase shift using a virtual dual-channel scope.</div>
+          <div style="display:flex;gap:16px;font-family:'Space Grotesk',sans-serif;font-size:12px;color:#737879;margin-bottom:18px;">
+            <span style="display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:14px;">schedule</span>60 mins</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:14px;">group</span>85 Assigned</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f2f3f9;padding-top:16px;">
+            <button onclick="window.showToast('Opening preview…','info')" style="background:none;border:none;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:#4a5759;cursor:pointer;display:flex;align-items:center;gap:4px;">Preview <span class="material-symbols-outlined" style="font-size:14px;">visibility</span></button>
+            <a href="assign-task.html" class="btn-primary" style="font-size:12px;padding:7px 14px;">Assign</a>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:0;right:0;width:80px;height:80px;background:rgba(215,229,231,0.3);filter:blur(24px);border-radius:50%;pointer-events:none;"></div>
+      </div>
+
+      <!-- EXP-03 -->
+      <div class="exp-card stagger-item fade-in">
+        <div style="height:3px;background:#5c3139;"></div>
+        <div style="padding:22px;flex:1;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+            <div style="width:48px;height:48px;border-radius:10px;background:#ffd9de;display:flex;align-items:center;justify-content:center;">
+              <span class="material-symbols-outlined icon-fill" style="font-size:24px;color:#330f17;">ssid_chart</span>
+            </div>
+            <span class="diff-badge diff-advanced">Advanced</span>
+          </div>
+          <div class="exp-title" style="font-size:16px;font-weight:800;color:#191c20;margin-bottom:8px;transition:color 0.2s;">Active RC Filters</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;line-height:1.6;flex:1;margin-bottom:16px;">Design and analyze Low-Pass and High-Pass filters utilizing Op-Amps. Plot Bode diagrams and calculate cutoff frequencies.</div>
+          <div style="display:flex;gap:16px;font-family:'Space Grotesk',sans-serif;font-size:12px;color:#737879;margin-bottom:18px;">
+            <span style="display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:14px;">schedule</span>90 mins</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:14px;">group</span>42 Assigned</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f2f3f9;padding-top:16px;">
+            <button onclick="window.showToast('Opening preview…','info')" style="background:none;border:none;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:#4a5759;cursor:pointer;display:flex;align-items:center;gap:4px;">Preview <span class="material-symbols-outlined" style="font-size:14px;">visibility</span></button>
+            <a href="assign-task.html" class="btn-primary" style="font-size:12px;padding:7px 14px;">Assign</a>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:0;right:0;width:80px;height:80px;background:rgba(255,217,222,0.4);filter:blur(24px);border-radius:50%;pointer-events:none;"></div>
+      </div>
+
+      <!-- EXP-04 -->
+      <div class="exp-card stagger-item fade-in">
+        <div style="height:3px;background:#516353;"></div>
+        <div style="padding:22px;flex:1;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+            <div style="width:48px;height:48px;border-radius:10px;background:#d3e8d4;display:flex;align-items:center;justify-content:center;">
+              <span class="material-symbols-outlined icon-fill" style="font-size:24px;color:#394b3c;">memory</span>
+            </div>
+            <span class="diff-badge diff-beginner">Beginner</span>
+          </div>
+          <div class="exp-title" style="font-size:16px;font-weight:800;color:#191c20;margin-bottom:8px;transition:color 0.2s;">555 Timer Circuits</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;line-height:1.6;flex:1;margin-bottom:16px;">Explore astable and monostable modes of the 555 timer. Build an LED blinker and analyze timing equations.</div>
+          <div style="display:flex;gap:16px;font-family:'Space Grotesk',sans-serif;font-size:12px;color:#737879;margin-bottom:18px;">
+            <span style="display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:14px;">schedule</span>50 mins</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:14px;">group</span>67 Assigned</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f2f3f9;padding-top:16px;">
+            <button onclick="window.showToast('Opening preview…','info')" style="background:none;border:none;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:#4a5759;cursor:pointer;display:flex;align-items:center;gap:4px;">Preview <span class="material-symbols-outlined" style="font-size:14px;">visibility</span></button>
+            <a href="assign-task.html" class="btn-primary" style="font-size:12px;padding:7px 14px;">Assign</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXP-05 -->
+      <div class="exp-card stagger-item fade-in">
+        <div style="height:3px;background:#334042;"></div>
+        <div style="padding:22px;flex:1;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+            <div style="width:48px;height:48px;border-radius:10px;background:#d7e5e7;display:flex;align-items:center;justify-content:center;">
+              <span class="material-symbols-outlined icon-fill" style="font-size:24px;color:#111e1f;">developer_board</span>
+            </div>
+            <span class="diff-badge diff-intermediate">Intermediate</span>
+          </div>
+          <div class="exp-title" style="font-size:16px;font-weight:800;color:#191c20;margin-bottom:8px;transition:color 0.2s;">Microcontroller Interfaces</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;line-height:1.6;flex:1;margin-bottom:16px;">Interface analog sensors with digital microcontrollers. Features interactive breadboarding and real-time serial monitor.</div>
+          <div style="display:flex;gap:16px;font-family:'Space Grotesk',sans-serif;font-size:12px;color:#737879;margin-bottom:18px;">
+            <span style="display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:14px;">schedule</span>75 mins</span>
+            <span style="display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:14px;">group</span>95 Assigned</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f2f3f9;padding-top:16px;">
+            <button onclick="window.showToast('Opening preview…','info')" style="background:none;border:none;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:#4a5759;cursor:pointer;display:flex;align-items:center;gap:4px;">Preview <span class="material-symbols-outlined" style="font-size:14px;">visibility</span></button>
+            <a href="assign-task.html" class="btn-primary" style="font-size:12px;padding:7px 14px;">Assign</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Request Card -->
+      <div class="exp-card stagger-item fade-in" style="background:#f8f9ff;border-style:dashed;align-items:center;justify-content:center;min-height:280px;">
+        <div style="padding:32px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;">
+          <div style="width:64px;height:64px;border-radius:50%;background:#fff;box-shadow:0 2px 12px rgba(74,87,89,0.1);display:flex;align-items:center;justify-content:center;">
+            <span class="material-symbols-outlined icon-fill" style="font-size:32px;color:#4a5759;">science</span>
+          </div>
+          <div style="font-size:16px;font-weight:800;color:#191c20;">Request Custom</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;line-height:1.5;">Need a specific circuit setup? Build a custom experiment template for your syllabus.</div>
+          <button onclick="window.showToast('Creator Studio launching soon!','info')" style="background:none;border:none;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:#4a5759;cursor:pointer;margin-top:4px;text-decoration:underline;">Launch Creator Studio</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

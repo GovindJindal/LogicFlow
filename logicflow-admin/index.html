@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — LogicFlow Admin</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="js/tailwind-config.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+</head>
+<body>
+
+<!-- Sidebar Overlay (mobile) -->
+<div id="sidebar-overlay"></div>
+
+<!-- ═══ SIDEBAR ═══════════════════════════════════════════════ -->
+<aside id="sidebar">
+  <div style="padding:20px 20px 16px; border-bottom:1px solid #eceef3;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#334042,#4a5759);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span class="material-symbols-outlined" style="color:#d7e5e7;font-size:22px;">developer_board</span>
+      </div>
+      <div>
+        <div style="font-weight:800;font-size:15px;color:#191c20;line-height:1.2;">Electronics Lab</div>
+        <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Department Admin</div>
+      </div>
+    </div>
+    <button data-action="new-assignment" class="btn-primary" style="width:100%;margin-top:16px;justify-content:center;font-size:13px;padding:9px;">
+      <span class="material-symbols-outlined" style="font-size:16px;">add</span> New Assignment
+    </button>
+  </div>
+
+  <nav style="flex:1;padding:12px 10px;overflow-y:auto;">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:8px 10px 4px;">Main Menu</div>
+    <a href="index.html" class="nav-link"><span class="material-symbols-outlined icon-fill" style="font-size:20px;">dashboard</span> Overview</a>
+    <a href="batches.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">grid_view</span> Batches</a>
+    <a href="students.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">group</span> Students</a>
+    <a href="experiments.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">biotech</span> Experiments</a>
+    <a href="evaluation.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">assignment_turned_in</span> Evaluation</a>
+    <a href="assign-task.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">send</span> Assign Task</a>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:16px 10px 4px;">System</div>
+    <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">history_edu</span> System Logs</a>
+    <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">contact_support</span> Support</a>
+  </nav>
+
+  <div style="padding:16px 20px;border-top:1px solid #eceef3;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;">AD</div>
+      <div>
+        <div style="font-weight:700;font-size:13px;color:#191c20;">Admin User</div>
+        <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">admin@lab.edu</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ CONTENT AREA ══════════════════════════════════════════ -->
+<div class="content-area">
+
+  <!-- Top Header -->
+  <header class="top-header">
+    <button id="sidebar-toggle" aria-label="Toggle menu">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <span style="font-size:16px;font-weight:800;color:#191c20;letter-spacing:-0.01em;white-space:nowrap;">CircuitLab Admin</span>
+
+    <div style="flex:1;max-width:340px;position:relative;margin-left:8px;">
+      <span class="material-symbols-outlined" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:18px;color:#737879;pointer-events:none;">search</span>
+      <input class="search-input" type="text" placeholder="Search… (Ctrl+K)" style="padding-left:36px;" />
+    </div>
+
+    <div style="display:flex;align-items:center;gap:4px;margin-left:auto;">
+      <button class="btn-ghost btn-notification" style="position:relative;" title="Notifications">
+        <span class="material-symbols-outlined" style="font-size:22px;">notifications</span>
+        <span class="notif-badge"></span>
+      </button>
+      <button class="btn-ghost btn-settings" title="Settings">
+        <span class="material-symbols-outlined" style="font-size:22px;">settings</span>
+      </button>
+      <div style="width:1px;height:24px;background:#e1e2e8;margin:0 6px;"></div>
+      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;cursor:pointer;">AD</div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main style="flex:1;padding:0 24px 32px;max-width:1440px;margin:0 auto;width:100%;">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h2>Dashboard Overview</h2>
+      <p>Welcome back! Here's what's happening in your lab today.</p>
+    </div>
+
+    <!-- Stat Cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+
+      <div class="stat-card fade-in stagger-item">
+        <div class="stat-card-accent" style="background:#d3e8d4;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div class="stat-label">Total Students</div>
+          <div style="width:36px;height:36px;border-radius:8px;background:#f2f3f9;display:flex;align-items:center;justify-content:center;">
+            <span class="material-symbols-outlined" style="font-size:20px;color:#4a5759;">school</span>
+          </div>
+        </div>
+        <div class="stat-value">342</div>
+        <div class="stat-meta" style="color:#516353;">
+          <span class="material-symbols-outlined" style="font-size:16px;">trending_up</span> +12% this semester
+        </div>
+      </div>
+
+      <div class="stat-card fade-in stagger-item">
+        <div class="stat-card-accent" style="background:#d7e5e7;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div class="stat-label">Active Tasks</div>
+          <div style="width:36px;height:36px;border-radius:8px;background:#f2f3f9;display:flex;align-items:center;justify-content:center;">
+            <span class="material-symbols-outlined" style="font-size:20px;color:#4a5759;">bolt</span>
+          </div>
+        </div>
+        <div class="stat-value">18</div>
+        <div class="stat-meta"><span class="material-symbols-outlined" style="font-size:16px;">schedule</span> 3 pending review</div>
+      </div>
+
+      <div class="stat-card fade-in stagger-item">
+        <div class="stat-card-accent" style="background:#b8ccb9;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div class="stat-label">Completion Rate</div>
+          <div style="width:36px;height:36px;border-radius:8px;background:#f2f3f9;display:flex;align-items:center;justify-content:center;">
+            <span class="material-symbols-outlined" style="font-size:20px;color:#516353;">check_circle</span>
+          </div>
+        </div>
+        <div class="stat-value">87%</div>
+        <div class="progress-bar" style="margin-top:8px;">
+          <div class="progress-fill" data-width="87%" style="width:0;"></div>
+        </div>
+      </div>
+
+      <div class="stat-card fade-in stagger-item">
+        <div class="stat-card-accent" style="background:#f5b6bf;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div class="stat-label">Avg Score</div>
+          <div style="width:36px;height:36px;border-radius:8px;background:#f2f3f9;display:flex;align-items:center;justify-content:center;">
+            <span class="material-symbols-outlined" style="font-size:20px;color:#5c3139;">stars</span>
+          </div>
+        </div>
+        <div class="stat-value">92.4</div>
+        <div class="stat-meta" style="color:#77474f;">Top Quartile: 98+</div>
+      </div>
+
+    </div>
+
+    <!-- Charts Row -->
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;margin-bottom:24px;" class="fade-in stagger-item">
+
+      <!-- Bar Chart -->
+      <div class="card" style="padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <div>
+            <div style="font-weight:800;font-size:16px;color:#191c20;">Batch Performance</div>
+            <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;margin-top:2px;">Average scores across recent lab assignments</div>
+          </div>
+          <select data-filter style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:6px 12px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
+            <option>This Week</option><option>This Month</option><option>This Semester</option>
+          </select>
+        </div>
+        <div class="bar-chart">
+          <div class="chart-grid">
+            <div class="chart-gridline"></div><div class="chart-gridline"></div>
+            <div class="chart-gridline"></div><div class="chart-gridline"></div>
+            <div class="chart-gridline" style="border-color:rgba(195,199,200,0.7);"></div>
+          </div>
+          <div class="bar-wrap" data-value="72"><div class="bar" style="height:72%;"></div><div class="bar-tooltip">B1 — 72 avg</div><div class="bar-label">B1</div></div>
+          <div class="bar-wrap" data-value="85"><div class="bar" style="height:85%;background:#4a5759;"></div><div class="bar-tooltip">B2 — 85 avg</div><div class="bar-label">B2</div></div>
+          <div class="bar-wrap" data-value="92"><div class="bar" style="height:92%;background:#4a5759;"></div><div class="bar-tooltip">B3 — 92 avg</div><div class="bar-label" style="font-weight:700;color:#191c20;">B3</div></div>
+          <div class="bar-wrap" data-value="65"><div class="bar" style="height:65%;"></div><div class="bar-tooltip">B4 — 65 avg</div><div class="bar-label">B4</div></div>
+          <div class="bar-wrap" data-value="78"><div class="bar" style="height:78%;"></div><div class="bar-tooltip">B5 — 78 avg</div><div class="bar-label">B5</div></div>
+          <div class="bar-wrap" data-value="58"><div class="bar" style="height:58%;"></div><div class="bar-tooltip">B6 — 58 avg</div><div class="bar-label">B6</div></div>
+        </div>
+      </div>
+
+      <!-- Donut Chart -->
+      <div class="card" style="padding:24px;">
+        <div style="font-weight:800;font-size:16px;color:#191c20;">Task Status</div>
+        <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;margin:2px 0 24px;">Current module distribution</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+          <div class="donut-container">
+            <svg width="160" height="160" viewBox="0 0 160 160">
+              <circle cx="80" cy="80" r="60" fill="none" stroke="#e1e2e8" stroke-width="22"/>
+              <circle cx="80" cy="80" r="60" fill="none" stroke="#d3e8d4" stroke-width="22"
+                stroke-dasharray="226.2 377" stroke-dashoffset="0" transform="rotate(-90 80 80)"/>
+              <circle cx="80" cy="80" r="60" fill="none" stroke="#bbc9cb" stroke-width="22"
+                stroke-dasharray="94.2 377" stroke-dashoffset="-226.2" transform="rotate(-90 80 80)"/>
+              <circle cx="80" cy="80" r="60" fill="none" stroke="#ffdad6" stroke-width="22"
+                stroke-dasharray="56.6 377" stroke-dashoffset="-320.4" transform="rotate(-90 80 80)"/>
+            </svg>
+            <div class="donut-inner">
+              <div style="font-size:28px;font-weight:800;color:#191c20;line-height:1;">18</div>
+              <div style="font-size:10px;font-family:'Space Grotesk',sans-serif;color:#737879;text-transform:uppercase;letter-spacing:0.06em;">Total</div>
+            </div>
+          </div>
+          <div style="width:100%;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#d3e8d4;"></div><span style="font-size:13px;color:#424848;font-family:'Space Grotesk',sans-serif;">Completed</span></div>
+              <span style="font-weight:700;font-size:13px;color:#191c20;">60%</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#bbc9cb;"></div><span style="font-size:13px;color:#424848;font-family:'Space Grotesk',sans-serif;">In Progress</span></div>
+              <span style="font-weight:700;font-size:13px;color:#191c20;">25%</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#ffdad6;"></div><span style="font-size:13px;color:#424848;font-family:'Space Grotesk',sans-serif;">Needs Review</span></div>
+              <span style="font-weight:700;font-size:13px;color:#191c20;">15%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Recent Activity + Quick Links -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="fade-in stagger-item">
+
+      <!-- Recent Submissions -->
+      <div class="card" style="padding:0;">
+        <div style="padding:20px 20px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eceef3;">
+          <div style="font-weight:800;font-size:15px;color:#191c20;">Recent Submissions</div>
+          <a href="evaluation.html" style="font-size:13px;color:#4a5759;font-family:'Space Grotesk',sans-serif;font-weight:600;text-decoration:none;">View all →</a>
+        </div>
+        <div>
+          <!-- Row -->
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid #f2f3f9;">
+            <div class="avatar-fallback" style="background:#d7e5e7;color:#334042;">AC</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;font-size:14px;color:#191c20;">Alex Chen</div>
+              <div style="font-size:12px;color:#737879;font-family:'Space Grotesk',sans-serif;">Full Adder Implementation · Batch A</div>
+            </div>
+            <div><span class="chip chip-pass">98</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid #f2f3f9;">
+            <div class="avatar-fallback" style="background:#ffd9de;color:#5c3139;">SP</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;font-size:14px;color:#191c20;">Samir Patel</div>
+              <div style="font-size:12px;color:#737879;font-family:'Space Grotesk',sans-serif;">RC Filter Design · Batch B</div>
+            </div>
+            <div><span class="chip chip-review" style="background:#fdf5e6;color:#8b6508;">72</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid #f2f3f9;">
+            <div class="avatar-fallback" style="background:#ffdad6;color:#93000a;">JL</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;font-size:14px;color:#191c20;">Jordan Lee</div>
+              <div style="font-size:12px;color:#737879;font-family:'Space Grotesk',sans-serif;">Logic Gates Analysis · Batch C</div>
+            </div>
+            <div><span class="chip chip-fail">45</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;">
+            <div class="avatar-fallback" style="background:#e1e2e8;color:#424848;">TC</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;font-size:14px;color:#191c20;">Taylor Chen</div>
+              <div style="font-size:12px;color:#737879;font-family:'Space Grotesk',sans-serif;">Oscilloscope Basics · Batch A</div>
+            </div>
+            <div><span class="chip chip-pending">Pending</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card" style="padding:20px;">
+        <div style="font-weight:800;font-size:15px;color:#191c20;margin-bottom:16px;">Quick Actions</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <a href="assign-task.html" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px;border-radius:10px;border:1px solid #eceef3;background:#f8f9ff;transition:all 0.2s;cursor:pointer;" onmouseenter="this.style.background='#f2f3f9'" onmouseleave="this.style.background='#f8f9ff'">
+            <span class="material-symbols-outlined" style="font-size:28px;color:#4a5759;">send</span>
+            <span style="font-size:13px;font-weight:600;color:#191c20;text-align:center;">Assign Task</span>
+          </a>
+          <a href="batches.html" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px;border-radius:10px;border:1px solid #eceef3;background:#f8f9ff;transition:all 0.2s;cursor:pointer;" onmouseenter="this.style.background='#f2f3f9'" onmouseleave="this.style.background='#f8f9ff'">
+            <span class="material-symbols-outlined" style="font-size:28px;color:#516353;">group_add</span>
+            <span style="font-size:13px;font-weight:600;color:#191c20;text-align:center;">New Batch</span>
+          </a>
+          <a href="evaluation.html" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px;border-radius:10px;border:1px solid #eceef3;background:#f8f9ff;transition:all 0.2s;cursor:pointer;" onmouseenter="this.style.background='#f2f3f9'" onmouseleave="this.style.background='#f8f9ff'">
+            <span class="material-symbols-outlined" style="font-size:28px;color:#5c3139;">grading</span>
+            <span style="font-size:13px;font-weight:600;color:#191c20;text-align:center;">Grade Submissions</span>
+          </a>
+          <a href="experiments.html" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px;border-radius:10px;border:1px solid #eceef3;background:#f8f9ff;transition:all 0.2s;cursor:pointer;" onmouseenter="this.style.background='#f2f3f9'" onmouseleave="this.style.background='#f8f9ff'">
+            <span class="material-symbols-outlined" style="font-size:28px;color:#334042;">biotech</span>
+            <span style="font-size:13px;font-weight:600;color:#191c20;text-align:center;">Browse Experiments</span>
+          </a>
+        </div>
+
+        <!-- Upcoming Deadlines -->
+        <div style="margin-top:20px;padding-top:20px;border-top:1px solid #eceef3;">
+          <div style="font-weight:700;font-size:13px;color:#191c20;margin-bottom:12px;">Upcoming Deadlines</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;">
+              <div style="display:flex;align-items:center;gap:8px;"><span class="material-symbols-outlined" style="font-size:16px;color:#516353;">event</span><span style="color:#191c20;">Logic Gates — Batch A</span></div>
+              <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;background:#ffd9de;color:#673a42;padding:2px 8px;border-radius:999px;font-weight:600;">2 days</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;">
+              <div style="display:flex;align-items:center;gap:8px;"><span class="material-symbols-outlined" style="font-size:16px;color:#516353;">event</span><span style="color:#191c20;">RC Filter — Batch B</span></div>
+              <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;background:#d7e5e7;color:#334042;padding:2px 8px;border-radius:999px;font-weight:600;">5 days</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;">
+              <div style="display:flex;align-items:center;gap:8px;"><span class="material-symbols-outlined" style="font-size:16px;color:#516353;">event</span><span style="color:#191c20;">Op-Amp Lab — Batch C</span></div>
+              <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;background:#d3e8d4;color:#394b3c;padding:2px 8px;border-radius:999px;font-weight:600;">1 week</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

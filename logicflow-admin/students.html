@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Students — LogicFlow Admin</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="js/tailwind-config.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <style>
+    .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .student-row { cursor: pointer; transition: background 0.2s; }
+    .student-row:hover { background: rgba(242,243,249,0.8); }
+  </style>
+</head>
+<body>
+
+<div id="sidebar-overlay"></div>
+
+<aside id="sidebar">
+  <div style="padding:20px 20px 16px;border-bottom:1px solid #eceef3;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#334042,#4a5759);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span class="material-symbols-outlined" style="color:#d7e5e7;font-size:22px;">developer_board</span>
+      </div>
+      <div><div style="font-weight:800;font-size:15px;color:#191c20;line-height:1.2;">Electronics Lab</div><div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Department Admin</div></div>
+    </div>
+    <button data-action="new-assignment" class="btn-primary" style="width:100%;margin-top:16px;justify-content:center;font-size:13px;padding:9px;">
+      <span class="material-symbols-outlined" style="font-size:16px;">add</span> New Assignment
+    </button>
+  </div>
+  <nav style="flex:1;padding:12px 10px;overflow-y:auto;">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:8px 10px 4px;">Main Menu</div>
+    <a href="index.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">dashboard</span> Overview</a>
+    <a href="batches.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">grid_view</span> Batches</a>
+    <a href="students.html" class="nav-link"><span class="material-symbols-outlined icon-fill" style="font-size:20px;">group</span> Students</a>
+    <a href="experiments.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">biotech</span> Experiments</a>
+    <a href="evaluation.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">assignment_turned_in</span> Evaluation</a>
+    <a href="assign-task.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">send</span> Assign Task</a>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:16px 10px 4px;">System</div>
+    <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">history_edu</span> System Logs</a>
+    <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">contact_support</span> Support</a>
+  </nav>
+  <div style="padding:16px 20px;border-top:1px solid #eceef3;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;">AD</div>
+      <div><div style="font-weight:700;font-size:13px;color:#191c20;">Admin User</div><div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">admin@lab.edu</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="content-area">
+  <header class="top-header">
+    <button id="sidebar-toggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
+    <span style="font-size:16px;font-weight:800;color:#191c20;letter-spacing:-0.01em;white-space:nowrap;">CircuitLab Admin</span>
+    <div style="flex:1;max-width:340px;position:relative;margin-left:8px;">
+      <span class="material-symbols-outlined" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:18px;color:#737879;pointer-events:none;">search</span>
+      <input class="search-input" id="student-search" type="text" placeholder="Search students… (Ctrl+K)" style="padding-left:36px;" />
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;margin-left:auto;">
+      <button class="btn-ghost btn-notification" style="position:relative;"><span class="material-symbols-outlined" style="font-size:22px;">notifications</span><span class="notif-badge"></span></button>
+      <button class="btn-ghost btn-settings"><span class="material-symbols-outlined" style="font-size:22px;">settings</span></button>
+      <div style="width:1px;height:24px;background:#e1e2e8;margin:0 6px;"></div>
+      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;cursor:pointer;">AD</div>
+    </div>
+  </header>
+
+  <main style="flex:1;padding:0 24px 40px;max-width:1440px;margin:0 auto;width:100%;">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2>Students Directory</h2>
+        <p>Manage and monitor student performance across all lab batches.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-outline" data-action="export"><span class="material-symbols-outlined" style="font-size:16px;">download</span> Export</button>
+        <button class="btn-outline"><span class="material-symbols-outlined" style="font-size:16px;">filter_list</span> Filter</button>
+      </div>
+    </div>
+
+    <!-- Filter row -->
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+      <select id="batch-filter" data-filter style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
+        <option value="">All Batches</option><option>Batch A</option><option>Batch B</option><option>Batch C</option><option>Batch D</option>
+      </select>
+      <select id="status-filter" data-filter style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
+        <option value="">All Status</option><option>Active</option><option>At Risk</option><option>Inactive</option>
+      </select>
+      <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;margin-left:auto;" id="student-count">Showing 8 students</div>
+    </div>
+
+    <!-- Table -->
+    <div class="card" style="padding:0;">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#d7e5e7,#d3e8d4);border-radius:12px 12px 0 0;"></div>
+      <div class="table-container">
+        <table class="data-table" id="students-table">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Roll No</th>
+              <th>Batch</th>
+              <th>Tasks Completed</th>
+              <th>Avg Score</th>
+              <th>Status</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="students-tbody">
+            <tr class="student-row">
+              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#d7e5e7;color:#334042;font-size:12px;font-weight:700;">AC</div><div style="font-weight:600;font-size:14px;color:#191c20;">Alex Chen</div></div></td>
+              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-001</td>
+              <td style="font-size:13px;color:#424848;">Batch A</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="80%" style="width:0;"></div></div>
+                  <span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">8/10</span>
+                </div>
+              </td>
+              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#516353;">98</span></td>
+              <td><span class="chip chip-active">Active</span></td>
+              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#4a5759;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #4a5759;border-radius:6px;">Grade</a></td>
+            </tr>
+            <tr class="student-row">
+              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#ffd9de;color:#5c3139;font-size:12px;font-weight:700;">SP</div><div style="font-weight:600;font-size:14px;color:#191c20;">Samir Patel</div></div></td>
+              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-018</td>
+              <td style="font-size:13px;color:#424848;">Batch A</td>
+              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="60%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">6/10</span></div></td>
+              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#8b6508;">72</span></td>
+              <td><span class="chip chip-active">Active</span></td>
+              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#4a5759;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #4a5759;border-radius:6px;">Grade</a></td>
+            </tr>
+            <tr class="student-row">
+              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#ffdad6;color:#93000a;font-size:12px;font-weight:700;">JL</div><div style="font-weight:600;font-size:14px;color:#191c20;">Jordan Lee</div></div></td>
+              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-089</td>
+              <td style="font-size:13px;color:#424848;">Batch B</td>
+              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill progress-fill-tertiary" data-width="30%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">3/10</span></div></td>
+              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#ba1a1a;">45</span></td>
+              <td><span class="chip chip-review">At Risk</span></td>
+              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#ba1a1a;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #ba1a1a;border-radius:6px;">Review</a></td>
+            </tr>
+            <tr class="student-row">
+              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#e1e2e8;color:#424848;font-size:12px;font-weight:700;">TC</div><div style="font-weight:600;font-size:14px;color:#191c20;">Taylor Chen</div></div></td>
+              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-112</td>
+              <td style="font-size:13px;color:#424848;">Batch A</td>
+              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="50%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">5/10</span></div></td>
+              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#737879;">—</span></td>
+              <td><span class="chip chip-pending">Pending</span></td>
+              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#4a5759;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #4a5759;border-radius:6px;">Grade</a></td>
+            </tr>
+            <tr class="student-row">
+              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#d3e8d4;color:#394b3c;font-size:12px;font-weight:700;">MK</div><div style="font-weight:600;font-size:14px;color:#191c20;">Maya Kim</div></div></td>
+              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-023</td>
+              <td style="font-size:13px;color:#424848;">Batch C</td>
+              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="100%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">10/10</span></div></td>
+              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#516353;">95</span></td>
+              <td><span class="chip chip-active">Active</span></td>
+              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#4a5759;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #4a5759;border-radius:6px;">Grade</a></td>
+            </tr>
+            <tr class="student-row">
+              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#bbc9cb;color:#111e1f;font-size:12px;font-weight:700;">RN</div><div style="font-weight:600;font-size:14px;color:#191c20;">Raj Nair</div></div></td>
+              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-041</td>
+              <td style="font-size:13px;color:#424848;">Batch D</td>
+              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="70%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">7/10</span></div></td>
+              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#516353;">84</span></td>
+              <td><span class="chip chip-active">Active</span></td>
+              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#4a5759;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #4a5759;border-radius:6px;">Grade</a></td>
+            </tr>
+            <tr class="student-row">
+              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#ffd9de;color:#330f17;font-size:12px;font-weight:700;">LW</div><div style="font-weight:600;font-size:14px;color:#191c20;">Lily Wang</div></div></td>
+              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-067</td>
+              <td style="font-size:13px;color:#424848;">Batch B</td>
+              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill progress-fill-tertiary" data-width="20%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">2/10</span></div></td>
+              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#ba1a1a;">38</span></td>
+              <td><span class="chip chip-review">At Risk</span></td>
+              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#ba1a1a;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #ba1a1a;border-radius:6px;">Review</a></td>
+            </tr>
+            <tr class="student-row">
+              <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar-fallback" style="background:#d7e5e7;color:#111e1f;font-size:12px;font-weight:700;">DO</div><div style="font-weight:600;font-size:14px;color:#191c20;">David Osei</div></div></td>
+              <td style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:#737879;">EL-24-082</td>
+              <td style="font-size:13px;color:#424848;">Batch C</td>
+              <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" data-width="90%" style="width:0;"></div></div><span style="font-size:13px;font-family:'Space Grotesk',sans-serif;color:#191c20;">9/10</span></div></td>
+              <td><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#516353;">91</span></td>
+              <td><span class="chip chip-active">Active</span></td>
+              <td style="text-align:right;"><a href="evaluation.html" style="font-size:12px;color:#4a5759;font-weight:600;text-decoration:none;padding:4px 10px;border:1px solid #4a5759;border-radius:6px;">Grade</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div style="padding:14px 20px;border-top:1px solid #f2f3f9;display:flex;align-items:center;justify-content:space-between;background:rgba(242,243,249,0.3);">
+        <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;">Showing 1–8 of 342 students</div>
+        <div class="pagination">
+          <button class="page-btn" disabled><span class="material-symbols-outlined" style="font-size:18px;">chevron_left</span></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn" onclick="window.showToast('Navigating to page 2','info')">2</button>
+          <button class="page-btn" onclick="window.showToast('Navigating to page 3','info')">3</button>
+          <button class="page-btn" style="color:#737879;cursor:default;font-size:13px;">…</button>
+          <button class="page-btn" onclick="window.showToast('Navigating to last page','info')">43</button>
+          <button class="page-btn" onclick="window.showToast('Navigating to page 2','info')"><span class="material-symbols-outlined" style="font-size:18px;">chevron_right</span></button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  // Client-side search
+  const searchInput = document.getElementById('student-search');
+  const batchFilter = document.getElementById('batch-filter');
+  const statusFilter = document.getElementById('status-filter');
+  const tbody = document.getElementById('students-tbody');
+  const countEl = document.getElementById('student-count');
+
+  function filterTable() {
+    const q = searchInput.value.toLowerCase();
+    const batch = batchFilter.value.toLowerCase();
+    const status = statusFilter.value.toLowerCase();
+    let shown = 0;
+    tbody.querySelectorAll('tr').forEach(row => {
+      const text = row.textContent.toLowerCase();
+      const matchQ = !q || text.includes(q);
+      const matchB = !batch || text.includes(batch);
+      const matchS = !status || text.includes(status);
+      row.style.display = matchQ && matchB && matchS ? '' : 'none';
+      if (matchQ && matchB && matchS) shown++;
+    });
+    countEl.textContent = `Showing ${shown} student${shown !== 1 ? 's' : ''}`;
+  }
+
+  searchInput.addEventListener('input', filterTable);
+  batchFilter.addEventListener('change', filterTable);
+  statusFilter.addEventListener('change', filterTable);
+</script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evaluation — LogicFlow Admin</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="js/tailwind-config.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <style>
+    .grade-input {
+      width: 72px; padding: 6px 10px;
+      border: none; border-bottom: 2px solid #e1e2e8;
+      background: transparent; text-align: center;
+      font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700;
+      outline: none; transition: border-color 0.2s;
+      border-radius: 0;
+    }
+    .grade-input:focus { border-bottom-color: #4a5759; }
+    .grade-select {
+      width: 100%; padding: 7px 30px 7px 10px;
+      border: none; border-radius: 6px;
+      font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; outline: none; appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 6px center; background-size: 16px;
+    }
+    .grade-select.pass { background-color: #d3e8d4; color: #394b3c; }
+    .grade-select.warn { background-color: #fdf5e6; color: #8b6508; }
+    .grade-select.fail { background-color: #ffdad6; color: #93000a; }
+    .grade-select.pending { background-color: #e1e2e8; color: #424848; }
+    .comment-area {
+      width: 100%; padding: 8px 10px;
+      border: 1px solid rgba(195,199,200,0.5); border-radius: 8px;
+      background: transparent; resize: none;
+      font-family: 'Manrope', sans-serif; font-size: 13px; color: #424848;
+      outline: none; transition: border-color 0.2s, background 0.2s;
+    }
+    .comment-area:focus { border-color: #4a5759; background: #fff; }
+    .eval-row td { vertical-align: top; padding: 16px 18px; }
+    .eval-row:hover td { background: rgba(242,243,249,0.6); }
+    .eval-row.flagged td { background: rgba(255,218,214,0.12); }
+    @media (max-width: 900px) {
+      .eval-table-wrap { font-size: 13px; }
+      .eval-row td { padding: 12px 12px; }
+      .grade-input { width: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="sidebar-overlay"></div>
+
+<aside id="sidebar">
+  <div style="padding:20px 20px 16px;border-bottom:1px solid #eceef3;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#334042,#4a5759);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span class="material-symbols-outlined" style="color:#d7e5e7;font-size:22px;">developer_board</span>
+      </div>
+      <div><div style="font-weight:800;font-size:15px;color:#191c20;line-height:1.2;">Electronics Lab</div><div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Department Admin</div></div>
+    </div>
+    <button data-action="new-assignment" class="btn-primary" style="width:100%;margin-top:16px;justify-content:center;font-size:13px;padding:9px;">
+      <span class="material-symbols-outlined" style="font-size:16px;">add</span> New Assignment
+    </button>
+  </div>
+  <nav style="flex:1;padding:12px 10px;overflow-y:auto;">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:8px 10px 4px;">Main Menu</div>
+    <a href="index.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">dashboard</span> Overview</a>
+    <a href="batches.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">grid_view</span> Batches</a>
+    <a href="students.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">group</span> Students</a>
+    <a href="experiments.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">biotech</span> Experiments</a>
+    <a href="evaluation.html" class="nav-link"><span class="material-symbols-outlined icon-fill" style="font-size:20px;">assignment_turned_in</span> Evaluation</a>
+    <a href="assign-task.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">send</span> Assign Task</a>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:16px 10px 4px;">System</div>
+    <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">history_edu</span> System Logs</a>
+    <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">contact_support</span> Support</a>
+  </nav>
+  <div style="padding:16px 20px;border-top:1px solid #eceef3;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;">AD</div>
+      <div><div style="font-weight:700;font-size:13px;color:#191c20;">Admin User</div><div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">admin@lab.edu</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="content-area">
+  <header class="top-header">
+    <button id="sidebar-toggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
+    <span style="font-size:16px;font-weight:800;color:#191c20;letter-spacing:-0.01em;white-space:nowrap;">CircuitLab Admin</span>
+    <div style="flex:1;max-width:340px;position:relative;margin-left:8px;">
+      <span class="material-symbols-outlined" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:18px;color:#737879;pointer-events:none;">search</span>
+      <input class="search-input" type="text" placeholder="Search students… (Ctrl+K)" style="padding-left:36px;" />
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;margin-left:auto;">
+      <button class="btn-ghost btn-notification" style="position:relative;"><span class="material-symbols-outlined" style="font-size:22px;">notifications</span><span class="notif-badge"></span></button>
+      <button class="btn-ghost btn-settings"><span class="material-symbols-outlined" style="font-size:22px;">settings</span></button>
+      <div style="width:1px;height:24px;background:#e1e2e8;margin:0 6px;"></div>
+      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;cursor:pointer;">AD</div>
+    </div>
+  </header>
+
+  <main style="flex:1;padding:0 24px 40px;max-width:1440px;margin:0 auto;width:100%;">
+
+    <!-- Page Header -->
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2>Evaluation Board</h2>
+        <p>Review and grade submitted circuit designs for Batch A — Basic Logic Gates.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <select data-filter style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
+          <option>Batch A</option><option>Batch B</option><option>Batch C</option><option>Batch D</option>
+        </select>
+        <button class="btn-outline" data-action="export"><span class="material-symbols-outlined" style="font-size:16px;">download</span> Export</button>
+        <button class="btn-primary" data-action="publish"><span class="material-symbols-outlined" style="font-size:16px;">publish</span> Publish Grades</button>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px;">
+      <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid rgba(195,199,200,0.4);text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:#191c20;">32</div>
+        <div style="font-size:11px;font-family:'Space Grotesk',sans-serif;color:#737879;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">Total Submissions</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid rgba(195,199,200,0.4);text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:#516353;">20</div>
+        <div style="font-size:11px;font-family:'Space Grotesk',sans-serif;color:#737879;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">Graded</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid rgba(195,199,200,0.4);text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:#8b6508;">8</div>
+        <div style="font-size:11px;font-family:'Space Grotesk',sans-serif;color:#737879;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">Needs Review</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid rgba(195,199,200,0.4);text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:#737879;">4</div>
+        <div style="font-size:11px;font-family:'Space Grotesk',sans-serif;color:#737879;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">Pending</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid rgba(195,199,200,0.4);text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:#334042;">79.2</div>
+        <div style="font-size:11px;font-family:'Space Grotesk',sans-serif;color:#737879;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">Class Average</div>
+      </div>
+    </div>
+
+    <!-- Evaluation Table -->
+    <div class="card eval-table-wrap" style="padding:0;">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#b8ccb9,#f5b6bf);border-radius:12px 12px 0 0;"></div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+        <table style="width:100%;border-collapse:collapse;min-width:800px;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(195,199,200,0.5);background:rgba(248,249,255,0.7);">
+              <th style="padding:14px 18px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#737879;text-align:left;white-space:nowrap;">Student</th>
+              <th style="padding:14px 18px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#737879;text-align:left;">Submission</th>
+              <th style="padding:14px 18px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#737879;text-align:center;">Score</th>
+              <th style="padding:14px 18px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#737879;text-align:left;">Grade Status</th>
+              <th style="padding:14px 18px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#737879;text-align:left;min-width:220px;">Comments</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <!-- Row 1 — High Score -->
+            <tr class="eval-row">
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="avatar-fallback" style="background:#d7e5e7;color:#334042;font-size:12px;font-weight:700;flex-shrink:0;">AC</div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;color:#191c20;">Alex Chen</div>
+                    <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">ENG-2024-001</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div style="font-weight:600;font-size:13px;color:#4a5759;cursor:pointer;margin-bottom:3px;" onclick="window.showToast('Opening file preview…','info')">Full Adder Implementation.cir</div>
+                <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Submitted: 3 hours ago</div>
+              </td>
+              <td style="text-align:center;">
+                <input class="grade-input score-input" type="number" min="0" max="100" value="98" />
+              </td>
+              <td>
+                <select class="grade-select pass" onchange="this.className='grade-select '+this.options[this.selectedIndex].dataset.cls">
+                  <option value="pass" data-cls="pass" selected>Graded — Pass</option>
+                  <option value="warn" data-cls="warn">Needs Review</option>
+                  <option value="fail" data-cls="fail">Graded — Fail</option>
+                  <option value="pending" data-cls="pending">Pending Review</option>
+                </select>
+              </td>
+              <td>
+                <textarea class="comment-area" rows="2" placeholder="Add comments…">Excellent schematic organization. Minimal gate delay observed.</textarea>
+              </td>
+            </tr>
+
+            <!-- Row 2 — Mid Score -->
+            <tr class="eval-row">
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="avatar-fallback" style="background:#ffd9de;color:#5c3139;font-size:12px;font-weight:700;flex-shrink:0;">SP</div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;color:#191c20;">Samir Patel</div>
+                    <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">ENG-2024-018</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div style="font-weight:600;font-size:13px;color:#4a5759;cursor:pointer;margin-bottom:3px;" onclick="window.showToast('Opening file preview…','info')">Full Adder Implementation.cir</div>
+                <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Submitted: 1 hour ago</div>
+              </td>
+              <td style="text-align:center;">
+                <input class="grade-input score-input" type="number" min="0" max="100" value="72" />
+              </td>
+              <td>
+                <select class="grade-select warn" onchange="this.className='grade-select '+this.options[this.selectedIndex].dataset.cls">
+                  <option value="pass" data-cls="pass">Graded — Pass</option>
+                  <option value="warn" data-cls="warn" selected>Needs Review</option>
+                  <option value="fail" data-cls="fail">Graded — Fail</option>
+                  <option value="pending" data-cls="pending">Pending Review</option>
+                </select>
+              </td>
+              <td>
+                <textarea class="comment-area" rows="2" placeholder="Add comments…">Logic is sound, but layout is cluttered. Consider grouping AND gates.</textarea>
+              </td>
+            </tr>
+
+            <!-- Row 3 — Low Score / Flagged -->
+            <tr class="eval-row flagged">
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="avatar-fallback" style="background:#ffdad6;color:#93000a;font-size:12px;font-weight:700;flex-shrink:0;">JL</div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;color:#191c20;">Jordan Lee</div>
+                    <div style="font-size:11px;color:#ba1a1a;font-family:'Space Grotesk',sans-serif;">ENG-2024-089</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div style="font-weight:600;font-size:13px;color:#4a5759;cursor:pointer;margin-bottom:3px;" onclick="window.showToast('Opening file preview…','info')">Full Adder Implementation.cir</div>
+                <div style="font-size:11px;color:#ba1a1a;font-family:'Space Grotesk',sans-serif;">⚠ Submitted: Late (+2 hrs)</div>
+              </td>
+              <td style="text-align:center;">
+                <input class="grade-input score-input" type="number" min="0" max="100" value="45" />
+              </td>
+              <td>
+                <select class="grade-select fail" onchange="this.className='grade-select '+this.options[this.selectedIndex].dataset.cls">
+                  <option value="pass" data-cls="pass">Graded — Pass</option>
+                  <option value="warn" data-cls="warn">Needs Review</option>
+                  <option value="fail" data-cls="fail" selected>Graded — Fail</option>
+                  <option value="pending" data-cls="pending">Pending Review</option>
+                </select>
+              </td>
+              <td>
+                <textarea class="comment-area" rows="2" placeholder="Add comments…" style="border-color:rgba(186,26,26,0.3);">Carry-out logic is incorrect. Short circuit at node C4. Please review module 3.</textarea>
+              </td>
+            </tr>
+
+            <!-- Row 4 — Pending -->
+            <tr class="eval-row">
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="avatar-fallback" style="background:#e1e2e8;color:#424848;font-size:12px;font-weight:700;flex-shrink:0;">TC</div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;color:#191c20;">Taylor Chen</div>
+                    <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">ENG-2024-112</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div style="font-weight:600;font-size:13px;color:#4a5759;cursor:pointer;margin-bottom:3px;" onclick="window.showToast('Opening file preview…','info')">Full Adder Implementation.cir</div>
+                <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Submitted: Just now</div>
+              </td>
+              <td style="text-align:center;">
+                <input class="grade-input score-input" type="number" min="0" max="100" placeholder="—" />
+              </td>
+              <td>
+                <select class="grade-select pending" onchange="this.className='grade-select '+this.options[this.selectedIndex].dataset.cls">
+                  <option value="pending" data-cls="pending" selected>Pending Review</option>
+                  <option value="pass" data-cls="pass">Graded — Pass</option>
+                  <option value="warn" data-cls="warn">Needs Review</option>
+                  <option value="fail" data-cls="fail">Graded — Fail</option>
+                </select>
+              </td>
+              <td>
+                <textarea class="comment-area" rows="2" placeholder="Add comments…"></textarea>
+              </td>
+            </tr>
+
+            <!-- Row 5 -->
+            <tr class="eval-row">
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="avatar-fallback" style="background:#d3e8d4;color:#394b3c;font-size:12px;font-weight:700;flex-shrink:0;">MK</div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;color:#191c20;">Maya Kim</div>
+                    <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">ENG-2024-023</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div style="font-weight:600;font-size:13px;color:#4a5759;cursor:pointer;margin-bottom:3px;" onclick="window.showToast('Opening file preview…','info')">Full Adder Implementation.cir</div>
+                <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Submitted: 5 hours ago</div>
+              </td>
+              <td style="text-align:center;">
+                <input class="grade-input score-input" type="number" min="0" max="100" value="95" />
+              </td>
+              <td>
+                <select class="grade-select pass" onchange="this.className='grade-select '+this.options[this.selectedIndex].dataset.cls">
+                  <option value="pass" data-cls="pass" selected>Graded — Pass</option>
+                  <option value="warn" data-cls="warn">Needs Review</option>
+                  <option value="fail" data-cls="fail">Graded — Fail</option>
+                  <option value="pending" data-cls="pending">Pending Review</option>
+                </select>
+              </td>
+              <td>
+                <textarea class="comment-area" rows="2" placeholder="Add comments…">Perfect implementation. Clean, readable schematic with optimal gate arrangement.</textarea>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer -->
+      <div style="padding:14px 18px;border-top:1px solid #f2f3f9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:rgba(242,243,249,0.3);">
+        <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;">Showing 1–5 of 32 students</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="btn-outline" style="font-size:13px;padding:7px 14px;" onclick="window.showToast('Saving all grades…','info')">
+            <span class="material-symbols-outlined" style="font-size:16px;">save</span> Save All
+          </button>
+          <div class="pagination">
+            <button class="page-btn" disabled><span class="material-symbols-outlined" style="font-size:18px;">chevron_left</span></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn" onclick="window.showToast('Page 2','info')">2</button>
+            <button class="page-btn" onclick="window.showToast('Page 3','info')">3</button>
+            <button class="page-btn" onclick="window.showToast('Next page','info')"><span class="material-symbols-outlined" style="font-size:18px;">chevron_right</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

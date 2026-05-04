@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Batches — LogicFlow Admin</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="js/tailwind-config.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <style>
+    .batch-card { background:#fff;border-radius:12px;border:1px solid rgba(195,199,200,0.4);overflow:hidden;display:flex;flex-direction:column;transition:transform 0.25s,box-shadow 0.25s;position:relative; }
+    .batch-card:hover { transform:translateY(-3px);box-shadow:0 12px 40px -8px rgba(74,87,89,0.15); }
+    .batch-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px; }
+  </style>
+</head>
+<body>
+
+<div id="sidebar-overlay"></div>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div style="padding:20px 20px 16px;border-bottom:1px solid #eceef3;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#334042,#4a5759);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span class="material-symbols-outlined" style="color:#d7e5e7;font-size:22px;">developer_board</span>
+      </div>
+      <div>
+        <div style="font-weight:800;font-size:15px;color:#191c20;line-height:1.2;">Electronics Lab</div>
+        <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Department Admin</div>
+      </div>
+    </div>
+    <button data-action="new-assignment" class="btn-primary" style="width:100%;margin-top:16px;justify-content:center;font-size:13px;padding:9px;">
+      <span class="material-symbols-outlined" style="font-size:16px;">add</span> New Assignment
+    </button>
+  </div>
+  <nav style="flex:1;padding:12px 10px;overflow-y:auto;">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:8px 10px 4px;">Main Menu</div>
+    <a href="index.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">dashboard</span> Overview</a>
+    <a href="batches.html" class="nav-link"><span class="material-symbols-outlined icon-fill" style="font-size:20px;">grid_view</span> Batches</a>
+    <a href="students.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">group</span> Students</a>
+    <a href="experiments.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">biotech</span> Experiments</a>
+    <a href="evaluation.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">assignment_turned_in</span> Evaluation</a>
+    <a href="assign-task.html" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">send</span> Assign Task</a>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#c3c7c8;padding:16px 10px 4px;">System</div>
+    <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">history_edu</span> System Logs</a>
+    <a href="#" class="nav-link"><span class="material-symbols-outlined" style="font-size:20px;">contact_support</span> Support</a>
+  </nav>
+  <div style="padding:16px 20px;border-top:1px solid #eceef3;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;">AD</div>
+      <div><div style="font-weight:700;font-size:13px;color:#191c20;">Admin User</div><div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">admin@lab.edu</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- CONTENT -->
+<div class="content-area">
+  <header class="top-header">
+    <button id="sidebar-toggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
+    <span style="font-size:16px;font-weight:800;color:#191c20;letter-spacing:-0.01em;white-space:nowrap;">CircuitLab Admin</span>
+    <div style="flex:1;max-width:340px;position:relative;margin-left:8px;">
+      <span class="material-symbols-outlined" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:18px;color:#737879;pointer-events:none;">search</span>
+      <input class="search-input" type="text" placeholder="Search batches… (Ctrl+K)" style="padding-left:36px;" />
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;margin-left:auto;">
+      <button class="btn-ghost btn-notification" style="position:relative;" title="Notifications">
+        <span class="material-symbols-outlined" style="font-size:22px;">notifications</span><span class="notif-badge"></span>
+      </button>
+      <button class="btn-ghost btn-settings" title="Settings"><span class="material-symbols-outlined" style="font-size:22px;">settings</span></button>
+      <div style="width:1px;height:24px;background:#e1e2e8;margin:0 6px;"></div>
+      <div class="avatar-fallback" style="background:#4a5759;color:#d7e5e7;font-size:12px;font-weight:700;cursor:pointer;">AD</div>
+    </div>
+  </header>
+
+  <main style="flex:1;padding:0 24px 40px;max-width:1440px;margin:0 auto;width:100%;">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2>Batches</h2>
+        <p>Manage student cohorts and track batch-level performance metrics.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-outline" data-action="export"><span class="material-symbols-outlined" style="font-size:16px;">download</span> Export</button>
+        <button class="btn-primary" data-modal="new-batch-modal"><span class="material-symbols-outlined" style="font-size:16px;">add</span> New Batch</button>
+      </div>
+    </div>
+
+    <!-- Filter Row -->
+    <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
+      <select data-filter style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
+        <option>All Status</option><option>Active</option><option>Review</option><option>Inactive</option>
+      </select>
+      <select data-filter style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
+        <option>All Semesters</option><option>Spring 2025</option><option>Fall 2024</option>
+      </select>
+      <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;margin-left:auto;">12 batches total</div>
+    </div>
+
+    <!-- Batch Grid -->
+    <div class="batch-grid">
+
+      <!-- Batch Card Template repeated -->
+      <!-- G-1 -->
+      <div class="batch-card stagger-item fade-in" data-deletable>
+        <div style="height:4px;background:#516353;"></div>
+        <div style="padding:16px;border-bottom:1px solid #f2f3f9;display:flex;justify-content:space-between;align-items:start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#191c20;">G-1</span>
+              <span class="chip chip-active">Active</span>
+            </div>
+            <div style="font-size:12px;color:#737879;font-family:'Space Grotesk',sans-serif;">Morning Cohort A</div>
+          </div>
+          <span class="material-symbols-outlined" style="font-size:18px;color:#737879;">group</span>
+        </div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+            <div><div style="font-size:11px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:#737879;margin-bottom:2px;">Students</div><div style="font-size:22px;font-weight:800;color:#191c20;">38</div></div>
+            <div style="text-align:right;"><div style="font-size:11px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:#737879;margin-bottom:2px;">Avg Score</div><div style="font-size:18px;font-weight:700;color:#516353;">91<span style="font-size:12px;font-weight:400;color:#737879;">/100</span></div></div>
+          </div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;font-family:'Space Grotesk',sans-serif;"><span style="color:#737879;text-transform:uppercase;letter-spacing:0.04em;">Completion</span><span style="font-weight:700;color:#191c20;">92%</span></div><div class="progress-bar"><div class="progress-fill" data-width="92%" style="width:0;"></div></div></div>
+          <div style="display:flex;gap:8px;padding-top:4px;border-top:1px solid #f2f3f9;">
+            <a href="students.html" class="btn-outline" style="flex:1;justify-content:center;font-size:12px;padding:7px;">View Students</a>
+            <a href="assign-task.html" class="btn-primary" style="flex:1;justify-content:center;font-size:12px;padding:7px;">Assign Task</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- G-2 -->
+      <div class="batch-card stagger-item fade-in" data-deletable>
+        <div style="height:4px;background:#516353;"></div>
+        <div style="padding:16px;border-bottom:1px solid #f2f3f9;display:flex;justify-content:space-between;align-items:start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#191c20;">G-2</span><span class="chip chip-active">Active</span></div>
+            <div style="font-size:12px;color:#737879;font-family:'Space Grotesk',sans-serif;">Afternoon Cohort A</div>
+          </div>
+          <span class="material-symbols-outlined" style="font-size:18px;color:#737879;">group</span>
+        </div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+            <div><div style="font-size:11px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:#737879;margin-bottom:2px;">Students</div><div style="font-size:22px;font-weight:800;color:#191c20;">45</div></div>
+            <div style="text-align:right;"><div style="font-size:11px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:#737879;margin-bottom:2px;">Avg Score</div><div style="font-size:18px;font-weight:700;color:#516353;">88<span style="font-size:12px;font-weight:400;color:#737879;">/100</span></div></div>
+          </div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;font-family:'Space Grotesk',sans-serif;"><span style="color:#737879;text-transform:uppercase;letter-spacing:0.04em;">Completion</span><span style="font-weight:700;color:#191c20;">78%</span></div><div class="progress-bar"><div class="progress-fill" data-width="78%" style="width:0;"></div></div></div>
+          <div style="display:flex;gap:8px;padding-top:4px;border-top:1px solid #f2f3f9;"><a href="students.html" class="btn-outline" style="flex:1;justify-content:center;font-size:12px;padding:7px;">View Students</a><a href="assign-task.html" class="btn-primary" style="flex:1;justify-content:center;font-size:12px;padding:7px;">Assign Task</a></div>
+        </div>
+      </div>
+
+      <!-- G-3 -->
+      <div class="batch-card stagger-item fade-in" data-deletable>
+        <div style="height:4px;background:#516353;"></div>
+        <div style="padding:16px;border-bottom:1px solid #f2f3f9;display:flex;justify-content:space-between;align-items:start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#191c20;">G-3</span><span class="chip chip-active">Active</span></div>
+            <div style="font-size:12px;color:#737879;font-family:'Space Grotesk',sans-serif;">Evening Cohort B</div>
+          </div>
+          <span class="material-symbols-outlined" style="font-size:18px;color:#737879;">group</span>
+        </div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+            <div><div style="font-size:11px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:#737879;margin-bottom:2px;">Students</div><div style="font-size:22px;font-weight:800;color:#191c20;">32</div></div>
+            <div style="text-align:right;"><div style="font-size:11px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:#737879;margin-bottom:2px;">Avg Score</div><div style="font-size:18px;font-weight:700;color:#516353;">83<span style="font-size:12px;font-weight:400;color:#737879;">/100</span></div></div>
+          </div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;font-family:'Space Grotesk',sans-serif;"><span style="color:#737879;text-transform:uppercase;letter-spacing:0.04em;">Completion</span><span style="font-weight:700;color:#191c20;">55%</span></div><div class="progress-bar"><div class="progress-fill" data-width="55%" style="width:0;"></div></div></div>
+          <div style="display:flex;gap:8px;padding-top:4px;border-top:1px solid #f2f3f9;"><a href="students.html" class="btn-outline" style="flex:1;justify-content:center;font-size:12px;padding:7px;">View Students</a><a href="assign-task.html" class="btn-primary" style="flex:1;justify-content:center;font-size:12px;padding:7px;">Assign Task</a></div>
+        </div>
+      </div>
+
+      <!-- G-4 review -->
+      <div class="batch-card stagger-item fade-in" data-deletable>
+        <div style="height:4px;background:#f5b6bf;"></div>
+        <div style="padding:16px;border-bottom:1px solid #f2f3f9;display:flex;justify-content:space-between;align-items:start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#191c20;">G-4</span><span class="chip chip-review">Review</span></div>
+            <div style="font-size:12px;color:#737879;font-family:'Space Grotesk',sans-serif;">Advanced Logic</div>
+          </div>
+          <span class="material-symbols-outlined" style="font-size:18px;color:#737879;">group</span>
+        </div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+            <div><div style="font-size:11px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:#737879;margin-bottom:2px;">Students</div><div style="font-size:22px;font-weight:800;color:#191c20;">18</div></div>
+            <div style="text-align:right;"><div style="font-size:11px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:#737879;margin-bottom:2px;">Avg Score</div><div style="font-size:18px;font-weight:700;color:#5c3139;">54<span style="font-size:12px;font-weight:400;color:#737879;">/100</span></div></div>
+          </div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;font-family:'Space Grotesk',sans-serif;"><span style="color:#737879;text-transform:uppercase;letter-spacing:0.04em;">Completion</span><span style="font-weight:700;color:#191c20;">88%</span></div><div class="progress-bar"><div class="progress-fill progress-fill-tertiary" data-width="88%" style="width:0;"></div></div></div>
+          <div style="display:flex;gap:8px;padding-top:4px;border-top:1px solid #f2f3f9;"><a href="students.html" class="btn-outline" style="flex:1;justify-content:center;font-size:12px;padding:7px;">View Students</a><a href="evaluation.html" class="btn-primary" style="flex:1;justify-content:center;font-size:12px;padding:7px;background:#77474f;">Grade Now</a></div>
+        </div>
+      </div>
+
+      <!-- G-5 -->
+      <div class="batch-card stagger-item fade-in" data-deletable>
+        <div style="height:4px;background:#516353;"></div>
+        <div style="padding:16px;border-bottom:1px solid #f2f3f9;display:flex;justify-content:space-between;align-items:start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#191c20;">G-5</span><span class="chip chip-active">Active</span></div>
+            <div style="font-size:12px;color:#737879;font-family:'Space Grotesk',sans-serif;">Morning Cohort B</div>
+          </div>
+          <span class="material-symbols-outlined" style="font-size:18px;color:#737879;">group</span>
+        </div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+            <div><div style="font-size:11px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:#737879;margin-bottom:2px;">Students</div><div style="font-size:22px;font-weight:800;color:#191c20;">40</div></div>
+            <div style="text-align:right;"><div style="font-size:11px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:#737879;margin-bottom:2px;">Avg Score</div><div style="font-size:18px;font-weight:700;color:#516353;">79<span style="font-size:12px;font-weight:400;color:#737879;">/100</span></div></div>
+          </div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;font-family:'Space Grotesk',sans-serif;"><span style="color:#737879;text-transform:uppercase;letter-spacing:0.04em;">Completion</span><span style="font-weight:700;color:#191c20;">64%</span></div><div class="progress-bar"><div class="progress-fill" data-width="64%" style="width:0;"></div></div></div>
+          <div style="display:flex;gap:8px;padding-top:4px;border-top:1px solid #f2f3f9;"><a href="students.html" class="btn-outline" style="flex:1;justify-content:center;font-size:12px;padding:7px;">View Students</a><a href="assign-task.html" class="btn-primary" style="flex:1;justify-content:center;font-size:12px;padding:7px;">Assign Task</a></div>
+        </div>
+      </div>
+
+      <!-- G-6 inactive -->
+      <div class="batch-card stagger-item fade-in" data-deletable>
+        <div style="height:4px;background:#e1e2e8;"></div>
+        <div style="padding:16px;border-bottom:1px solid #f2f3f9;display:flex;justify-content:space-between;align-items:start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#191c20;">G-6</span><span class="chip chip-inactive">Inactive</span></div>
+            <div style="font-size:12px;color:#737879;font-family:'Space Grotesk',sans-serif;">Weekend Special</div>
+          </div>
+          <span class="material-symbols-outlined" style="font-size:18px;color:#737879;">group</span>
+        </div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+            <div><div style="font-size:11px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:#737879;margin-bottom:2px;">Students</div><div style="font-size:22px;font-weight:800;color:#737879;">12</div></div>
+            <div style="text-align:right;"><div style="font-size:11px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:#737879;margin-bottom:2px;">Avg Score</div><div style="font-size:18px;font-weight:700;color:#737879;">—<span style="font-size:12px;font-weight:400;color:#737879;">/100</span></div></div>
+          </div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;font-family:'Space Grotesk',sans-serif;"><span style="color:#737879;text-transform:uppercase;letter-spacing:0.04em;">Completion</span><span style="font-weight:700;color:#737879;">0%</span></div><div class="progress-bar"><div class="progress-fill" data-width="0%" style="width:0;background:#e1e2e8;"></div></div></div>
+          <div style="display:flex;gap:8px;padding-top:4px;border-top:1px solid #f2f3f9;"><button class="btn-outline" style="flex:1;justify-content:center;font-size:12px;padding:7px;opacity:0.5;" disabled>View Students</button><button class="btn-primary" style="flex:1;justify-content:center;font-size:12px;padding:7px;" onclick="window.showToast('Batch is inactive','error')">Activate</button></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- New Batch Modal -->
+<div id="new-batch-modal" role="dialog" class="hidden" style="position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(25,28,32,0.5);backdrop-filter:blur(4px);" onclick="if(event.target===this){this.classList.add('hidden');this.style.display='none';document.body.style.overflow='';}">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:480px;margin:16px;box-shadow:0 24px 64px rgba(0,0,0,0.2);" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <div style="font-size:18px;font-weight:800;color:#191c20;">Create New Batch</div>
+      <button data-modal-close style="background:none;border:none;cursor:pointer;color:#737879;" onclick="document.getElementById('new-batch-modal').classList.add('hidden');document.getElementById('new-batch-modal').style.display='none';document.body.style.overflow='';">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div><label class="form-label">Batch Name / Code</label><input class="form-input" type="text" placeholder="e.g., G-13" /></div>
+      <div><label class="form-label">Cohort Description</label><input class="form-input" type="text" placeholder="e.g., Morning Cohort F" /></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label class="form-label">Semester</label><select class="form-input form-select"><option>Spring 2025</option><option>Fall 2025</option></select></div>
+        <div><label class="form-label">Capacity</label><input class="form-input" type="number" placeholder="Max students" min="1" /></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button onclick="document.getElementById('new-batch-modal').classList.add('hidden');document.getElementById('new-batch-modal').style.display='none';document.body.style.overflow='';" class="btn-outline" style="flex:1;justify-content:center;">Cancel</button>
+        <button onclick="window.showToast('Batch created successfully!','success');document.getElementById('new-batch-modal').classList.add('hidden');document.getElementById('new-batch-modal').style.display='none';document.body.style.overflow='';" class="btn-primary" style="flex:1;justify-content:center;">Create Batch</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // Fix modal toggle
+  document.querySelectorAll('[data-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const modal = document.getElementById(btn.dataset.modal);
+      if (modal) { modal.classList.remove('hidden'); modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+    });
+  });
+</script>
+
+<script src="js/app.js"></script>
+</body>
+</html>
