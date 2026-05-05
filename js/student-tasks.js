@@ -1,9 +1,11 @@
 (function () {
   const SESSION_KEY = 'logicflow_session';
   const SUBMISSIONS_KEY = 'lf_submissions';
+  const TASKS_KEY = 'lf_tasks';
   const CURRENT_USER_KEY = 'lf_currentUser';
   const STUDENTS_KEY = 'lf_students';
   const BATCHES_KEY = 'lf_batches';
+  const NOTIFICATIONS_KEY = 'lf_notifications';
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function escapeHtml(str) {
@@ -41,6 +43,123 @@
     const parts = name.trim().split(' ');
     if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
     return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  }
+
+  function getPriorityColor(priority) {
+    switch (priority) {
+      case 'low': return '#394b3c';
+      case 'medium': return '#334042';
+      case 'high': return '#ba1a1a';
+      default: return '#737879';
+    }
+  }
+
+  function getPriorityBadge(priority) {
+    switch (priority) {
+      case 'low': return 'Low priority';
+      case 'medium': return 'Medium priority';
+      case 'high': return 'High priority';
+      default: return 'Normal';
+    }
+  }
+
+  function formatDate(isoString) {
+    const d = new Date(isoString);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  function isTaskSubmitted(taskId, studentId) {
+    const submissions = getStorage(SUBMISSIONS_KEY) || [];
+    return submissions.some(s => s.taskId === taskId && s.studentId === studentId);
+  }
+
+  function loadTasks() {
+    const currentUser = getCurrentUser();
+    if (!currentUser || !currentUser.studentId) {
+      showNoTasks();
+      return;
+    }
+
+    const tasks = getStorage(TASKS_KEY) || [];
+    const students = getStorage(STUDENTS_KEY) || [];
+    const student = students.find(s => s.studentId === currentUser.studentId);
+
+    // Filter tasks for this student
+    const myTasks = tasks.filter(task => {
+      if (task.assignmentType === 'batch') {
+        return task.targetId === (student?.batchId || currentUser.batchId);
+      } else if (task.assignmentType === 'individual') {
+        return task.targetId === currentUser.studentId;
+      }
+      return false;
+    });
+
+    if (myTasks.length === 0) {
+      showNoTasks();
+      return;
+    }
+
+    renderTasks(myTasks, currentUser.studentId);
+  }
+
+  function showNoTasks() {
+    const taskStack = document.getElementById('task-stack');
+    const noTasks = document.getElementById('no-tasks');
+    if (taskStack) taskStack.innerHTML = '';
+    if (noTasks) noTasks.style.display = 'block';
+  }
+
+  function renderTasks(tasks, studentId) {
+    const taskStack = document.getElementById('task-stack');
+    const noTasks = document.getElementById('no-tasks');
+    if (!taskStack) return;
+
+    noTasks.style.display = 'none';
+
+    taskStack.innerHTML = tasks.map(task => {
+      const submitted = isTaskSubmitted(task.taskId, studentId);
+      const priorityColor = getPriorityColor(task.priority);
+      const priorityBadge = getPriorityBadge(task.priority);
+      const deadline = formatDate(task.deadline);
+      const expNum = task.experimentName.match(/^\d+/)?.[0] || '';
+
+      return `
+        <article class="st-task-card">
+          <div class="st-task-top">
+            <h3>${escapeHtml(task.experimentName)}</h3>
+            <span class="st-pill st-pill--lab">Lab</span>
+          </div>
+          <div class="st-task-meta">
+            <div>
+              <span class="st-meta-k">Due</span>
+              <span class="st-meta-v">${deadline}</span>
+            </div>
+            <div>
+              <span class="st-meta-k">Assigned by</span>
+              <span class="st-meta-v">${escapeHtml(task.assignedBy)}</span>
+            </div>
+          </div>
+          <div class="st-progress-wrap">
+            <div class="st-progress-track" role="progressbar" aria-valuenow="${submitted ? 100 : 0}" aria-valuemin="0" aria-valuemax="100">
+              <div class="st-progress-fill" style="width: ${submitted ? '100' : '0'}%" data-width="${submitted ? 100 : 0}"></div>
+            </div>
+            <span class="st-progress-pct">${submitted ? '100' : '0'}%</span>
+          </div>
+          <span class="st-pill st-pill--priority" style="color:${priorityColor};">${priorityBadge}</span>
+          ${task.instructions ? `<div style="font-size:12px;color:#737879;margin-top:8px;font-family:'Space Grotesk',sans-serif;">${escapeHtml(task.instructions)}</div>` : ''}
+          <div class="st-task-actions">
+            <a href="${task.experimentUrl}" class="st-btn st-btn--primary">Open experiment</a>
+            ${submitted 
+              ? `<button type="button" class="st-btn st-btn--ghost" disabled style="background:#d3e8d4;color:#394b3c;cursor:default;">Submitted ✓</button>`
+              : `<button type="button" class="st-btn st-btn--ghost st-btn--submit" data-task-id="${task.taskId}" data-task-title="${escapeHtml(task.experimentName)}" data-deadline="${task.deadline}">Submit Task</button>`
+            }
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    // Re-initialize submit buttons
+    initSubmitButtons();
   }
 
   function handleTaskSubmit(button) {
@@ -96,12 +215,8 @@
     submissions.push(submission);
     setStorage(SUBMISSIONS_KEY, submissions);
 
-    // Update UI
-    button.textContent = 'Submitted ✓';
-    button.disabled = true;
-    button.style.background = '#d3e8d4';
-    button.style.color = '#394b3c';
-    button.style.borderColor = '#b8ccb9';
+    // Reload tasks to update UI
+    loadTasks();
 
     // Show success message
     alert('Submission received!');
@@ -111,6 +226,53 @@
     document.querySelectorAll('.st-btn--submit').forEach(button => {
       button.addEventListener('click', () => handleTaskSubmit(button));
     });
+  }
+
+  function checkNotifications() {
+    const currentUser = getCurrentUser();
+    if (!currentUser || !currentUser.studentId) return;
+
+    const notifications = getStorage(NOTIFICATIONS_KEY) || [];
+    const unseen = notifications.filter(n => 
+      !n.seen && n.studentIds.includes(currentUser.studentId)
+    );
+
+    if (unseen.length > 0) {
+      // Show notification toast
+      const notification = unseen[0];
+      showToast(`New task assigned: ${notification.message} — Due ${formatDate(notification.message.match(/Due: ([^—]+)/)?.[1] || 'soon')}`, 'info');
+
+      // Mark as seen
+      notification.seen = true;
+      setStorage(NOTIFICATIONS_KEY, notifications);
+    }
+  }
+
+  function showToast(message, type = 'info') {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'info' ? '#4a5759' : '#516353'};
+      color: #fff;
+      padding: 16px 24px;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 10000;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      animation: slideIn 0.3s ease-out;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    // Remove after 5 seconds
+    setTimeout(() => {
+      toast.style.animation = 'slideOut 0.3s ease-in';
+      setTimeout(() => toast.remove(), 300);
+    }, 5000);
   }
 
   function applyProfile() {
@@ -200,6 +362,7 @@
     applyProfile();
     animateMetric();
     fillProgressBars();
-    initSubmitButtons();
+    loadTasks();
+    checkNotifications();
   });
 })();

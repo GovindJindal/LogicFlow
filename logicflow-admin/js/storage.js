@@ -42,6 +42,9 @@ function initializeStorage() {
   if (!localStorage.getItem(STORAGE_KEYS.TASKS)) {
     localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify([]));
   }
+  if (!localStorage.getItem('lf_notifications')) {
+    localStorage.setItem('lf_notifications', JSON.stringify([]));
+  }
 }
 
 // ─── Generic Storage Operations ───────────────────────────────────────

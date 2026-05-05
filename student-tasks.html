@@ -106,126 +106,13 @@
         <h2 class="st-section-title">Your assignments</h2>
         <p class="st-section-sub">Issued by your department — open each item in LogicFlow to continue where you left off.</p>
 
-        <div class="st-task-stack">
-
-          <article class="st-task-card">
-            <div class="st-task-top">
-              <h3>PN junction diode — I–V &amp; load line</h3>
-              <span class="st-pill st-pill--lab">Lab</span>
-            </div>
-            <div class="st-task-meta">
-              <div>
-                <span class="st-meta-k">Due</span>
-                <span class="st-meta-v">Mar 14</span>
-              </div>
-              <div>
-                <span class="st-meta-k">Module</span>
-                <span class="st-meta-v">Semiconductors</span>
-              </div>
-              <div>
-                <span class="st-meta-k">Instructor</span>
-                <span class="st-meta-v">Dr. Mehta</span>
-              </div>
-            </div>
-            <div class="st-progress-wrap">
-              <div class="st-progress-track" role="progressbar" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">
-                <div class="st-progress-fill" style="width: 0%" data-width="65"></div>
-              </div>
-              <span class="st-progress-pct">65%</span>
-            </div>
-            <span class="st-pill st-pill--priority">High priority</span>
-            <div class="st-task-actions">
-              <div class="st-mini-avatars" aria-hidden="true" title="Cohort">
-                <span class="st-mini-av">R</span>
-                <span class="st-mini-av">S</span>
-                <span class="st-mini-more">+9</span>
-              </div>
-              <a href="exp3_diode.html" class="st-btn st-btn--primary">Continue lab</a>
-              <button type="button" class="st-btn st-btn--ghost st-btn--submit" data-task-id="task-1" data-task-title="PN junction diode — I–V & load line" data-deadline="2024-03-14T23:59:59">Submit Task</button>
-            </div>
-          </article>
-
-          <article class="st-task-card">
-            <div class="st-task-top">
-              <h3>Flip-flops &amp; timing — SR to D latch</h3>
-              <span class="st-pill st-pill--lab">Lab</span>
-            </div>
-            <div class="st-task-meta">
-              <div>
-                <span class="st-meta-k">Due</span>
-                <span class="st-meta-v">Mar 22</span>
-              </div>
-              <div>
-                <span class="st-meta-k">Module</span>
-                <span class="st-meta-v">Sequential logic</span>
-              </div>
-            </div>
-            <div class="st-progress-wrap">
-              <div class="st-progress-track" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">
-                <div class="st-progress-fill" style="width: 0%" data-width="30"></div>
-              </div>
-              <span class="st-progress-pct">30%</span>
-            </div>
-            <div class="st-task-actions">
-              <a href="exp6_flipflops.html" class="st-btn st-btn--primary">Open experiment</a>
-              <a href="curriculum.html" class="st-btn st-btn--ghost">Syllabus</a>
-              <button type="button" class="st-btn st-btn--ghost st-btn--submit" data-task-id="task-2" data-task-title="Flip-flops & timing — SR to D latch" data-deadline="2024-03-22T23:59:59">Submit Task</button>
-            </div>
-          </article>
-
-          <article class="st-task-card">
-            <div class="st-task-top">
-              <h3>Rectifier circuits — theory check</h3>
-              <span class="st-pill st-pill--quiz">Quiz</span>
-            </div>
-            <div class="st-task-meta">
-              <div>
-                <span class="st-meta-k">Due</span>
-                <span class="st-meta-v">Mar 18</span>
-              </div>
-              <div>
-                <span class="st-meta-k">Est. time</span>
-                <span class="st-meta-v">25 min</span>
-              </div>
-            </div>
-            <div class="st-progress-wrap">
-              <div class="st-progress-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                <div class="st-progress-fill" style="width: 0%" data-width="0"></div>
-              </div>
-              <span class="st-progress-pct">0%</span>
-            </div>
-            <div class="st-task-actions">
-              <a href="eval1.html" class="st-btn st-btn--primary">Start quiz</a>
-              <button type="button" class="st-btn st-btn--ghost st-btn--submit" data-task-id="task-3" data-task-title="Rectifier circuits — theory check" data-deadline="2024-03-18T23:59:59">Submit Task</button>
-            </div>
-          </article>
-
-          <article class="st-task-card">
-            <div class="st-task-top">
-              <h3>Breadboard &amp; instrument safety</h3>
-              <span class="st-pill st-pill--reading">Reading</span>
-            </div>
-            <div class="st-task-meta">
-              <div>
-                <span class="st-meta-k">Due</span>
-                <span class="st-meta-v">Mar 10</span>
-              </div>
-              <div>
-                <span class="st-meta-k">Pages</span>
-                <span class="st-meta-v">Lab handbook §2–3</span>
-              </div>
-            </div>
-            <div class="st-progress-wrap">
-              <div class="st-progress-track" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                <div class="st-progress-fill" style="width: 0%" data-width="100"></div>
-              </div>
-              <span class="st-progress-pct">100%</span>
-            </div>
-            <div class="st-task-actions">
-              <a href="exp2_equipments.html" class="st-btn st-btn--ghost">Reference lab</a>
-            </div>
-          </article>
-
+        <div class="st-task-stack" id="task-stack">
+          <!-- Tasks will be loaded dynamically from localStorage -->
+        </div>
+        <div id="no-tasks" style="display:none;text-align:center;padding:60px 20px;">
+          <div style="font-size:48px;margin-bottom:16px;">📋</div>
+          <h3 style="font-size:18px;font-weight:700;color:#191c20;margin-bottom:8px;">No tasks assigned yet</h3>
+          <p style="color:#737879;font-family:'Space Grotesk',sans-serif;">Check back soon for new assignments from your instructor.</p>
         </div>
       </main>
 
