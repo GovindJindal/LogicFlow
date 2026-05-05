@@ -18,6 +18,14 @@
 
 <body class="landing">
 
+  <!-- Experiment loading overlay -->
+  <div id="expLoadingOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.88);z-index:10000;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+    <div style="text-align:center;">
+      <div class="exp-loading-spinner" style="width:48px;height:48px;border:4px solid #e1e2e8;border-top-color:#1a56db;border-radius:50%;margin:0 auto 16px;"></div>
+      <div style="font-size:15px;font-weight:600;color:#424848;">Loading experiment...</div>
+    </div>
+  </div>
+
   <canvas id="bgCanvas" aria-hidden="true" role="presentation"></canvas>
   <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
   <canvas id="particleCanvas" aria-hidden="true" role="presentation"></canvas>
@@ -34,13 +42,13 @@
         <li><a href="#team">Team</a></li>
       </ul>
       <ul class="nav-links nav-links--app" id="navLinksApp" hidden>
-        <li><a href="curriculum.html">Curriculum</a></li>
+        <li id="navCurriculumItem"><a href="curriculum.html">Curriculum</a></li>
         <li id="navTasksItem" hidden><a href="student-tasks.html">My tasks</a></li>
         <li><a href="sandbox.html">Logic Gates</a></li>
         <li><a href="coa.html">Computer Architecture</a></li>
-        <li class="dropdown">
+        <li class="dropdown" style="position:relative;overflow:visible;">
           <a href="#" id="experimentDropdownBtn">Experiments</a>
-          <div class="dropdown-content" id="experimentDropdown">
+          <div class="dropdown-content" id="experimentDropdown" style="position:absolute;top:100%;left:50%;right:auto;transform:translateX(-50%);z-index:1000;">
             <div class="dropdown-menu">
               <a href="exp1_components.html">1. Component Familiarization</a>
               <a href="exp2_equipments.html">2. Measurement Equipment</a>
@@ -49,7 +57,9 @@
               <a href="exp5_rectifier.html">5. Rectifiers</a>
               <a href="exp6_flipflops.html">6. Flip-Flops</a>
               <a href="exp7_bcd_decoder.html">7. BCD Decoder</a>
-            <a href=\"exp8_mux_demux.html\">8. Data Routing & Distribution</a>
+              <a href="exp8_mux_demux.html">8. Data Routing & Distribution</a>
+              <a href="exp9_motherboard.html">9. Motherboard Anatomy</a>
+              <a href="exp10_alu.html">10. ALU Simulation</a>
             </div>
           </div>
         </li>
@@ -306,6 +316,27 @@
 
   <script src="logicflow-admin/js/storage.js"></script>
   <script src="js/index.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('btnSignOut');
+      if (!btn) return;
+
+      btn.addEventListener(
+        'click',
+        (e) => {
+          if (sessionStorage.getItem('logicflow_session') !== 'guest') return;
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          localStorage.removeItem('lf_currentUser');
+          sessionStorage.removeItem('logicflow_session');
+          sessionStorage.removeItem('logicflow_student_email');
+          sessionStorage.removeItem('logicflow_student_display');
+          window.location.href = 'index.html';
+        },
+        true
+      );
+    });
+  </script>
 </body>
 
 </html>

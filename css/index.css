@@ -82,6 +82,14 @@ body.landing button.btn-enter {
   font-family: inherit;
 }
 
+/* Experiment loading spinner */
+@keyframes exp-loading-spin {
+  to { transform: rotate(360deg); }
+}
+.exp-loading-spinner {
+  animation: exp-loading-spin 0.8s linear infinite;
+}
+
 /* Student avatar dropdown in navbar */
 .student-nav-profile {
   display: flex;

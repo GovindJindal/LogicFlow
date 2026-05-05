@@ -5,6 +5,16 @@
 
 'use strict';
 
+// Safety timeout: show error if initialization hangs
+const _expSafetyTimer = setTimeout(function() {
+  if (document.body) {
+    var err = document.createElement('div');
+    err.style.cssText = 'position:fixed;inset:0;background:rgba(255,255,255,0.95);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:sans-serif;';
+    err.innerHTML = '<h2 style="color:#dc3545;margin:0 0 12px;">This experiment failed to load</h2><p style="color:#424848;margin:0 0 24px;">Please refresh or go back.</p><a href="index.html" style="padding:10px 20px;background:#1a56db;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">Go Back</a>';
+    document.body.appendChild(err);
+  }
+}, 8000);
+
 // ================================================================
 // 1. TAB SWITCHING
 // ================================================================
@@ -749,3 +759,4 @@ window.loadDemoCircuit = function () {
 };
 
 buildBreadboard();
+clearTimeout(_expSafetyTimer);

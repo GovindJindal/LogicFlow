@@ -16,6 +16,14 @@
           }
         });
       }
+
+      // Show loading overlay when clicking any experiment link
+      document.querySelectorAll('#experimentDropdown a[href^="exp"]').forEach((link) => {
+        link.addEventListener('click', () => {
+          const overlay = document.getElementById('expLoadingOverlay');
+          if (overlay) overlay.style.display = 'flex';
+        });
+      });
     });
 
     // ── Animated blob background (Codex-style) ───────────────────────────────────
@@ -431,11 +439,14 @@
         const role = sessionStorage.getItem(SESSION_KEY);
         const authed = role === 'guest' || role === 'student' || role === 'faculty';
         const isStudent = role === 'student';
+        const isGuest = role === 'guest';
         document.body.classList.toggle('has-app-nav', authed);
         const navLanding = document.getElementById('navLinksLanding');
         const navApp = document.getElementById('navLinksApp');
         if (navLanding) navLanding.hidden = authed;
         if (navApp) navApp.hidden = !authed;
+        const navCurriculumItem = document.getElementById('navCurriculumItem');
+        if (navCurriculumItem) navCurriculumItem.hidden = isGuest;
         const btnEnterLab = document.getElementById('btnEnterLab');
         const btnSignOut = document.getElementById('btnSignOut');
         const studentNavProfile = document.getElementById('studentNavProfile');

@@ -21,6 +21,12 @@
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.dropdown')) expDropdown.classList.remove('show');
     });
+    // Close dropdown instantly on experiment link click
+    expDropdown.querySelectorAll('a[href]').forEach((link) => {
+      link.addEventListener('click', () => {
+        expDropdown.classList.remove('show');
+      });
+    });
   }
 
   function isAuthed() {
@@ -39,17 +45,11 @@
     if (!btn || btn.dataset.lfBound === '1') return;
     btn.dataset.lfBound = '1';
     btn.addEventListener('click', () => {
+      localStorage.removeItem('lf_currentUser');
       sessionStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem('logicflow_student_email');
       sessionStorage.removeItem('logicflow_student_display');
-      const onStudentTasks = /student-tasks\.html/i.test(window.location.pathname);
-      if (onStudentTasks) {
-        window.location.reload();
-        return;
-      }
-      syncSignOutButton();
-      syncStudentNavItem();
-      highlightCurrentNav();
+      window.location.href = 'index.html';
     });
   }
 
