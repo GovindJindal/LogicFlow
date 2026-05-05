@@ -5,7 +5,6 @@
 
 /* ── Local variable extensions (global.css vars are inherited) ── */
 :root {
-  --bg:          #eceeff;
   --surface:     rgba(255,255,255,0.55);
   --border:      rgba(255,255,255,0.6);
   --border-dark: rgba(0,0,0,0.08);
@@ -23,7 +22,6 @@
 }
 
 body {
-  background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
 }

@@ -1,29 +1,29 @@
 /* ============================================================
-   exp8_mux_demux.css
+   exp8_mux_demux.css — Data Routing & Distribution
+   Requires: global.css (handles nav, bg-mesh, blobs, base vars)
    ============================================================ */
 
 :root {
-  --bg: #eceeff;
-  --surface: rgba(255,255,255,0.65);
-  --border: rgba(255,255,255,0.4);
+  --surface: rgba(255,255,255,0.55);
+  --border: rgba(255,255,255,0.6);
   --border-dark: rgba(0,0,0,0.08);
-  --border-radius: 14px;
-  --panel-radius: 12px;
+  --green: #10B981;
+  --cyan: #06b6d4;
+  --purple: #7C3AED;
+  --amber: #F59E0B;
+  --blue: #1A56DB;
+  --rose: #F43F5E;
   --text: #0f0f1a;
   --muted: #475569;
-  --cyan: #06b6d4;
-  --green: #10b981;
-  --rose: #f43f5e;
-  --blue: #1a56db;
-  --font-body: -apple-system, 'SF Pro Display', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: var(--lf-font-display);
+  --font-body: var(--lf-font-body);
 }
 
 body {
-  margin: 0;
-  background-color: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
+  min-height: 100vh;
 }
 
 .page {

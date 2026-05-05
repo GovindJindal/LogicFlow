@@ -113,8 +113,8 @@
         <p>Review and grade submitted circuit designs for Batch A — Basic Logic Gates.</p>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <select data-filter style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
-          <option>Batch A</option><option>Batch B</option><option>Batch C</option><option>Batch D</option>
+        <select id="batch-filter" data-filter style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
+          <option value="all">All Batches</option>
         </select>
         <button class="btn-outline" data-action="export"><span class="material-symbols-outlined" style="font-size:16px;">download</span> Export</button>
         <button class="btn-primary" data-action="publish"><span class="material-symbols-outlined" style="font-size:16px;">publish</span> Publish Grades</button>
@@ -124,23 +124,23 @@
     <!-- Summary Stats -->
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px;">
       <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid rgba(195,199,200,0.4);text-align:center;">
-        <div style="font-size:24px;font-weight:800;color:#191c20;">32</div>
+        <div style="font-size:24px;font-weight:800;color:#191c20;" id="stat-total">0</div>
         <div style="font-size:11px;font-family:'Space Grotesk',sans-serif;color:#737879;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">Total Submissions</div>
       </div>
       <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid rgba(195,199,200,0.4);text-align:center;">
-        <div style="font-size:24px;font-weight:800;color:#516353;">20</div>
+        <div style="font-size:24px;font-weight:800;color:#516353;" id="stat-graded">0</div>
         <div style="font-size:11px;font-family:'Space Grotesk',sans-serif;color:#737879;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">Graded</div>
       </div>
       <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid rgba(195,199,200,0.4);text-align:center;">
-        <div style="font-size:24px;font-weight:800;color:#8b6508;">8</div>
+        <div style="font-size:24px;font-weight:800;color:#8b6508;" id="stat-needs-review">0</div>
         <div style="font-size:11px;font-family:'Space Grotesk',sans-serif;color:#737879;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">Needs Review</div>
       </div>
       <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid rgba(195,199,200,0.4);text-align:center;">
-        <div style="font-size:24px;font-weight:800;color:#737879;">4</div>
+        <div style="font-size:24px;font-weight:800;color:#737879;" id="stat-pending">0</div>
         <div style="font-size:11px;font-family:'Space Grotesk',sans-serif;color:#737879;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">Pending</div>
       </div>
       <div style="background:#fff;border-radius:10px;padding:16px;border:1px solid rgba(195,199,200,0.4);text-align:center;">
-        <div style="font-size:24px;font-weight:800;color:#334042;">79.2</div>
+        <div style="font-size:24px;font-weight:800;color:#334042;" id="stat-average">0</div>
         <div style="font-size:11px;font-family:'Space Grotesk',sans-serif;color:#737879;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">Class Average</div>
       </div>
     </div>
@@ -159,170 +159,15 @@
               <th style="padding:14px 18px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#737879;text-align:left;min-width:220px;">Comments</th>
             </tr>
           </thead>
-          <tbody>
-
-            <!-- Row 1 — High Score -->
-            <tr class="eval-row">
-              <td>
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <div class="avatar-fallback" style="background:#d7e5e7;color:#334042;font-size:12px;font-weight:700;flex-shrink:0;">AC</div>
-                  <div>
-                    <div style="font-weight:600;font-size:14px;color:#191c20;">Alex Chen</div>
-                    <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">ENG-2024-001</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div style="font-weight:600;font-size:13px;color:#4a5759;cursor:pointer;margin-bottom:3px;" onclick="window.showToast('Opening file preview…','info')">Full Adder Implementation.cir</div>
-                <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Submitted: 3 hours ago</div>
-              </td>
-              <td style="text-align:center;">
-                <input class="grade-input score-input" type="number" min="0" max="100" value="98" />
-              </td>
-              <td>
-                <select class="grade-select pass" onchange="this.className='grade-select '+this.options[this.selectedIndex].dataset.cls">
-                  <option value="pass" data-cls="pass" selected>Graded — Pass</option>
-                  <option value="warn" data-cls="warn">Needs Review</option>
-                  <option value="fail" data-cls="fail">Graded — Fail</option>
-                  <option value="pending" data-cls="pending">Pending Review</option>
-                </select>
-              </td>
-              <td>
-                <textarea class="comment-area" rows="2" placeholder="Add comments…">Excellent schematic organization. Minimal gate delay observed.</textarea>
-              </td>
-            </tr>
-
-            <!-- Row 2 — Mid Score -->
-            <tr class="eval-row">
-              <td>
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <div class="avatar-fallback" style="background:#ffd9de;color:#5c3139;font-size:12px;font-weight:700;flex-shrink:0;">SP</div>
-                  <div>
-                    <div style="font-weight:600;font-size:14px;color:#191c20;">Samir Patel</div>
-                    <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">ENG-2024-018</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div style="font-weight:600;font-size:13px;color:#4a5759;cursor:pointer;margin-bottom:3px;" onclick="window.showToast('Opening file preview…','info')">Full Adder Implementation.cir</div>
-                <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Submitted: 1 hour ago</div>
-              </td>
-              <td style="text-align:center;">
-                <input class="grade-input score-input" type="number" min="0" max="100" value="72" />
-              </td>
-              <td>
-                <select class="grade-select warn" onchange="this.className='grade-select '+this.options[this.selectedIndex].dataset.cls">
-                  <option value="pass" data-cls="pass">Graded — Pass</option>
-                  <option value="warn" data-cls="warn" selected>Needs Review</option>
-                  <option value="fail" data-cls="fail">Graded — Fail</option>
-                  <option value="pending" data-cls="pending">Pending Review</option>
-                </select>
-              </td>
-              <td>
-                <textarea class="comment-area" rows="2" placeholder="Add comments…">Logic is sound, but layout is cluttered. Consider grouping AND gates.</textarea>
-              </td>
-            </tr>
-
-            <!-- Row 3 — Low Score / Flagged -->
-            <tr class="eval-row flagged">
-              <td>
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <div class="avatar-fallback" style="background:#ffdad6;color:#93000a;font-size:12px;font-weight:700;flex-shrink:0;">JL</div>
-                  <div>
-                    <div style="font-weight:600;font-size:14px;color:#191c20;">Jordan Lee</div>
-                    <div style="font-size:11px;color:#ba1a1a;font-family:'Space Grotesk',sans-serif;">ENG-2024-089</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div style="font-weight:600;font-size:13px;color:#4a5759;cursor:pointer;margin-bottom:3px;" onclick="window.showToast('Opening file preview…','info')">Full Adder Implementation.cir</div>
-                <div style="font-size:11px;color:#ba1a1a;font-family:'Space Grotesk',sans-serif;">⚠ Submitted: Late (+2 hrs)</div>
-              </td>
-              <td style="text-align:center;">
-                <input class="grade-input score-input" type="number" min="0" max="100" value="45" />
-              </td>
-              <td>
-                <select class="grade-select fail" onchange="this.className='grade-select '+this.options[this.selectedIndex].dataset.cls">
-                  <option value="pass" data-cls="pass">Graded — Pass</option>
-                  <option value="warn" data-cls="warn">Needs Review</option>
-                  <option value="fail" data-cls="fail" selected>Graded — Fail</option>
-                  <option value="pending" data-cls="pending">Pending Review</option>
-                </select>
-              </td>
-              <td>
-                <textarea class="comment-area" rows="2" placeholder="Add comments…" style="border-color:rgba(186,26,26,0.3);">Carry-out logic is incorrect. Short circuit at node C4. Please review module 3.</textarea>
-              </td>
-            </tr>
-
-            <!-- Row 4 — Pending -->
-            <tr class="eval-row">
-              <td>
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <div class="avatar-fallback" style="background:#e1e2e8;color:#424848;font-size:12px;font-weight:700;flex-shrink:0;">TC</div>
-                  <div>
-                    <div style="font-weight:600;font-size:14px;color:#191c20;">Taylor Chen</div>
-                    <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">ENG-2024-112</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div style="font-weight:600;font-size:13px;color:#4a5759;cursor:pointer;margin-bottom:3px;" onclick="window.showToast('Opening file preview…','info')">Full Adder Implementation.cir</div>
-                <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Submitted: Just now</div>
-              </td>
-              <td style="text-align:center;">
-                <input class="grade-input score-input" type="number" min="0" max="100" placeholder="—" />
-              </td>
-              <td>
-                <select class="grade-select pending" onchange="this.className='grade-select '+this.options[this.selectedIndex].dataset.cls">
-                  <option value="pending" data-cls="pending" selected>Pending Review</option>
-                  <option value="pass" data-cls="pass">Graded — Pass</option>
-                  <option value="warn" data-cls="warn">Needs Review</option>
-                  <option value="fail" data-cls="fail">Graded — Fail</option>
-                </select>
-              </td>
-              <td>
-                <textarea class="comment-area" rows="2" placeholder="Add comments…"></textarea>
-              </td>
-            </tr>
-
-            <!-- Row 5 -->
-            <tr class="eval-row">
-              <td>
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <div class="avatar-fallback" style="background:#d3e8d4;color:#394b3c;font-size:12px;font-weight:700;flex-shrink:0;">MK</div>
-                  <div>
-                    <div style="font-weight:600;font-size:14px;color:#191c20;">Maya Kim</div>
-                    <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">ENG-2024-023</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div style="font-weight:600;font-size:13px;color:#4a5759;cursor:pointer;margin-bottom:3px;" onclick="window.showToast('Opening file preview…','info')">Full Adder Implementation.cir</div>
-                <div style="font-size:11px;color:#737879;font-family:'Space Grotesk',sans-serif;">Submitted: 5 hours ago</div>
-              </td>
-              <td style="text-align:center;">
-                <input class="grade-input score-input" type="number" min="0" max="100" value="95" />
-              </td>
-              <td>
-                <select class="grade-select pass" onchange="this.className='grade-select '+this.options[this.selectedIndex].dataset.cls">
-                  <option value="pass" data-cls="pass" selected>Graded — Pass</option>
-                  <option value="warn" data-cls="warn">Needs Review</option>
-                  <option value="fail" data-cls="fail">Graded — Fail</option>
-                  <option value="pending" data-cls="pending">Pending Review</option>
-                </select>
-              </td>
-              <td>
-                <textarea class="comment-area" rows="2" placeholder="Add comments…">Perfect implementation. Clean, readable schematic with optimal gate arrangement.</textarea>
-              </td>
-            </tr>
-
+          <tbody id="submissions-tbody">
+            <!-- Submissions will be loaded dynamically from localStorage -->
           </tbody>
         </table>
       </div>
 
       <!-- Footer -->
       <div style="padding:14px 18px;border-top:1px solid #f2f3f9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:rgba(242,243,249,0.3);">
-        <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;">Showing 1–5 of 32 students</div>
+        <div style="font-size:13px;color:#737879;font-family:'Space Grotesk',sans-serif;" id="showing-text">No submissions yet</div>
         <div style="display:flex;align-items:center;gap:10px;">
           <button class="btn-outline" style="font-size:13px;padding:7px 14px;" onclick="window.showToast('Saving all grades…','info')">
             <span class="material-symbols-outlined" style="font-size:16px;">save</span> Save All
@@ -367,5 +212,6 @@
 
 <script src="js/storage.js"></script>
 <script src="js/app.js"></script>
+<script src="js/evaluation.js"></script>
 </body>
 </html>
