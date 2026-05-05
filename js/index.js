@@ -436,17 +436,34 @@
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       function applyNavMode() {
+        const SESSION_KEY = 'logicflow_session';
+        const CURRENT_USER_KEY = 'lf_currentUser';
+        
         const role = sessionStorage.getItem(SESSION_KEY);
-        const authed = role === 'guest' || role === 'student' || role === 'faculty';
-        const isStudent = role === 'student';
-        const isGuest = role === 'guest';
+        
+        // Also check localStorage for current user role
+        let effectiveRole = role;
+        try {
+          const currentUserStr = localStorage.getItem(CURRENT_USER_KEY);
+          const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+          if (currentUser?.role) {
+            effectiveRole = currentUser.role;
+          }
+        } catch (e) {
+          console.error('Error reading current user:', e);
+        }
+        
+        const authed = effectiveRole === 'guest' || effectiveRole === 'student' || effectiveRole === 'faculty';
+        const isStudent = effectiveRole === 'student';
+        const isGuest = effectiveRole === 'guest';
         document.body.classList.toggle('has-app-nav', authed);
         const navLanding = document.getElementById('navLinksLanding');
         const navApp = document.getElementById('navLinksApp');
         if (navLanding) navLanding.hidden = authed;
         if (navApp) navApp.hidden = !authed;
         const navCurriculumItem = document.getElementById('navCurriculumItem');
-        if (navCurriculumItem) navCurriculumItem.hidden = isGuest;
+        // Hide curriculum for guests and non-logged-in users
+        if (navCurriculumItem) navCurriculumItem.hidden = isGuest || !authed;
         const btnEnterLab = document.getElementById('btnEnterLab');
         const btnSignOut = document.getElementById('btnSignOut');
         const studentNavProfile = document.getElementById('studentNavProfile');
