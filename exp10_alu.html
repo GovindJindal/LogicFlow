@@ -38,6 +38,7 @@
             <a href="exp5_rectifier.html">5. Rectifiers</a>
             <a href="exp6_flipflops.html">6. Flip-Flops</a>
             <a href="exp7_bcd_decoder.html">7. BCD Decoder</a>
+            <a href="exp8_mux_demux.html">8. Data Routing & Distribution</a>
             <a href="exp9_motherboard.html">9. Computer Architecture</a>
             <a href="exp10_alu.html" class="active">10. ALU Simulation</a>
           </div>
@@ -50,7 +51,7 @@
   </nav>
 
   <!-- Page Content -->
-  <main class="page-container">
+  <main class="page">
     <div class="page-header no-print">
       <div class="breadcrumb">
         <span class="badge">Experiment 10</span>
@@ -61,51 +62,88 @@
     </div>
 
     <!-- 3-ZONE LAYOUT -->
-    <div class="workspace-grid">
+    <div class="zones-container">
       
-      <!-- ZONE 1: Left Navigation & Controls -->
-      <aside class="zone-left no-print">
-        <div class="panel nav-panel">
-          <h3>Lab Steps</h3>
-          <ul class="lab-nav">
-            <li><a href="#" class="active">Aim</a></li>
-            <li><a href="#">Theory</a></li>
-            <li><a href="#">Pretest</a></li>
-            <li><a href="#">Procedure</a></li>
-            <li><a href="#">Simulation</a></li>
-            <li><a href="#">Posttest</a></li>
-            <li><a href="#">References</a></li>
-            <li><a href="#">Feedback</a></li>
-          </ul>
-        </div>
-        <div class="panel controls-panel">
-          <h3>Controls</h3>
-          <div class="btn-group">
-            <button class="btn btn-reset" id="btnResetAlu">↺ Reset ALU</button>
-            <button class="btn btn-export" id="btnExportReport">↓ Export Lab Report</button>
-          </div>
+      <!-- ZONE 1: Navigation & Controls -->
+      <aside class="zone zone-1 glass-card no-print">
+        <div class="card-label">LAB LIFECYCLE</div>
+        <ul class="lab-nav" id="tabNav">
+          <li><a href="#" data-target="tab-aim">Aim</a></li>
+          <li><a href="#" data-target="tab-theory">Theory</a></li>
+          <li><a href="#" data-target="tab-pretest">Pretest</a></li>
+          <li><a href="#" data-target="tab-procedure">Procedure</a></li>
+          <li><a href="#" data-target="tab-simulation" class="active">Simulation</a></li>
+          <li><a href="#" data-target="tab-posttest">Posttest</a></li>
+          <li><a href="#" data-target="tab-references">References</a></li>
+          <li><a href="#" data-target="tab-feedback">Feedback</a></li>
+        </ul>
+        
+        <div class="controls-divider"></div>
+        
+        <div class="card-label">CONTROLS</div>
+        <div class="btn-group-vertical">
+          <button id="btnResetAlu" class="btn btn-outline">↺ Reset ALU</button>
+          <button id="btnExportReport" class="btn btn-primary">↓ Export Lab Report</button>
         </div>
       </aside>
 
-      <!-- ZONE 2: Center Stage (The Macro Glass Box ALU) -->
-      <section class="zone-center no-print">
-        <div class="panel alu-stage">
-          <div class="panel-header">ALU Macro Architecture</div>
+      <!-- ZONE 2: Center Stage -->
+      <section class="zone zone-2 no-print">
+
+        <!-- Aim Tab -->
+        <div id="tab-aim" class="core-tab-panel glass-card read-content">
+           <div class="card-label">AIM</div>
+           <h2>Objective</h2>
+           <p>To design and simulate an Arithmetic Logic Unit (ALU). Configure inputs and select modes to observe data routing through arithmetic and logic sub-units via the multiplexer.</p>
+        </div>
+
+        <!-- Theory Tab -->
+        <div id="tab-theory" class="core-tab-panel glass-card read-content">
+           <div class="card-label">THEORY</div>
+           <h2>Working Principles</h2>
+           <p>An Arithmetic Logic Unit (ALU) is the part of a computer processor (CPU) that carries out arithmetic and logic operations on the operands in computer instruction words. The ALU is divided into an Arithmetic Unit and a Logic Unit, with a multiplexer selecting between their outputs based on a Mode line.</p>
+        </div>
+
+        <!-- Pretest Tab -->
+        <div id="tab-pretest" class="core-tab-panel glass-card read-content">
+           <div class="card-label">PRETEST</div>
+           <h2>Assess Your Knowledge</h2>
+           <ol>
+              <li><strong>What does ALU stand for?</strong><br>
+              <input type="radio" name="pt1"> Arithmetic Logic Unit <br><input type="radio" name="pt1"> Asymmetric Logic Unit</li>
+              <li><strong>Which component selects between the Arithmetic and Logic outputs?</strong><br>
+              <input type="radio" name="pt2"> Decoder <br><input type="radio" name="pt2"> Multiplexer</li>
+           </ol>
+        </div>
+
+        <!-- Procedure Tab -->
+        <div id="tab-procedure" class="core-tab-panel glass-card read-content">
+           <div class="card-label">PROCEDURE</div>
+           <h2>How to Perform the Experiment</h2>
+           <ul>
+              <li>Navigate to the <strong>Simulation</strong> tab.</li>
+              <li>Toggle the Mode (M) switch to select between Arithmetic (M=0) and Logic (M=1) operations.</li>
+              <li>Toggle the Select Lines (S) to pick a specific operation.</li>
+              <li>Set the Input A and Input B values and observe how the output Y changes.</li>
+              <li>Observe the active paths lighting up in the macro architecture diagram.</li>
+           </ul>
+        </div>
+
+        <!-- Simulation Tab -->
+        <div id="tab-simulation" class="core-tab-panel active glass-card" style="display:flex; flex-direction:column;">
+          <div class="card-label sim-heading">
+              <span id="simModeTitle">ALU MACRO ARCHITECTURE</span>
+              <div class="sim-status s-ok">SIMULATION ACTIVE</div>
+          </div>
           
-          <div class="alu-interactive-area">
-            
-            <!-- SVG Routing and Blocks -->
-            <svg class="alu-routing" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet">
+          <div class="simulator-canvas">
+            <svg class="alu-routing" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: 100%;">
               <defs>
                 <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
                   <path d="M0,0 L6,3 L0,6 Z" fill="currentColor" />
                 </marker>
-                <marker id="arrow-active" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                  <path d="M0,0 L6,3 L0,6 Z" fill="var(--cyan)" />
-                </marker>
               </defs>
 
-              <!-- Static Traces (4 individual wires for Inputs to Blocks) -->
               <g class="bus-a" id="busA_arith">
                 <path class="trace bit-trace" id="t-a-3-arith" d="M 120,85 L 250,85" marker-end="url(#arrow)" />
                 <path class="trace bit-trace" id="t-a-2-arith" d="M 120,95 L 250,95" marker-end="url(#arrow)" />
@@ -132,7 +170,6 @@
                 <path class="trace bit-trace" id="t-b-0-logic" d="M 120,315 L 250,315" marker-end="url(#arrow)" />
               </g>
               
-              <!-- Select Line Traces (4 individual wires) -->
               <g class="bus-s" id="busS_arith">
                 <path class="trace bit-trace" id="t-s-3-arith" d="M 120,185 L 185,185 L 185,65 L 300,65" marker-end="url(#arrow)" />
                 <path class="trace bit-trace" id="t-s-2-arith" d="M 120,195 L 195,195 L 195,75 L 300,75" marker-end="url(#arrow)" />
@@ -146,108 +183,133 @@
                 <path class="trace bit-trace" id="t-s-0-logic" d="M 215,215 L 215,355 L 300,355" marker-end="url(#arrow)" />
               </g>
 
-              <!-- Dynamic Traces (Blocks to MUX) -->
               <path class="trace dynamic-trace trace-arith" id="traceArith" d="M 350,120 L 420,120 L 420,180" marker-end="url(#arrow)" />
               <path class="trace dynamic-trace trace-logic" id="traceLogic" d="M 350,280 L 420,280 L 420,220" marker-end="url(#arrow)" />
               
-              <!-- Mode Line to MUX -->
               <path class="trace trace-mode" id="traceMode" d="M 450,80 L 450,160" marker-end="url(#arrow)" />
               
-              <!-- Output Trace -->
               <path class="trace trace-out" id="traceOut" d="M 450,240 L 450,320 L 520,320" marker-end="url(#arrow)" />
 
-              <!-- Blocks -->
               <rect class="svg-block" x="250" y="80" width="100" height="80" rx="8" />
               <text class="svg-text" x="300" y="125">Arithmetic Unit</text>
 
               <rect class="svg-block" x="250" y="240" width="100" height="80" rx="8" />
               <text class="svg-text" x="300" y="285">Logic Unit</text>
 
-              <!-- MUX Block -->
               <polygon class="svg-block" points="400,160 500,160 480,240 420,240" />
               <text class="svg-text" x="450" y="205">2:1 MUX</text>
+              
+              <!-- Draw some nice connection points instead of HTML overlays -->
+              <text class="svg-text" x="80" y="105" fill="var(--muted)">A [3:0]</text>
+              <text class="svg-text" x="80" y="145" fill="var(--muted)">B [3:0]</text>
+              <text class="svg-text" x="80" y="205" fill="var(--muted)">S [3:0]</text>
+              <text class="svg-text" x="450" y="70" fill="var(--muted)">Mode (M)</text>
+              <text class="svg-text" x="550" y="310" fill="var(--muted)">Y [3:0]</text>
             </svg>
+          </div>
 
-            <!-- HTML Overlays for Inputs/Outputs -->
-            <div class="io-overlay overlay-a">
-              <span class="io-label">Input A [3:0]</span>
-              <div class="toggle-array" id="inputA">
-                <button class="toggle-btn" data-bit="3" data-val="0">0</button>
-                <button class="toggle-btn" data-bit="2" data-val="0">0</button>
-                <button class="toggle-btn" data-bit="1" data-val="0">0</button>
-                <button class="toggle-btn" data-bit="0" data-val="0">0</button>
+          <!-- Bottom interactive switches -->
+          <div class="io-panel">
+            <div class="io-row">
+              <div class="io-group" id="inputA">
+                <span style="font-weight:bold; font-size: 0.8rem; margin-right: 10px;">Input A</span>
+                <div class="io-switch"><span>A3</span><button class="toggle-btn btn-a" data-bit="3" data-val="0">0</button></div>
+                <div class="io-switch"><span>A2</span><button class="toggle-btn btn-a" data-bit="2" data-val="0">0</button></div>
+                <div class="io-switch"><span>A1</span><button class="toggle-btn btn-a" data-bit="1" data-val="0">0</button></div>
+                <div class="io-switch"><span>A0</span><button class="toggle-btn btn-a" data-bit="0" data-val="0">0</button></div>
               </div>
-            </div>
 
-            <div class="io-overlay overlay-b">
-              <span class="io-label">Input B [3:0]</span>
-              <div class="toggle-array" id="inputB">
-                <button class="toggle-btn" data-bit="3" data-val="0">0</button>
-                <button class="toggle-btn" data-bit="2" data-val="0">0</button>
-                <button class="toggle-btn" data-bit="1" data-val="0">0</button>
-                <button class="toggle-btn" data-bit="0" data-val="0">0</button>
-              </div>
-            </div>
-
-            <div class="io-overlay overlay-s">
-              <span class="io-label">Select S [3:0]</span>
-              <div class="toggle-array array-purple" id="inputS">
-                <button class="toggle-btn" data-bit="3" data-val="0">0</button>
-                <button class="toggle-btn" data-bit="2" data-val="0">0</button>
-                <button class="toggle-btn" data-bit="1" data-val="0">0</button>
-                <button class="toggle-btn" data-bit="0" data-val="0">0</button>
-              </div>
-            </div>
-
-            <div class="io-overlay overlay-m">
-              <span class="io-label">Mode (M)</span>
-              <div class="toggle-array array-cyan" id="inputM">
-                <button class="toggle-btn mode-btn" data-bit="0" data-val="0">0</button>
-              </div>
-            </div>
-
-            <div class="io-overlay overlay-y">
-              <span class="io-label">Output Y [3:0]</span>
-              <div class="display-array" id="outputY">
-                <span class="disp-bit" id="y3">0</span>
-                <span class="disp-bit" id="y2">0</span>
-                <span class="disp-bit" id="y1">0</span>
-                <span class="disp-bit" id="y0">0</span>
+              <div class="io-group" id="inputB">
+                <span style="font-weight:bold; font-size: 0.8rem; margin-right: 10px;">Input B</span>
+                <div class="io-switch"><span>B3</span><button class="toggle-btn btn-b" data-bit="3" data-val="0">0</button></div>
+                <div class="io-switch"><span>B2</span><button class="toggle-btn btn-b" data-bit="2" data-val="0">0</button></div>
+                <div class="io-switch"><span>B1</span><button class="toggle-btn btn-b" data-bit="1" data-val="0">0</button></div>
+                <div class="io-switch"><span>B0</span><button class="toggle-btn btn-b" data-bit="0" data-val="0">0</button></div>
               </div>
             </div>
             
+            <div class="io-row" style="margin-top: 0.5rem; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 1rem;">
+              <div class="io-group" id="inputS">
+                <span style="font-weight:bold; font-size: 0.8rem; margin-right: 10px;">Select S</span>
+                <div class="io-switch"><span>S3</span><button class="toggle-btn btn-s" data-bit="3" data-val="0">0</button></div>
+                <div class="io-switch"><span>S2</span><button class="toggle-btn btn-s" data-bit="2" data-val="0">0</button></div>
+                <div class="io-switch"><span>S1</span><button class="toggle-btn btn-s" data-bit="1" data-val="0">0</button></div>
+                <div class="io-switch"><span>S0</span><button class="toggle-btn btn-s" data-bit="0" data-val="0">0</button></div>
+              </div>
+              
+              <div class="io-group" id="inputM">
+                <span style="font-weight:bold; font-size: 0.8rem; margin-right: 10px;">Mode</span>
+                <div class="io-switch"><span>M</span><button class="toggle-btn btn-m" data-bit="0" data-val="0">0</button></div>
+              </div>
+
+              <div class="io-group io-group-out" id="outputGroup">
+                <span style="font-weight:bold; font-size: 0.8rem; margin-right: 10px;">Output Y</span>
+                <div class="io-switch"><span>Y3</span><div class="output-ind" id="y3">0</div></div>
+                <div class="io-switch"><span>Y2</span><div class="output-ind" id="y2">0</div></div>
+                <div class="io-switch"><span>Y1</span><div class="output-ind" id="y1">0</div></div>
+                <div class="io-switch"><span>Y0</span><div class="output-ind" id="y0">0</div></div>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- Posttest Tab -->
+        <div id="tab-posttest" class="core-tab-panel glass-card read-content">
+           <div class="card-label">POSTTEST</div>
+           <h2>Final Assessment</h2>
+           <ol>
+              <li><strong>If M=0, what unit is active?</strong><br>
+              <input type="radio" name="po1"> Logic Unit <br><input type="radio" name="po1"> Arithmetic Unit</li>
+           </ol>
+        </div>
+
+        <!-- References Tab -->
+        <div id="tab-references" class="core-tab-panel glass-card read-content">
+           <div class="card-label">REFERENCES</div>
+           <h2>Further Reading</h2>
+           <ul>
+              <li>Computer Organization and Design by David A. Patterson and John L. Hennessy</li>
+              <li>Digital Design by M. Morris Mano</li>
+           </ul>
+        </div>
+
+        <!-- Feedback Tab -->
+        <div id="tab-feedback" class="core-tab-panel glass-card read-content">
+           <div class="card-label">FEEDBACK</div>
+           <h2>Leave Feedback</h2>
+           <div style="margin-bottom: 1.5rem;">
+              <p style="margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Rate your experience</p>
+              <div style="display: flex; gap: 0.5rem; cursor: pointer; font-size: 1.5rem;" id="feedbackStars">
+                 <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+              </div>
+           </div>
+           <p>Did you encounter any bugs? Please describe your issue.</p>
+           <textarea style="width:100%; height:80px; border-radius:8px; border:1px solid #ccc; padding:8px; font-family:var(--font-body);"></textarea>
+           <button class="btn btn-primary" style="margin-top:10px;">Submit Feedback</button>
+        </div>
+
       </section>
 
       <!-- ZONE 3: Right Contextual Panel -->
-      <aside class="zone-right">
-        <div class="panel flashcard-panel no-print">
-          <div class="panel-header">Contextual Operation</div>
-          <div class="flashcard" id="operationFlashcard">
-            <span class="flash-mode" id="flashMode">Mode: Arithmetic (M=0)</span>
-            <span class="flash-op" id="flashOp">Operation: A + B</span>
-            <p class="flash-desc" id="flashDesc">The ALU is currently adding A and B, and routing the sum through the multiplexer.</p>
-          </div>
+      <aside class="zone zone-3">
+        <div class="glass-card mb-4 theory-box no-print">
+          <div class="card-label">PROGRESSIVE THEORY</div>
+          <p id="theoryContent" class="theory-text">Adjust the Mode (M) and Select Lines (S) to see dynamic, easy-to-understand explanations of the ALU's operations here!</p>
         </div>
 
-        <div class="panel truth-table-panel print-full-width">
-          <div class="panel-header no-print">Data Collection</div>
-          <div class="table-actions no-print">
-            <button class="btn btn-add-reading" id="btnAddReading">+ ADD READING</button>
-          </div>
-          
-          <div class="table-container print-only-table">
-            <table class="logic-table" id="dataTable">
+        <div class="glass-card table-box print-full-width">
+          <div class="card-label no-print">OBSERVATION TABLE</div>
+          <div class="table-scroll print-only-table">
+            <table class="truth-table" id="dataTable">
               <thead>
-                <tr>
+                <tr id="ttHeader">
                   <th>S.No</th>
                   <th>M</th>
-                  <th>S<sub>3-0</sub></th>
-                  <th>A<sub>3-0</sub></th>
-                  <th>B<sub>3-0</sub></th>
-                  <th>Y<sub>3-0</sub></th>
-                  <th>Operation</th>
+                  <th>S</th>
+                  <th>A</th>
+                  <th>B</th>
+                  <th>Y</th>
+                  <th>Op</th>
                 </tr>
               </thead>
               <tbody id="tableBody">
@@ -255,18 +317,35 @@
               </tbody>
             </table>
           </div>
+          <button id="btnAddReading" class="btn btn-green full-w no-print">ADD READING</button>
+          <button id="exportCsvBtn" class="btn btn-primary full-w no-print" style="margin-top: 0.5rem;">Download CSV</button>
         </div>
       </aside>
 
     </div>
 
     <!-- Print Header (Hidden normally) -->
-    <div class="print-header">
-      <h2>LogicFlow Virtual Lab Report</h2>
-      <h3>Experiment 10: Arithmetic Logic Unit</h3>
-      <div class="print-meta">
-        <span>Date: <span id="printDate"></span></span>
-        <span>Signature: ______________________</span>
+    <div id="printReport">
+      <div class="print-header">
+        <h1 class="print-title">LogicFlow Virtual Lab Report</h1>
+        <div class="print-meta">
+          <p><strong>Experiment:</strong> Arithmetic Logic Unit (ALU)</p>
+          <p><strong>Date:</strong> <span id="printDate"></span></p>
+        </div>
+      </div>
+      <h2 class="print-section-title">Observation Table</h2>
+      <table class="print-table" id="prTable"></table>
+      <h2 class="print-section-title">Conclusion</h2>
+      <p class="print-conclusion">The ALU simulation was successfully verified. The observed outputs correctly matched the expected arithmetic and logic operations for each configuration.</p>
+      <div class="print-signatures">
+          <div class="sig-box">
+              <span class="sig-line"></span>
+              <p>Student Signature</p>
+          </div>
+          <div class="sig-box">
+              <span class="sig-line"></span>
+              <p>Faculty Signature</p>
+          </div>
       </div>
     </div>
   </main>

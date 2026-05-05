@@ -5,15 +5,16 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Motherboard Anatomy — LogicFlow</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="css/global.css">
-  <link rel="stylesheet" href="css/motherboard.css">
+  <link rel="stylesheet" href="css/exp9_motherboard.css">
   
-  <!-- Import the model-viewer web component (v2.2.1 supports KHR_materials_pbrSpecularGlossiness used by this GLB) -->
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/2.2.1/model-viewer.min.js"></script>
+  <!-- Import the latest model-viewer component -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 </head>
 <body>
 
+  <!-- Background Mesh -->
   <div class="bg-mesh">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -21,7 +22,8 @@
     <div class="blob blob-4"></div>
   </div>
 
-  <nav>
+  <!-- Navbar (Shared) -->
+  <nav class="no-print">
     <a href="index.html" class="nav-logo">LogicFlow</a>
     <ul class="nav-links">
       <li><a href="curriculum.html">Curriculum</a></li>
@@ -39,7 +41,9 @@
             <a href="exp5_rectifier.html">5. Rectifiers</a>
             <a href="exp6_flipflops.html">6. Flip-Flops</a>
             <a href="exp7_bcd_decoder.html">7. BCD Decoder</a>
+            <a href="exp8_mux_demux.html">8. Data Routing & Distribution</a>
             <a href="exp9_motherboard.html" class="active">9. Computer Architecture</a>
+            <a href="exp10_alu.html">10. ALU Simulation</a>
           </div>
         </div>
       </li>
@@ -49,71 +53,169 @@
     </div>
   </nav>
 
-  <main class="page viewer-page">
-    <div class="viewer-container">
-      <model-viewer 
-        id="motherboard-viewer"
-        src="motherboard.glb" 
-        camera-controls 
-        interaction-prompt="none"
-        environment-image="neutral"
-        shadow-intensity="1"
-        exposure="1"
-        camera-orbit="45deg 55deg auto"
-      >
-        <!-- Generate exact mathematically perfect coordinates using the official Model Viewer Editor (https://modelviewer.dev/editor/) and paste them here. -->
-        <button class="hotspot" slot="hotspot-processor" data-position="0 0.05 0" data-normal="0 1 0" data-target="processor">
-          <div class="hotspot-dot"></div>
-          <div class="hotspot-label">Processor</div>
-        </button>
+  <!-- Page Content -->
+  <main class="page">
+    <div class="page-header no-print">
+      <div class="breadcrumb">
+        <span class="badge">Experiment 09</span>
+        <span>›</span><span>Computer Architecture</span>
+      </div>
+      <h1>Motherboard Anatomy</h1>
+      <p>Explore the physical foundation of computer architecture. Interact with the 3D model to learn about key motherboard components.</p>
+    </div>
 
-        <button class="hotspot" slot="hotspot-memory" data-position="0.2 0.05 0" data-normal="0 1 0" data-target="memory">
-          <div class="hotspot-dot"></div>
-          <div class="hotspot-label">Memory</div>
-        </button>
+    <!-- 3-ZONE LAYOUT -->
+    <div class="zones-container">
+      
+      <!-- ZONE 1: Navigation & Controls -->
+      <aside class="zone zone-1 glass-card no-print">
+        <div class="card-label">LAB LIFECYCLE</div>
+        <ul class="lab-nav" id="tabNav">
+          <li><a href="#" data-target="tab-aim">Aim</a></li>
+          <li><a href="#" data-target="tab-theory">Theory</a></li>
+          <li><a href="#" data-target="tab-pretest">Pretest</a></li>
+          <li><a href="#" data-target="tab-procedure">Procedure</a></li>
+          <li><a href="#" data-target="tab-simulation" class="active">Interactive Model</a></li>
+          <li><a href="#" data-target="tab-posttest">Posttest</a></li>
+          <li><a href="#" data-target="tab-references">References</a></li>
+          <li><a href="#" data-target="tab-feedback">Feedback</a></li>
+        </ul>
+      </aside>
 
-        <button class="hotspot" slot="hotspot-pci" data-position="-0.2 0.05 -0.1" data-normal="0 1 0" data-target="pci">
-          <div class="hotspot-dot"></div>
-          <div class="hotspot-label">PCI Slots</div>
-        </button>
+      <!-- ZONE 2: Center Stage -->
+      <section class="zone zone-2 no-print">
 
-        <button class="hotspot" slot="hotspot-cmos" data-position="0 0.05 -0.3" data-normal="0 1 0" data-target="cmos">
-          <div class="hotspot-dot"></div>
-          <div class="hotspot-label">CMOS</div>
-        </button>
-
-        <button class="hotspot" slot="hotspot-ports" data-position="-0.3 0.1 0.3" data-normal="-1 0 0" data-target="ports">
-          <div class="hotspot-dot"></div>
-          <div class="hotspot-label">I/O Ports</div>
-        </button>
-      </model-viewer>
-
-      <!-- Overlay UI -->
-      <div class="viewer-header">
-        <div class="breadcrumb">
-          <a href="coa.html">COA</a>
-          <span>›</span>
-          <span class="badge badge-blue">Exp 09</span>
+        <!-- Aim Tab -->
+        <div id="tab-aim" class="core-tab-panel glass-card read-content">
+           <div class="card-label">AIM</div>
+           <h2>Objective</h2>
+           <p>To identify and understand the function of essential motherboard components including the Processor Socket, RAM slots, Expansion Slots, and I/O ports.</p>
         </div>
-        <h1>Motherboard Anatomy</h1>
-        <p>Explore the physical foundation of computer architecture.</p>
-      </div>
 
-      <div class="controls-overlay">
-        <button class="btn btn-secondary" id="btnReset">↺ Reset View</button>
-      </div>
+        <!-- Theory Tab -->
+        <div id="tab-theory" class="core-tab-panel glass-card read-content">
+           <div class="card-label">THEORY</div>
+           <h2>Motherboard Basics</h2>
+           <p>The motherboard is the main printed circuit board (PCB) in general-purpose computers. It holds and allows communication between many of the crucial electronic components of a system, such as the CPU and memory, and provides connectors for other peripherals.</p>
+        </div>
 
-      <div class="info-card" id="infoCard">
-        <button class="close-card" id="btnCloseCard">×</button>
-        <span class="info-badge" id="infoBadge">Component</span>
-        <h2 id="infoTitle">Title</h2>
-        <p id="infoDesc">Description</p>
-      </div>
+        <!-- Pretest Tab -->
+        <div id="tab-pretest" class="core-tab-panel glass-card read-content">
+           <div class="card-label">PRETEST</div>
+           <h2>Assess Your Knowledge</h2>
+           <ol>
+              <li><strong>What component provides volatile storage for the CPU?</strong><br>
+              <input type="radio" name="pt1"> Hard Drive <br><input type="radio" name="pt1"> RAM</li>
+              <li><strong>Which slot is typically used for graphics cards?</strong><br>
+              <input type="radio" name="pt2"> PCI Express <br><input type="radio" name="pt2"> CMOS</li>
+           </ol>
+        </div>
+
+        <!-- Procedure Tab -->
+        <div id="tab-procedure" class="core-tab-panel glass-card read-content">
+           <div class="card-label">PROCEDURE</div>
+           <h2>How to Perform the Experiment</h2>
+           <ul>
+              <li>Navigate to the <strong>Interactive Model</strong> tab.</li>
+              <li>Click and drag the 3D motherboard to rotate it in space.</li>
+              <li>Scroll or pinch to zoom in and out.</li>
+              <li>Click on the pulsing blue hotspots to learn about specific components on the board.</li>
+           </ul>
+        </div>
+
+        <!-- Simulation Tab -->
+        <div id="tab-simulation" class="core-tab-panel active glass-card" style="display:flex; flex-direction:column; padding: 0.5rem; background: transparent; border: none; box-shadow: none;">
+          <div class="card-label sim-heading" style="padding: 0 1rem;">
+              <span id="simModeTitle">MOTHERBOARD EXPLORER</span>
+              <div class="sim-status s-ok">MODEL ACTIVE</div>
+          </div>
+          
+          <div class="viewer-container">
+            <div class="controls-overlay">
+              <button class="btn-secondary" id="btnResetView">↺ Reset Camera</button>
+            </div>
+            
+            <model-viewer 
+              id="motherboard-viewer"
+              camera-controls 
+              interaction-prompt="none"
+              shadow-intensity="1"
+              exposure="1"
+              camera-orbit="45deg 55deg auto"
+            ></model-viewer>
+          </div>
+        </div>
+
+        <!-- Posttest Tab -->
+        <div id="tab-posttest" class="core-tab-panel glass-card read-content">
+           <div class="card-label">POSTTEST</div>
+           <h2>Final Assessment</h2>
+           <ol>
+              <li><strong>What preserves the BIOS settings when the PC is unplugged?</strong><br>
+              <input type="radio" name="po1"> Memory (RAM) <br><input type="radio" name="po1"> CMOS Battery</li>
+           </ol>
+        </div>
+
+        <!-- References Tab -->
+        <div id="tab-references" class="core-tab-panel glass-card read-content">
+           <div class="card-label">REFERENCES</div>
+           <h2>Further Reading</h2>
+           <ul>
+              <li>Computer Organization and Design by David A. Patterson and John L. Hennessy</li>
+              <li>CompTIA A+ Certification All-in-One Exam Guide</li>
+              <li>Intel Motherboard Design Guidelines</li>
+           </ul>
+        </div>
+
+        <!-- Feedback Tab -->
+        <div id="tab-feedback" class="core-tab-panel glass-card read-content">
+           <div class="card-label">FEEDBACK</div>
+           <h2>Leave Feedback</h2>
+           <div style="margin-bottom: 1.5rem;">
+              <p style="margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Rate your experience</p>
+              <div style="display: flex; gap: 0.5rem; cursor: pointer; font-size: 1.5rem;" id="feedbackStars">
+                 <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+              </div>
+           </div>
+           <p>Did you encounter any bugs? Please describe your issue.</p>
+           <textarea style="width:100%; height:80px; border-radius:8px; border:1px solid #ccc; padding:8px; font-family:var(--font-body);"></textarea>
+           <button class="btn btn-primary" style="margin-top:10px;">Submit Feedback</button>
+        </div>
+
+      </section>
+
+      <!-- ZONE 3: Right Contextual Panel -->
+      <aside class="zone zone-3">
+        <div class="glass-card mb-4 theory-box no-print">
+          <div class="card-label">COMPONENT DETAILS</div>
+          
+          <div id="componentDetails">
+             <div style="text-align: center; padding: 2rem 0; opacity: 0.6;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 1rem;">
+                   <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/>
+                </svg>
+                <p>Select a component from the list below to reveal its function and architectural details.</p>
+             </div>
+          </div>
+        </div>
+
+        <div class="glass-card mb-4 no-print">
+          <div class="card-label">COMPONENT SELECTION</div>
+          <div class="component-selector" id="componentSelectorList">
+            <button class="comp-btn" data-target="processor">Processor</button>
+            <button class="comp-btn" data-target="memory">Memory</button>
+            <button class="comp-btn" data-target="pci">PCI Slots</button>
+            <button class="comp-btn" data-target="cmos">CMOS Battery</button>
+            <button class="comp-btn" data-target="ports">I/O Ports</button>
+          </div>
+        </div>
+      </aside>
 
     </div>
   </main>
 
   <script defer src="js/nav-shared.js"></script>
-  <script defer src="js/motherboard.js"></script>
+  <script defer src="js/motherboard_data.js"></script>
+  <script defer src="js/exp9_motherboard.js"></script>
 </body>
 </html>

@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     M: 0,
     Y: 0
   };
+  
+  let observationData = [];
 
   // DOM Elements
   const inputA_btns = document.querySelectorAll('#inputA .toggle-btn');
@@ -17,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputS_btns = document.querySelectorAll('#inputS .toggle-btn');
   const inputM_btn = document.querySelector('#inputM .toggle-btn');
   
-  const outputY_spans = [
+  const outputY_inds = [
     document.getElementById('y0'),
     document.getElementById('y1'),
     document.getElementById('y2'),
@@ -28,41 +30,99 @@ document.addEventListener('DOMContentLoaded', () => {
   const traceLogic = document.getElementById('traceLogic');
   const traceOut = document.getElementById('traceOut');
 
-  const flashMode = document.getElementById('flashMode');
-  const flashOp = document.getElementById('flashOp');
-  const flashDesc = document.getElementById('flashDesc');
-
-  const btnAddReading = document.getElementById('btnAddReading');
+  const theoryContent = document.getElementById('theoryContent');
   const tableBody = document.getElementById('tableBody');
-  let readingCount = 0;
-
+  const btnAddReading = document.getElementById('btnAddReading');
+  const btnExportCsv = document.getElementById('exportCsvBtn');
+  
   const btnResetAlu = document.getElementById('btnResetAlu');
   const btnExportReport = document.getElementById('btnExportReport');
   const printDate = document.getElementById('printDate');
+  const prTable = document.getElementById('prTable');
+
+  // --- Tab Switching Logic ---
+  const tabNavLinks = document.querySelectorAll("#tabNav a");
+  const tabPanels = document.querySelectorAll(".core-tab-panel");
+
+  tabNavLinks.forEach(link => {
+      link.addEventListener("click", (e) => {
+          e.preventDefault();
+          tabNavLinks.forEach(l => l.classList.remove("active"));
+          link.classList.add("active");
+
+          tabPanels.forEach(panel => {
+              panel.style.display = "none";
+              panel.classList.remove("active");
+          });
+
+          const targetId = link.getAttribute("data-target");
+          const target = document.getElementById(targetId);
+          if(target) {
+              if(targetId === "tab-simulation") {
+                  target.style.display = "flex";
+              } else {
+                  target.style.display = "block";
+              }
+              target.classList.add("active");
+          }
+      });
+  });
+
+  // Feedback Stars
+  const stars = document.querySelectorAll(".star");
+  stars.forEach((star, idx) => {
+      star.addEventListener("click", () => {
+          stars.forEach((s, i) => s.textContent = i <= idx ? "★" : "☆");
+      });
+  });
 
   // Operation Map
   function getOperationDetails(M, S) {
     if (M === 0) {
       // Arithmetic Mode
       switch(S) {
-        case 0: return { op: "Transfer A", text: "Y = A", desc: "This mode configures the ALU to act as a direct pass-through for the A input bus. The Arithmetic Logic Unit completely bypasses any mathematical transformation and routes the 4-bit binary value of A straight into the Multiplexer, leaving it untouched. This is fundamentally useful when data simply needs to be moved from one register to another across the processor's internal data bus without modification." };
-        case 1: return { op: "Addition", text: "Y = A + B", desc: "The ALU engages its internal Full Adder circuits to perform true binary arithmetic addition. It takes the 4 bits from Input A and the 4 bits from Input B, combining them mathematically. Carry bits cascade from the Least Significant Bit (LSB) to the Most Significant Bit (MSB). This is the absolute core operation of any CPU, used constantly for calculating memory addresses, updating loop counters, and processing raw numerical data." };
-        case 2: return { op: "Subtraction", text: "Y = A - B", desc: "The ALU performs binary subtraction by utilizing the Two's Complement method. Behind the scenes, the internal circuitry first inverts every bit of Input B (creating the One's Complement), and then forces a Carry-In bit of 1 into the very first adder stage (completing the Two's Complement). The hardware then simply adds this negative version of B to A, perfectly computing A - B using the exact same adder hardware used for addition." };
-        case 3: return { op: "Decrement A", text: "Y = A - 1", desc: "This operation subtracts exactly 1 from the value currently held in Input A. At the hardware level, this is achieved by adding a constant block of all 1s (which equals -1 in Two's complement) to A, or by asserting a subtract operation with a hardwired B input of 1. Decrementing is one of the most frequently used hardware instructions in computer science, heavily relied upon for counting down loops and traversing backwards through arrays." };
-        case 4: return { op: "Increment A", text: "Y = A + 1", desc: "This operation adds exactly 1 to the current value of Input A. Instead of using the B input bus, the ALU forces a '1' into the Carry-In of the very first Full Adder stage while keeping the B input essentially zeroed out. Incrementing is critical to computer architecture; it is the exact mechanical process the processor uses to update its Program Counter to point to the very next instruction in memory." };
-        default: return { op: "Arithmetic Default", text: "Y = A", desc: "An unmapped Select line combination has been entered. The ALU safely falls back to a default Transfer state, pushing the raw A input straight to the output bus." };
+        case 0: return { op: "Transfer A", text: "Y = A" };
+        case 1: return { op: "Addition", text: "Y = A + B" };
+        case 2: return { op: "Subtraction", text: "Y = A - B" };
+        case 3: return { op: "Decrement A", text: "Y = A - 1" };
+        case 4: return { op: "Increment A", text: "Y = A + 1" };
+        default: return { op: "Transfer A", text: "Y = A" };
       }
     } else {
       // Logic Mode
       switch(S) {
-        case 0: return { op: "NOT A", text: "Y = ~A", desc: "The ALU performs a bitwise logical NOT, also known as Inversion or One's Complement. The circuit routes every single bit of Input A through an internal inverter gate, flipping 0s to 1s, and 1s to 0s independently. This operation does not cascade across bits like addition does. It is primarily used in generating masks, flipping polarities, and is the crucial first step in generating negative numbers in binary hardware." };
-        case 1: return { op: "AND", text: "Y = A & B", desc: "The ALU applies a bitwise logical AND operation. Every bit in Input A is paired with the corresponding bit in Input B and pushed through an AND gate. The resulting output bit is '1' only if both input bits are '1'; otherwise, it outputs a '0'. This operation is famously used in software for 'Bit Masking'—allowing programmers to purposefully erase specific bits by ANDing them with 0, while keeping others intact by ANDing them with 1." };
-        case 2: return { op: "OR", text: "Y = A | B", desc: "The ALU executes a bitwise logical OR operation. Corresponding bits from Input A and Input B are passed through OR gates. The output bit becomes '1' if at least one of the input bits is '1'. The OR operation is typically used by systems to aggressively set specific configuration flags to '1' without accidentally disturbing the neighboring bits in a status register." };
-        case 3: return { op: "XOR", text: "Y = A ^ B", desc: "The ALU executes an Exclusive-OR (XOR) logic operation. The output bit is '1' strictly when the bits from A and B are different. If they are exactly the same (both 0s or both 1s), the output is '0'. XOR is an incredibly powerful hardware function used for comparing numbers (if A^B is 0, the numbers are identical), generating parity bits for error checking, and forms the mathematical backbone of modern cryptographic ciphers." };
-        case 4: return { op: "NAND", text: "Y = ~(A & B)", desc: "The ALU performs a Not-AND logic operation. It calculates the standard AND operation and immediately inverts the result. The NAND gate holds a special place in digital electronics because it is 'Universally Complete'—meaning you can physically build any other logic gate, memory cell, or processor entirely out of nothing but NAND gates." };
-        case 5: return { op: "NOR", text: "Y = ~(A | B)", desc: "The ALU calculates a Not-OR logic operation. This involves evaluating the OR condition and immediately flipping the result through an inverter. Like NAND, the NOR logic gate is also a 'Universal Gate'. It outputs a '1' only in the highly specific scenario where absolutely every single input is '0'." };
-        case 6: return { op: "XNOR", text: "Y = ~(A ^ B)", desc: "The ALU performs an Exclusive-NOR operation. This is the exact inverse of the XOR logic. The output bit is '1' if and only if the bits from Input A and Input B perfectly match. Because of this property, XNOR circuits are frequently used deep inside hardware comparators to detect digital equality between two different memory registers." };
-        default: return { op: "Logic Default", text: "Y = 0", desc: "An unmapped Select line combination has been entered in Logic Mode. The ALU defaults to pulling all output lines low to logic zero." };
+        case 0: return { op: "NOT A", text: "Y = ~A" };
+        case 1: return { op: "AND", text: "Y = A & B" };
+        case 2: return { op: "OR", text: "Y = A | B" };
+        case 3: return { op: "XOR", text: "Y = A ^ B" };
+        case 4: return { op: "NAND", text: "Y = ~(A & B)" };
+        case 5: return { op: "NOR", text: "Y = ~(A | B)" };
+        case 6: return { op: "XNOR", text: "Y = ~(A ^ B)" };
+        default: return { op: "Zero", text: "Y = 0" };
+      }
+    }
+  }
+
+  function getLaymanTheory(M, S, A, B, Y) {
+    if (M === 0) {
+      switch(S) {
+        case 0: return `You've set the Mode to <strong>Arithmetic (M=0)</strong> and Select lines to <strong>Transfer A</strong>. The Arithmetic Unit completely bypasses any mathematical transformation and routes the value of Input A (<strong>${A}</strong>) straight through.<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+        case 1: return `You've set the Mode to <strong>Arithmetic (M=0)</strong> and Select lines to <strong>Addition</strong>. The ALU takes the value from Input A (<strong>${A}</strong>) and adds it to Input B (<strong>${B}</strong>).<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+        case 2: return `You've set the Mode to <strong>Arithmetic (M=0)</strong> and Select lines to <strong>Subtraction</strong>. The ALU takes the value from Input A (<strong>${A}</strong>) and subtracts Input B (<strong>${B}</strong>) from it using Two's Complement arithmetic.<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+        case 3: return `You've set the Mode to <strong>Arithmetic (M=0)</strong> and Select lines to <strong>Decrement A</strong>. This operation subtracts exactly 1 from the value currently held in Input A (<strong>${A}</strong>).<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+        case 4: return `You've set the Mode to <strong>Arithmetic (M=0)</strong> and Select lines to <strong>Increment A</strong>. This operation adds exactly 1 to the current value of Input A (<strong>${A}</strong>).<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+        default: return `The ALU is safely falling back to a default Transfer state, pushing the raw A input (<strong>${A}</strong>) straight to the output bus.<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+      }
+    } else {
+      switch(S) {
+        case 0: return `You've set the Mode to <strong>Logic (M=1)</strong> and Select lines to <strong>NOT A</strong>. Every single bit of Input A (<strong>${A}</strong>) is flipped. 0s become 1s, and 1s become 0s.<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+        case 1: return `You've set the Mode to <strong>Logic (M=1)</strong> and Select lines to <strong>AND</strong>. Every bit in Input A (<strong>${A}</strong>) is paired with the corresponding bit in Input B (<strong>${B}</strong>). The output bit is '1' only if both input bits are '1'.<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+        case 2: return `You've set the Mode to <strong>Logic (M=1)</strong> and Select lines to <strong>OR</strong>. The output bit becomes '1' if at least one of the input bits from A (<strong>${A}</strong>) or B (<strong>${B}</strong>) is '1'.<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+        case 3: return `You've set the Mode to <strong>Logic (M=1)</strong> and Select lines to <strong>XOR</strong>. The output bit is '1' strictly when the bits from A (<strong>${A}</strong>) and B (<strong>${B}</strong>) are different.<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+        case 4: return `You've set the Mode to <strong>Logic (M=1)</strong> and Select lines to <strong>NAND</strong>. It calculates the standard AND operation on A (<strong>${A}</strong>) and B (<strong>${B}</strong>), and immediately inverts the result.<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+        case 5: return `You've set the Mode to <strong>Logic (M=1)</strong> and Select lines to <strong>NOR</strong>. It calculates the OR condition on A (<strong>${A}</strong>) and B (<strong>${B}</strong>), and immediately flips the result.<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+        case 6: return `You've set the Mode to <strong>Logic (M=1)</strong> and Select lines to <strong>XNOR</strong>. The output bit is '1' if and only if the bits from Input A (<strong>${A}</strong>) and Input B (<strong>${B}</strong>) perfectly match.<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
+        default: return `An unmapped Select line combination has been entered in Logic Mode. The ALU defaults to pulling all output lines low to logic zero.<br><br><strong>Therefore, the output Y is ${Y}.</strong>`;
       }
     }
   }
@@ -98,25 +158,30 @@ document.addEventListener('DOMContentLoaded', () => {
     return val.toString(2).padStart(4, '0');
   }
 
+  function setWireState(id, isActive, activeClass) {
+      const el = document.getElementById(id);
+      if (el) {
+          el.className.baseVal = `trace bit-trace ${isActive ? activeClass : 'trace-dimmed'}`;
+      }
+  }
+
   function updateUI() {
-    // 1. Update output spans
+    // 1. Update output indicators
     const yStr = to4BitStr(state.Y);
     for (let i = 0; i < 4; i++) {
-      outputY_spans[i].textContent = yStr[3 - i];
+      const bit = parseInt(yStr[3 - i]);
+      outputY_inds[i].textContent = bit;
+      outputY_inds[i].classList.toggle('on', bit === 1);
     }
 
     // 2. Update SVG Routing Blocks (Arithmetic vs Logic)
-    traceOut.classList.add('trace-active');
+    traceOut.className.baseVal = 'trace trace-out trace-active';
     if (state.M === 0) {
-      traceArith.classList.add('trace-active');
-      traceArith.classList.remove('trace-dimmed');
-      traceLogic.classList.remove('trace-active');
-      traceLogic.classList.add('trace-dimmed');
+      traceArith.className.baseVal = 'trace dynamic-trace trace-arith trace-active-a';
+      traceLogic.className.baseVal = 'trace dynamic-trace trace-logic trace-dimmed';
     } else {
-      traceLogic.classList.add('trace-active');
-      traceLogic.classList.remove('trace-dimmed');
-      traceArith.classList.remove('trace-active');
-      traceArith.classList.add('trace-dimmed');
+      traceLogic.className.baseVal = 'trace dynamic-trace trace-logic trace-active-b';
+      traceArith.className.baseVal = 'trace dynamic-trace trace-arith trace-dimmed';
     }
 
     // 3. Update individual bit wires for A, B, and S
@@ -126,23 +191,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const bitS = (state.S >> i) & 1;
 
       // Arithmetic Block paths
-      document.getElementById(`t-a-${i}-arith`).className = `trace bit-trace ${bitA ? 'trace-active-a' : 'trace-dimmed'}`;
-      document.getElementById(`t-b-${i}-arith`).className = `trace bit-trace ${bitB ? 'trace-active-b' : 'trace-dimmed'}`;
-      document.getElementById(`t-s-${i}-arith`).className = `trace bit-trace ${bitS ? 'trace-active-s' : 'trace-dimmed'}`;
+      setWireState(`t-a-${i}-arith`, bitA, 'trace-active-a');
+      setWireState(`t-b-${i}-arith`, bitB, 'trace-active-b');
+      setWireState(`t-s-${i}-arith`, bitS, 'trace-active-s');
 
       // Logic Block paths
-      document.getElementById(`t-a-${i}-logic`).className = `trace bit-trace ${bitA ? 'trace-active-a' : 'trace-dimmed'}`;
-      document.getElementById(`t-b-${i}-logic`).className = `trace bit-trace ${bitB ? 'trace-active-b' : 'trace-dimmed'}`;
-      document.getElementById(`t-s-${i}-logic`).className = `trace bit-trace ${bitS ? 'trace-active-s' : 'trace-dimmed'}`;
+      setWireState(`t-a-${i}-logic`, bitA, 'trace-active-a');
+      setWireState(`t-b-${i}-logic`, bitB, 'trace-active-b');
+      setWireState(`t-s-${i}-logic`, bitS, 'trace-active-s');
     }
 
-    // 4. Update Flashcard
-    const modeName = state.M === 0 ? "Arithmetic" : "Logic";
-    flashMode.textContent = `Mode: ${modeName} (M=${state.M})`;
-    
-    const details = getOperationDetails(state.M, state.S);
-    flashOp.textContent = details.text;
-    flashDesc.textContent = details.desc;
+    // 4. Update Theory Flashcard
+    theoryContent.innerHTML = getLaymanTheory(state.M, state.S, state.A, state.B, state.Y);
   }
 
   function handleToggle(e, type) {
@@ -154,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update button visually
     btn.dataset.val = newVal;
     btn.textContent = newVal;
+    btn.classList.toggle('on', newVal === 1);
 
     // Update state
     if (newVal === 1) {
@@ -175,44 +236,99 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Add Reading to Truth Table
   btnAddReading.addEventListener('click', () => {
-    readingCount++;
-    const row = document.createElement('tr');
     const details = getOperationDetails(state.M, state.S);
+    const reading = {
+      sNo: observationData.length + 1,
+      M: state.M,
+      S: to4BitStr(state.S),
+      A: to4BitStr(state.A),
+      B: to4BitStr(state.B),
+      Y: to4BitStr(state.Y),
+      Op: details.op
+    };
     
+    observationData.push(reading);
+    
+    const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${readingCount}</td>
-      <td style="color: var(--cyan); font-weight: bold;">${state.M}</td>
-      <td style="color: var(--purple); font-weight: bold;">${to4BitStr(state.S)}</td>
-      <td>${to4BitStr(state.A)}</td>
-      <td>${to4BitStr(state.B)}</td>
-      <td style="font-weight: bold; color: var(--text);">${to4BitStr(state.Y)}</td>
-      <td>${details.op} (${details.text})</td>
+      <td>${reading.sNo}</td>
+      <td style="color: var(--cyan); font-weight: bold;">${reading.M}</td>
+      <td style="color: var(--blue); font-weight: bold;">${reading.S}</td>
+      <td style="color: var(--green); font-weight: bold;">${reading.A}</td>
+      <td style="color: var(--rose); font-weight: bold;">${reading.B}</td>
+      <td style="font-weight: bold; color: var(--text);">${reading.Y}</td>
+      <td>${reading.Op}</td>
     `;
     
+    Array.from(tableBody.children).forEach(r => r.classList.remove("row-active"));
+    row.classList.add("row-active");
     tableBody.appendChild(row);
     
     // Auto-scroll to bottom
-    const container = document.querySelector('.table-container');
+    const container = document.querySelector('.table-scroll');
     container.scrollTop = container.scrollHeight;
   });
 
   // Reset ALU
   btnResetAlu.addEventListener('click', () => {
     state = { A: 0, B: 0, S: 0, M: 0, Y: 0 };
+    observationData = [];
     document.querySelectorAll('.toggle-btn').forEach(btn => {
       btn.dataset.val = "0";
       btn.textContent = "0";
+      btn.classList.remove('on');
     });
     tableBody.innerHTML = '';
-    readingCount = 0;
     computeY();
     updateUI();
   });
 
+  // Download CSV
+  btnExportCsv.addEventListener('click', () => {
+    if(observationData.length === 0) {
+        alert("No readings to export to CSV. Please add readings to the table first.");
+        return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "S.No,M,S,A,B,Y,Operation\r\n";
+
+    observationData.forEach(row => {
+        csvContent += `${row.sNo},${row.M},${row.S},${row.A},${row.B},${row.Y},${row.Op}\r\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `LogicFlow_Exp10_ALU_observations.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+
   // Export Lab Report (Print)
   btnExportReport.addEventListener('click', () => {
+    if(observationData.length === 0) {
+        alert("No readings to export. Please add readings to the table first.");
+        return;
+    }
+
     const d = new Date();
     printDate.textContent = d.toLocaleDateString() + " " + d.toLocaleTimeString();
+    
+    prTable.innerHTML = '';
+    const thead = document.createElement("thead");
+    thead.innerHTML = `<tr><th>S.No</th><th>M</th><th>S</th><th>A</th><th>B</th><th>Y</th><th>Operation</th></tr>`;
+    prTable.appendChild(thead);
+    
+    const tbody = document.createElement("tbody");
+    observationData.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${row.sNo}</td><td>${row.M}</td><td>${row.S}</td><td>${row.A}</td><td>${row.B}</td><td><strong>${row.Y}</strong></td><td>${row.Op}</td>`;
+        tbody.appendChild(tr);
+    });
+    prTable.appendChild(tbody);
+
     window.print();
   });
 
