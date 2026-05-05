@@ -59,6 +59,20 @@
     <div class="nav-actions">
       <button type="button" class="btn-enter" id="btnEnterLab">Enter Lab ↗</button>
       <button type="button" class="nav-sign-out" id="btnSignOut" hidden>Sign out</button>
+      <div class="student-nav-profile" id="studentNavProfile" hidden>
+        <div class="student-avatar-dropdown">
+          <button type="button" class="student-avatar-btn" id="studentAvatarBtn" aria-label="Student menu">
+            <span id="studentAvatarLetter">S</span>
+          </button>
+          <div class="student-avatar-menu" id="studentAvatarMenu">
+            <div class="student-avatar-info">
+              <div class="student-avatar-name" id="studentNavName">Student</div>
+              <div class="student-avatar-email" id="studentNavEmail">student@edu.in</div>
+            </div>
+            <button type="button" class="student-avatar-signout" id="studentNavSignOut">Sign Out</button>
+          </div>
+        </div>
+      </div>
     </div>
   </nav>
 
@@ -269,6 +283,26 @@
       </div>
     </div>
   </dialog>
+
+  <!-- Student Sign-Out Confirmation Modal -->
+  <div id="studentSignoutModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+    <div style="background:#fff;border-radius:16px;padding:28px;max-width:400px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.2);">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div style="width:44px;height:44px;border-radius:50%;background:#ffd9de;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#93000a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </div>
+        <div>
+          <div style="font-weight:800;font-size:17px;color:#191c20;">Sign Out</div>
+          <div style="font-size:13px;color:#737879;">Confirm your action</div>
+        </div>
+      </div>
+      <p style="font-size:15px;color:#424848;line-height:1.5;margin-bottom:24px;">Are you sure you want to sign out? You'll return to the default view.</p>
+      <div style="display:flex;gap:12px;justify-content:flex-end;">
+        <button id="studentSignoutCancel" style="padding:10px 20px;border:1px solid #e1e2e8;border-radius:10px;font-size:14px;font-weight:600;color:#424848;background:#fff;cursor:pointer;transition:background 0.2s;" onmouseenter="this.style.background='#f2f3f9'" onmouseleave="this.style.background='#fff'">Cancel</button>
+        <button id="studentSignoutConfirm" style="padding:10px 20px;border:none;border-radius:10px;font-size:14px;font-weight:600;color:#fff;background:#dc3545;cursor:pointer;transition:background 0.2s;" onmouseenter="this.style.background='#c82333'" onmouseleave="this.style.background='#dc3545'">Yes, Sign Out</button>
+      </div>
+    </div>
+  </div>
 
   <script src="logicflow-admin/js/storage.js"></script>
   <script src="js/index.js"></script>
