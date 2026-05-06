@@ -5,8 +5,8 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Logic Gate Sandbox — LogicFlow</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>  <link rel="stylesheet" href="css/global.css">
-
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>  
+  <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/sandbox.css">
 </head>
 <body>
@@ -38,7 +38,7 @@
             <a href="exp5_rectifier.html">5. Rectifiers</a>
             <a href="exp6_flipflops.html">6. Flip-Flops</a>
             <a href="exp7_bcd_decoder.html">7. BCD Decoder</a>
-            <a href=\"exp8_mux_demux.html\">8. Data Routing & Distribution</a>
+            <a href="exp8_mux_demux.html">8. Data Routing & Distribution</a>
           </div>
         </div>
       </li>
@@ -49,39 +49,15 @@
     </div>
   </nav>
 
-<div class="center-wrap">
-  <div class="coming-badge">🔧 In Development</div>
-
-  <div class="sandbox-icon">🔀</div>
-
-  <h1>Logic Gate Sandbox</h1>
-
-  <p class="subtitle">
-    An interactive drag-and-drop circuit builder for AND, OR, NOT, XOR, NAND, NOR gates — 
-    with real-time truth table evaluation and shareable circuit links. Coming soon.
-  </p>
-
-  <div class="gate-preview">
-    <div class="gate-chip">AND</div>
-    <div class="gate-chip">OR</div>
-    <div class="gate-chip">NOT</div>
-    <div class="gate-chip">XOR</div>
-    <div class="gate-chip">NAND</div>
-    <div class="gate-chip">NOR</div>
-    <div class="gate-chip">Half Adder</div>
-    <div class="gate-chip">Full Adder</div>
-    <div class="gate-chip">Flip-Flops</div>
-  </div>
-
-  <div class="progress-hint">
-    Development Progress — 65% Complete
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill"></div>
+  <div class="logicflow-container">
+    <div class="circuit-layer"></div>
+    
+    <div class="content">
+      <h1 class="sandbox-title">LogicFlow</h1>
+      <p class="sandbox-sub">Digital Electronics Simulator</p>
+      <a href="http://localhost:5173" class="glass-btn">Start Experimenting</a>
     </div>
   </div>
-
-  <a href="exp3_diode.html" class="btn-back">← Explore Experiments in the meantime</a>
-</div>
 
 <script defer src="js/nav-shared.js"></script>
 <script defer src="js/sandbox.js"></script>
