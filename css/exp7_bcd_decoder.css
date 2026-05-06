@@ -1,5 +1,6 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
+  --bg:#eceeff;
   --surface:rgba(255,255,255,0.55);
   --border:rgba(255,255,255,0.6);
   --border-dark:rgba(0,0,0,0.08);
@@ -9,7 +10,7 @@
   --font-body:var(--lf-font-body);
   --font-mono:'JetBrains Mono',monospace;
 }
-body{color:var(--text);font-family:var(--font-body);min-height:100vh}
+body{margin:0;background-color:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh}
 
     /* LAYOUT */
     .page{padding-top:var(--lf-main-padding-top);max-width:1300px;margin:0 auto;padding-left:2rem;padding-right:2rem;position:relative;z-index:10}
