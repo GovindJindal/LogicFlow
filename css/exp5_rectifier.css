@@ -58,3 +58,57 @@ body{color:var(--text);font-family:var(--font-body);min-height:100vh}
     .chart-box{height:250px;position:relative;background:rgba(255,255,255,0.4);border-radius:12px;padding:10px;border:1px solid var(--border)}
     
     @media(max-width:900px){.lab-grid{grid-template-columns:1fr}}
+
+/* ═══════════ WIRED SANDBOX STYLES ═══════════ */
+:root { --rose:#F43F5E; }
+
+/* Mode toggle */
+.mode-toggle{display:flex;gap:.4rem;background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.08);border-radius:10px;padding:.3rem;margin-bottom:1.5rem;max-width:340px}
+.mode-btn{flex:1;padding:.55rem;border-radius:7px;border:none;background:none;color:var(--muted);font-family:var(--font-mono);font-size:.78rem;cursor:pointer;transition:all .2s;font-weight:700}
+.mode-btn.active{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(26,86,219,.35)}
+
+/* Dual grid */
+.sandbox-layout{display:grid;grid-template-columns:260px 1fr;gap:1.5rem;padding-bottom:3rem}
+.right-col{display:flex;flex-direction:column;gap:1rem}
+
+/* Live circuit panel */
+.circuit-panel{background:#0f172a;border-radius:16px;border:2px solid #1e293b;overflow:hidden;position:relative}
+.circuit-label{position:absolute;top:12px;left:16px;font-family:var(--font-mono);font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+
+/* Palette */
+.palette-wrap{display:flex;flex-direction:column;gap:1rem}
+.palette-panel{background:rgba(30,41,59,.5);border:1px solid rgba(51,65,85,.5);border-radius:12px;padding:1rem}
+.palette-title{font-family:var(--font-mono);font-size:.8rem;color:#f1f5f9;font-weight:700;margin-bottom:.4rem}
+.palette-sub{font-size:.7rem;color:var(--muted);margin-bottom:.75rem}
+.components-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.component-item{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:.65rem .4rem;background:rgba(15,23,42,.5);border:1px solid rgba(51,65,85,.3);border-radius:8px;cursor:grab;transition:all .2s;user-select:none}
+.component-item:hover{background:rgba(26,86,219,.12);border-color:rgba(26,86,219,.35);transform:translateY(-2px)}
+.component-item:active{cursor:grabbing;transform:scale(.95)}
+.component-item span{font-family:var(--font-mono);font-size:.62rem;color:#94a3b8;text-align:center}
+
+/* Wire guide */
+.wire-guide{background:rgba(15,23,42,.4);border:1px solid rgba(51,65,85,.3);border-radius:8px;padding:.75rem;margin-top:.5rem}
+.wire-guide h4{font-family:var(--font-mono);font-size:.72rem;color:#e2e8f0;margin-bottom:.5rem}
+.wire-guide ol{font-size:.68rem;color:var(--muted);line-height:1.6;padding-left:1.1rem}
+.wire-guide ol li{margin-bottom:.2rem}
+.hint-chips{display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap}
+.hint-chip{font-size:.6rem;padding:.15rem .45rem;border-radius:4px;font-family:var(--font-mono)}
+
+/* Canvas */
+.canvas-wrap{display:flex;flex-direction:column;gap:1rem}
+.canvas-header{display:flex;justify-content:space-between;align-items:center}
+.canvas-header h3{font-family:var(--font-mono);font-size:.85rem;color:#f1f5f9;font-weight:700}
+.canvas-btns{display:flex;gap:.5rem;flex-wrap:wrap}
+.cbtn{padding:.45rem .8rem;border-radius:6px;font-family:var(--font-mono);font-size:.7rem;font-weight:700;cursor:pointer;transition:all .2s;border:1px solid}
+.cbtn-danger{background:rgba(244,63,94,.1);border-color:rgba(244,63,94,.3);color:#f87171}
+.cbtn-danger:hover{background:rgba(244,63,94,.2)}
+.cbtn-run{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.35);color:#34d399}
+.cbtn-run:hover{background:rgba(16,185,129,.25)}
+.cbtn-tpl{background:rgba(26,86,219,.1);border-color:rgba(26,86,219,.3);color:#a78bfa;font-size:.65rem}
+.cbtn-tpl:hover{background:rgba(26,86,219,.2)}
+
+#circuit-canvas-5{width:100%;height:400px;background:#0f172a;border-radius:12px;border:1px solid #1e293b;cursor:crosshair;display:block}
+
+.readings-panel{background:rgba(30,41,59,.5);border:1px solid rgba(51,65,85,.5);border-radius:12px;padding:1rem}
+.readings-title{font-family:var(--font-mono);font-size:.8rem;color:#f1f5f9;font-weight:700;margin-bottom:.75rem}
+#circuit-readings-5{min-height:60px}

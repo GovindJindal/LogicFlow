@@ -1,177 +1,310 @@
-// Safety timeout: show error if initialization hangs
-const _expSafetyTimer = setTimeout(function() {
-  if (document.body) {
-    var err = document.createElement('div');
-    err.style.cssText = 'position:fixed;inset:0;background:rgba(255,255,255,0.95);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:sans-serif;';
-    err.innerHTML = '<h2 style="color:#dc3545;margin:0 0 12px;">This experiment failed to load</h2><p style="color:#424848;margin:0 0 24px;">Please refresh or go back.</p><a href="index.html" style="padding:10px 20px;background:#1a56db;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">Go Back</a>';
-    document.body.appendChild(err);
+// ══════════════════════════════════════════════════════════════════════════════
+//  LogicFlow — Exp 5: Rectifier & Filter Circuits
+//  Wireless Sim mode + Wired Sandbox (uses CircuitSandbox engine)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+const RECT_F         = 50;   // Hz mains frequency
+const RECT_VM        = 10;   // Peak input voltage
+const RECT_VD_DROP   = 0.7;  // Single diode drop
+const RECT_VD_BRIDGE = 1.4;  // Bridge = 2 diodes
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let activeMode5 = 'wireless';
+let sandbox5    = null;
+let chartIn5    = null;
+let chartOut5   = null;
+let topo5       = 'hw';
+
+// ── DOMContentLoaded ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  buildCharts5();
+  initSliders5();
+  updateLab5();
+
+  sandbox5 = new CircuitSandbox({
+    svgId:      'circuit-canvas-5',
+    readingsId: 'circuit-readings-5',
+    experiment: 'rectifier'
+  });
+
+  buildPalette5();
+  setTimeout(() => sandbox5.loadTemplate(RECT_TEMPLATES['half-wave']), 100);
+
+  switchMode5('wireless');
+});
+
+// ── Mode switch ────────────────────────────────────────────────────────────────
+function switchMode5(mode) {
+  activeMode5 = mode;
+  document.getElementById('btn5-wireless')?.classList.toggle('active', mode === 'wireless');
+  document.getElementById('btn5-wired')?.classList.toggle('active',   mode === 'wired');
+  document.getElementById('panel5-wireless').style.display = mode === 'wireless' ? '' : 'none';
+  document.getElementById('panel5-wired').style.display    = mode === 'wired'    ? '' : 'none';
+}
+
+// ── Palette ────────────────────────────────────────────────────────────────────
+function buildPalette5() {
+  const grid = document.getElementById('palette-grid-5');
+  if (!grid) return;
+  const items  = ['generator','diode','capacitor','resistor','ammeter','voltmeter','ground'];
+  const labels = { generator:'AC Gen', diode:'Diode', capacitor:'Capacitor', resistor:'Resistor', ammeter:'Ammeter', voltmeter:'Voltmeter', ground:'Ground' };
+  grid.innerHTML = items.map(type => `
+    <div class="component-item" draggable="true" data-csb-component="${type}">
+      <svg width="46" height="46" viewBox="0 0 50 50">${sandbox5.defs[type]?.icon || ''}</svg>
+      <span>${labels[type]}</span>
+    </div>
+  `).join('');
+  grid.querySelectorAll('[data-csb-component]').forEach(item => {
+    item.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('csb-type', item.dataset.csbComponent);
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+  });
+}
+
+// ── Templates ─────────────────────────────────────────────────────────────────
+const RECT_TEMPLATES = {
+  'half-wave': {
+    components: [
+      { id:1, type:'generator', x:55,  y:160, values:{ voltage:10, frequency:50 } },
+      { id:2, type:'diode',     x:170, y:160, values:{ vf:0.7 } },
+      { id:3, type:'resistor',  x:290, y:160, values:{ resistance:1000 } },
+      { id:4, type:'voltmeter', x:380, y:100, values:{} },
+      { id:5, type:'ground',    x:430, y:255, values:{} }
+    ],
+    connections: [
+      { fromComp:1, fromPort:0, toComp:2, toPort:0 },
+      { fromComp:2, fromPort:1, toComp:3, toPort:0 },
+      { fromComp:3, fromPort:1, toComp:5, toPort:0 },
+      { fromComp:1, fromPort:1, toComp:5, toPort:0 },
+      { fromComp:3, fromPort:0, toComp:4, toPort:0 },
+      { fromComp:5, fromPort:0, toComp:4, toPort:1 }
+    ]
+  },
+  'half-wave-filtered': {
+    components: [
+      { id:1, type:'generator', x:55,  y:160, values:{ voltage:10, frequency:50 } },
+      { id:2, type:'diode',     x:160, y:160, values:{ vf:0.7 } },
+      { id:3, type:'capacitor', x:280, y:220, values:{ capacitance:100 } },
+      { id:4, type:'resistor',  x:390, y:160, values:{ resistance:1000 } },
+      { id:5, type:'voltmeter', x:470, y:100, values:{} },
+      { id:6, type:'ground',    x:520, y:270, values:{} }
+    ],
+    connections: [
+      { fromComp:1, fromPort:0, toComp:2, toPort:0 },
+      { fromComp:2, fromPort:1, toComp:3, toPort:0 },
+      { fromComp:2, fromPort:1, toComp:4, toPort:0 },
+      { fromComp:4, fromPort:1, toComp:6, toPort:0 },
+      { fromComp:3, fromPort:1, toComp:6, toPort:0 },
+      { fromComp:1, fromPort:1, toComp:6, toPort:0 },
+      { fromComp:4, fromPort:0, toComp:5, toPort:0 },
+      { fromComp:6, fromPort:0, toComp:5, toPort:1 }
+    ]
+  },
+  'full-wave-bridge': {
+    components: [
+      { id:1,  type:'generator', x:55,  y:180, values:{ voltage:10, frequency:50 } },
+      { id:2,  type:'diode',     x:165, y:110, values:{ vf:0.7 } },
+      { id:3,  type:'diode',     x:260, y:110, values:{ vf:0.7 } },
+      { id:4,  type:'diode',     x:165, y:250, values:{ vf:0.7 } },
+      { id:5,  type:'diode',     x:260, y:250, values:{ vf:0.7 } },
+      { id:6,  type:'resistor',  x:390, y:180, values:{ resistance:1000 } },
+      { id:7,  type:'voltmeter', x:470, y:100, values:{} },
+      { id:8,  type:'ground',    x:520, y:290, values:{} }
+    ],
+    connections: [
+      { fromComp:1, fromPort:0, toComp:2, toPort:0 },
+      { fromComp:1, fromPort:0, toComp:5, toPort:0 },
+      { fromComp:1, fromPort:1, toComp:4, toPort:0 },
+      { fromComp:1, fromPort:1, toComp:3, toPort:0 },
+      { fromComp:2, fromPort:1, toComp:6, toPort:0 },
+      { fromComp:3, fromPort:1, toComp:6, toPort:0 },
+      { fromComp:4, fromPort:1, toComp:8, toPort:0 },
+      { fromComp:5, fromPort:1, toComp:8, toPort:0 },
+      { fromComp:6, fromPort:1, toComp:8, toPort:0 },
+      { fromComp:6, fromPort:0, toComp:7, toPort:0 },
+      { fromComp:8, fromPort:0, toComp:7, toPort:1 }
+    ]
+  },
+  'full-wave-filtered': {
+    components: [
+      { id:1,  type:'generator', x:50,  y:180, values:{ voltage:10, frequency:50 } },
+      { id:2,  type:'diode',     x:155, y:110, values:{ vf:0.7 } },
+      { id:3,  type:'diode',     x:250, y:110, values:{ vf:0.7 } },
+      { id:4,  type:'diode',     x:155, y:250, values:{ vf:0.7 } },
+      { id:5,  type:'diode',     x:250, y:250, values:{ vf:0.7 } },
+      { id:6,  type:'capacitor', x:360, y:230, values:{ capacitance:470 } },
+      { id:7,  type:'resistor',  x:460, y:160, values:{ resistance:1000 } },
+      { id:8,  type:'voltmeter', x:540, y:100, values:{} },
+      { id:9,  type:'ground',    x:580, y:300, values:{} }
+    ],
+    connections: [
+      { fromComp:1, fromPort:0, toComp:2, toPort:0 },
+      { fromComp:1, fromPort:0, toComp:5, toPort:0 },
+      { fromComp:1, fromPort:1, toComp:4, toPort:0 },
+      { fromComp:1, fromPort:1, toComp:3, toPort:0 },
+      { fromComp:2, fromPort:1, toComp:7, toPort:0 },
+      { fromComp:3, fromPort:1, toComp:7, toPort:0 },
+      { fromComp:4, fromPort:1, toComp:9, toPort:0 },
+      { fromComp:5, fromPort:1, toComp:9, toPort:0 },
+      { fromComp:6, fromPort:0, toComp:7, toPort:0 },
+      { fromComp:6, fromPort:1, toComp:9, toPort:0 },
+      { fromComp:7, fromPort:1, toComp:9, toPort:0 },
+      { fromComp:7, fromPort:0, toComp:8, toPort:0 },
+      { fromComp:9, fromPort:0, toComp:8, toPort:1 }
+    ]
   }
-}, 8000);
+};
 
-// ── Animated Background ──────────────────────────────────────────
-  (function () {
-      const canvas = document.getElementById('bgCanvas');
-      if (!canvas) return; // bgCanvas removed, skip old animation
-      const ctx = canvas.getContext('2d');
-      let W, H;
-      const blobs = [
-        { xf: .15, yf: .15, rf: .45, color: [120, 100, 255], speed: 0.00018, phase: 0 },
-        { xf: .78, yf: .10, rf: .40, color: [90, 140, 255], speed: 0.00013, phase: 1.2 },
-        { xf: .50, yf: .55, rf: .38, color: [160, 80, 240], speed: 0.00021, phase: 2.4 },
-        { xf: .08, yf: .68, rf: .33, color: [200, 160, 255], speed: 0.00016, phase: 0.7 }
-      ];
-      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-      function draw(ts) {
-        ctx.clearRect(0, 0, W, H);
-        ctx.fillStyle = '#eceeff'; ctx.fillRect(0, 0, W, H);
-        for (const b of blobs) {
-          const angle = ts * b.speed + b.phase;
-          const cx = (b.xf + Math.sin(angle * 1.3) * 0.12) * W;
-          const cy = (b.yf + Math.cos(angle * 0.9) * 0.10) * H;
-          const r = b.rf * Math.min(W, H) * (0.9 + 0.1 * Math.sin(angle * 2.1));
-          const [R, G, B] = b.color;
-          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-          g.addColorStop(0, `rgba(${R},${G},${B},0.58)`);
-          g.addColorStop(1, `rgba(${R},${G},${B},0)`);
-          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
-          ctx.fillStyle = g; ctx.fill();
-        }
-        requestAnimationFrame(draw);
+function buildExampleCircuit5(name) { const t = RECT_TEMPLATES[name]; if (t) sandbox5.loadTemplate(t); }
+function clearCanvas5()             { sandbox5.clearAll(); }
+function runSimulation5()           { sandbox5.runSimulation(); }
+
+// ── Eraser ─────────────────────────────────────────────────────────────────────
+let _eraserTimer5 = null;
+document.addEventListener('mousedown', e => {
+  if (e.button !== 0 || activeMode5 !== 'wired') return;
+  if (e.target.closest('button,input,select,textarea,.component-item')) return;
+  _eraserTimer5 = setTimeout(() => {
+    sandbox5.activateEraser();
+    document.addEventListener('mouseup', () => setTimeout(() => sandbox5.deactivateEraser(), 800), { once: true });
+    document.addEventListener('keydown', e2 => { if (e2.key === 'Escape') sandbox5.deactivateEraser(); }, { once: true });
+  }, 600);
+});
+document.addEventListener('mouseup', () => { clearTimeout(_eraserTimer5); _eraserTimer5 = null; });
+
+// ── Wireless topology toggle ───────────────────────────────────────────────────
+function setTopology(t) {
+  topo5 = t;
+  document.getElementById('btn-hw')?.classList.toggle('active', t === 'hw');
+  document.getElementById('btn-fw')?.classList.toggle('active', t === 'fw');
+  updateLab5();
+}
+
+// ── Wireless sliders ───────────────────────────────────────────────────────────
+function initSliders5() {
+  ['sid-cap','sid-load','chk-filter'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateLab5);
+    if (el) el.addEventListener('change', updateLab5);
+  });
+  const capEl  = document.getElementById('sid-cap');
+  const loadEl = document.getElementById('sid-load');
+  if (capEl)  { capEl.addEventListener('input',  () => { const p=((capEl.value-1)/99)*100;  capEl.style.background=`linear-gradient(to right,#10B981 ${p}%,rgba(0,0,0,0.1) ${p}%)`; }); capEl.dispatchEvent(new Event('input')); }
+  if (loadEl) { loadEl.addEventListener('input', () => { const p=((loadEl.value-100)/9900)*100; loadEl.style.background=`linear-gradient(to right,#1A56DB ${p}%,rgba(0,0,0,0.1) ${p}%)`; }); loadEl.dispatchEvent(new Event('input')); }
+}
+
+// ── Wireless simulation ────────────────────────────────────────────────────────
+function updateLab5() {
+  const isFilter = document.getElementById('chk-filter')?.checked || false;
+  const C  = parseFloat(document.getElementById('sid-cap')?.value  || 10) * 1e-6;
+  const RL = parseFloat(document.getElementById('sid-load')?.value || 1000);
+
+  const capEl  = document.getElementById('sid-cap');
+  const loadEl = document.getElementById('sid-load');
+  if (capEl)  document.getElementById('lbl-cap').textContent  = (C * 1e6) + ' µF';
+  if (loadEl) document.getElementById('lbl-load').textContent = RL >= 1000 ? (RL/1000).toFixed(1)+' kΩ' : RL+' Ω';
+  if (capEl)  capEl.style.background  = `linear-gradient(to right,#10B981 ${((C*1e6-1)/99)*100}%,rgba(0,0,0,0.1) ${((C*1e6-1)/99)*100}%)`;
+  if (loadEl) loadEl.style.background = `linear-gradient(to right,#1A56DB ${((RL-100)/9900)*100}%,rgba(0,0,0,0.1) ${((RL-100)/9900)*100}%)`;
+
+  // Build waveforms
+  const steps = 500, tMax = 0.04, dt = tMax / steps;
+  const ptsIn = [], ptsOut = [];
+  let lastPeak = 0, tDischarge = 0;
+
+  for (let i = 0; i <= steps; i++) {
+    const t = i * dt;
+    const vsi = RECT_VM * Math.sin(2 * Math.PI * RECT_F * t);
+    ptsIn.push({ x: t, y: vsi });
+
+    let vrect = 0;
+    if (topo5 === 'hw') {
+      if (vsi > RECT_VD_DROP) vrect = vsi - RECT_VD_DROP;
+    } else {
+      if (Math.abs(vsi) > RECT_VD_BRIDGE) vrect = Math.abs(vsi) - RECT_VD_BRIDGE;
+    }
+
+    if (!isFilter) {
+      ptsOut.push({ x: t, y: vrect });
+    } else {
+      const decay = lastPeak * Math.exp(-(t - tDischarge) / (RL * C));
+      if (vrect > decay) {
+        ptsOut.push({ x: t, y: vrect });
+        lastPeak   = vrect;
+        tDischarge = t;
+      } else {
+        ptsOut.push({ x: t, y: Math.max(0, decay) });
       }
-      resize();
-      window.addEventListener('resize', resize);
-      requestAnimationFrame(draw);
-  })();
+    }
+  }
 
-  // ── Physics ────────────────────────────────────────────────────────
-  let topo = 'hw'; // hw, fw
-  const f = 50; // Hz
-  const Vm = 10; // Peak input voltage
-  const T = 1 / f;
-  const diodeDrop = 0.7;
+  if (chartIn5)  { chartIn5.data.datasets[0].data  = ptsIn;  chartIn5.update(); }
+  if (chartOut5) { chartOut5.data.datasets[0].data = ptsOut; chartOut5.update(); }
 
-  // ── Chart setup ──────────────────────────────────────────────
+  // Add electron flow animation to live circuit
+  if (typeof CircuitAnimations !== 'undefined' && CircuitAnimations.animateCurrentFlow) {
+    const svg = document.querySelector('#panel5-wireless svg');
+    if (svg) {
+      CircuitAnimations.animateCurrentFlow(svg, [], '#10B981');
+    }
+  }
+
+  // Metrics
+  const Vp = topo5 === 'hw' ? RECT_VM - RECT_VD_DROP : RECT_VM - RECT_VD_BRIDGE;
+  let Vdc = 0, Vrpp = 0, gamma = 0, eff = 0;
+
+  if (!isFilter) {
+    if (topo5 === 'hw') {
+      Vdc   = Vp / Math.PI;
+      const Vrms = Vp / 2;
+      gamma = Math.sqrt(Math.pow(Vrms / Vdc, 2) - 1) * 100;
+      eff   = (40.6) / (1 + RECT_VD_DROP / RECT_VM);
+    } else {
+      Vdc   = 2 * Vp / Math.PI;
+      const Vrms = Vp / Math.sqrt(2);
+      gamma = Math.sqrt(Math.pow(Vrms / Vdc, 2) - 1) * 100;
+      eff   = (81.2) / (1 + RECT_VD_BRIDGE / RECT_VM);
+    }
+    Vrpp = Vp;
+  } else {
+    const fm = topo5 === 'hw' ? RECT_F : 2 * RECT_F;
+    Vrpp  = Math.min(Vp, Vp / (fm * RL * C));
+    Vdc   = Vp - Vrpp / 2;
+    gamma = (Vrpp / (2 * Math.sqrt(3) * Vdc)) * 100;
+    eff   = 90;
+  }
+
+  const el = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+  el('m-vdc',   Vdc.toFixed(2)  + ' V');
+  el('m-vrip',  Vrpp.toFixed(2) + ' V');
+  el('m-gamma', gamma.toFixed(1)+ ' %');
+  el('m-eff',   eff > 100 ? '≈100%' : eff.toFixed(1)+' %');
+}
+
+// ── Charts ─────────────────────────────────────────────────────────────────────
+function buildCharts5() {
   Chart.defaults.font.family = 'JetBrains Mono';
   Chart.defaults.color = '#64748B';
 
-  const chartIn = new Chart(document.getElementById('chartIn'), {
-    type: 'line', data: { datasets: [{ borderColor: '#64748B', borderWidth: 2, pointRadius: 0, tension: 0.4 }] },
-    options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false }, tooltip: { enabled: false } },
-      scales: { x: { type: 'linear', min: 0, max: 0.04, title: { display: true, text: 'Time (s)' }, ticks: {maxTicksLimit:5} },
-                y: { min: -15, max: 15, title: { display: true, text: 'Voltage (V)' } } }
-    }
-  });
-
-  const chartOut = new Chart(document.getElementById('chartOut'), {
-    type: 'line', data: { datasets: [{ borderColor: '#10B981', borderWidth: 2.5, pointRadius: 0, tension: 0, fill: true, backgroundColor: 'rgba(16,185,129,0.1)' }] },
-    options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false }, tooltip: { enabled: false } },
-      scales: { x: { type: 'linear', min: 0, max: 0.04, title: { display: true, text: 'Time (s)' }, ticks: {maxTicksLimit:5} },
-                y: { min: -5, max: 15, title: { display: true, text: 'Voltage (V)' } } }
-    }
-  });
-
-  function setTopology(t) {
-    topo = t;
-    document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
-    document.getElementById(`btn-${t}`).classList.add('active');
-    updateLab();
-  }
-
-  function updateLab() {
-    const isFilter = document.getElementById('chk-filter').checked;
-    const C = parseFloat(document.getElementById('sid-cap').value) * 1e-6; // F
-    const RL = parseFloat(document.getElementById('sid-load').value); // Ω
-    
-    document.getElementById('lbl-cap').textContent = (C * 1e6) + ' µF';
-    document.getElementById('lbl-load').textContent = RL >= 1000 ? (RL/1000).toFixed(1) + ' kΩ' : RL + ' Ω';
-    
-    // Sliders
-    document.getElementById('sid-cap').style.background = `linear-gradient(to right, #10B981 ${((C*1e6-1)/99)*100}%, rgba(0,0,0,0.1) ${((C*1e6-1)/99)*100}%)`;
-    document.getElementById('sid-load').style.background = `linear-gradient(to right, #1A56DB ${((RL-100)/9900)*100}%, rgba(0,0,0,0.1) ${((RL-100)/9900)*100}%)`;
-
-    // Timeline
-    const steps = 500;
-    const tMax = 0.04;
-    const dt = tMax / steps;
-    
-    const ptsIn = [];
-    const ptsOut = [];
-    
-    let lastVoutPeak = 0;
-    let tDischargeStart = 0;
-    let inDischarge = false;
-
-    // Numerical integration for filter
-    for (let i = 0; i <= steps; i++) {
-      const t = i * dt;
-      const vsi = Vm * Math.sin(2 * Math.PI * f * t);
-      ptsIn.push({x: t, y: vsi});
-      
-      let vrect = 0;
-      if (topo === 'hw') {
-        if (vsi > diodeDrop) vrect = vsi - diodeDrop;
-      } else {
-        if (Math.abs(vsi) > 2 * diodeDrop) vrect = Math.abs(vsi) - 2 * diodeDrop;
-      }
-
-      if (!isFilter) {
-        ptsOut.push({x: t, y: vrect});
-      } else {
-        // Capacitor charging/discharging logic
-        if (vrect > lastVoutPeak * Math.exp(-(t - tDischargeStart) / (RL * C))) {
-          // Charging (diode conducting)
-          ptsOut.push({x: t, y: vrect});
-          lastVoutPeak = vrect;
-          tDischargeStart = t;
-        } else {
-          // Discharging
-          const vdc = lastVoutPeak * Math.exp(-(t - tDischargeStart) / (RL * C));
-          ptsOut.push({x: t, y: vdc});
+  const mkChart = (id, color, yMin, yMax) => {
+    const ctx = document.getElementById(id)?.getContext('2d');
+    if (!ctx) return null;
+    return new Chart(ctx, {
+      type: 'line',
+      data: { datasets: [{ borderColor: color, borderWidth: 2.5, pointRadius: 0, tension: 0.3, fill: color !== '#64748B', backgroundColor: color !== '#64748B' ? color.replace(')',',0.08)').replace('rgb','rgba') : 'transparent' }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        animation: { duration: 1000, easing: 'easeOutQuart' },
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { type: 'linear', min: 0, max: 0.04, title: { display: true, text: 'Time (s)', color: '#475569', font: { family: 'JetBrains Mono', size: 10 } }, ticks: { color: '#64748B', font: { family: 'JetBrains Mono', size: 9 }, maxTicksLimit: 5 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+          y: { min: yMin, max: yMax, title: { display: true, text: 'Voltage (V)', color: '#475569', font: { family: 'JetBrains Mono', size: 10 } }, ticks: { color: '#64748B', font: { family: 'JetBrains Mono', size: 9 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
         }
       }
-    }
+    });
+  };
 
-    chartIn.data.datasets[0].data = ptsIn;
-    chartOut.data.datasets[0].data = ptsOut;
-    chartIn.update();
-    chartOut.update();
-
-    // METRICS
-    let Vdc = 0, Vrpp = 0, gamma = 0, eff = 0;
-    const Vp = topo === 'hw' ? Vm - diodeDrop : Vm - 2*diodeDrop;
-    
-    if (!isFilter) {
-        if (topo === 'hw') {
-            Vdc = Vp / Math.PI;
-            const Vrms = Vp / 2;
-            gamma = Math.sqrt(Math.pow(Vrms/Vdc, 2) - 1) * 100;
-            eff = (40.6) / (1 + diodeDrop/Vm); // Theoretical 40.6%
-        } else {
-            Vdc = 2 * Vp / Math.PI;
-            const Vrms = Vp / Math.sqrt(2);
-            gamma = Math.sqrt(Math.pow(Vrms/Vdc, 2) - 1) * 100;
-            eff = (81.2) / (1 + 2*diodeDrop/Vm); // Theoretical 81.2%
-        }
-        Vrpp = ptsOut.reduce((max, p) => p.y > max ? p.y : max, 0) - ptsOut.reduce((min, p) => p.y < min ? p.y : min, Vm);
-        // Without cap, Vrpp is just Vp
-        Vrpp = Vp;
-    } else {
-        // Ripple approximation: Vrpp = Vp / (f * R * C) for HW, Vrpp = Vp / (2*f*R*C) for FW
-        const freqMult = topo === 'hw' ? 1 : 2;
-        Vrpp = Vp / (freqMult * f * RL * C);
-        if (Vrpp > Vp) Vrpp = Vp; // Limit
-        Vdc = Vp - (Vrpp / 2);
-        
-        const Vrms_ac = Vrpp / (2 * Math.sqrt(3));
-        gamma = (Vrms_ac / Vdc) * 100;
-        eff = 90; // Approx high efficiency with cap filter
-    }
-
-    document.getElementById('m-vdc').textContent = Vdc.toFixed(2) + ' V';
-    document.getElementById('m-vrip').textContent = Vrpp.toFixed(2) + ' V';
-    document.getElementById('m-gamma').textContent = gamma.toFixed(1) + ' %';
-    document.getElementById('m-eff').textContent = eff > 100 ? '≈100%' : eff.toFixed(1) + ' %';
-  }
-
-  updateLab();
-  clearTimeout(_expSafetyTimer);
+  chartIn5  = mkChart('chartIn',  '#64748B', -15, 15);
+  chartOut5 = mkChart('chartOut', '#10B981', -2,  12);
+}

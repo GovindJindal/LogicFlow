@@ -9,6 +9,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>  <link rel="stylesheet" href="css/global.css">
 
   <link rel="stylesheet" href="css/exp5_rectifier.css">
+  <link rel="stylesheet" href="css/visual-effects.css">
 </head>
 <body>
 
@@ -55,80 +56,155 @@
   <div class="page-header">
     <div>
       <div class="breadcrumb">
-        <span class="badge">Experiment 06</span>
+        <span class="badge">Experiment 05</span>
         <span>›</span><span>Diode Applications</span>
       </div>
       <h1>Rectifier & Filter Circuits</h1>
-      <p>Convert Alternating Current (AC) to Direct Current (DC). Toggle between Half-Wave and Full-Wave (Bridge) topologies, and engage the capacitor filter to observe ripple reduction.</p>
+      <p>Convert Alternating Current (AC) to Direct Current (DC). Switch to Wired Sandbox to build your own rectifier circuits with custom components.</p>
     </div>
   </div>
 
-  <div class="lab-grid">
-    <div style="display:flex;flex-direction:column;gap:1.5rem">
-      <div class="panel">
-        <div class="panel-label">Topology Settings</div>
-        
-        <div class="toggle-group">
-          <button class="toggle-btn active" id="btn-hw" onclick="setTopology('hw')">Half-Wave</button>
-          <button class="toggle-btn" id="btn-fw" onclick="setTopology('fw')">Full-Wave Bridge</button>
-        </div>
-
-        <div class="switch-row">
-          <span class="switch-label">Enable Capacitor Filter</span>
-          <input type="checkbox" class="switch-input" id="chk-filter" onchange="updateLab()">
-        </div>
-
-        <div class="slider-wrap">
-          <div class="slider-head"><span class="slider-title">Filter Cap (C)</span><span class="slider-val" id="lbl-cap" style="color:var(--green)">10 µF</span></div>
-          <input type="range" id="sid-cap" min="1" max="100" step="1" value="10" oninput="updateLab()" style="accent-color:var(--green)">
-          <div class="slider-range"><span>1µF</span><span>100µF</span></div>
-        </div>
-
-        <div class="slider-wrap">
-          <div class="slider-head"><span class="slider-title">Load Res. (RL)</span><span class="slider-val" id="lbl-load">1000 Ω</span></div>
-          <input type="range" id="sid-load" min="100" max="10000" step="100" value="1000" oninput="updateLab()">
-          <div class="slider-range"><span>100Ω</span><span>10kΩ</span></div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-label">Circuit Observations</div>
-        <div class="meter-grid" style="margin-bottom:0">
-          <div class="meter-card">
-            <div class="meter-key">AVG DC VOLTAGE (Vdc)</div>
-            <div class="meter-val" id="m-vdc" style="color:var(--blue)">0.00 V</div>
-          </div>
-          <div class="meter-card">
-            <div class="meter-key">RIPPLE VOLTAGE (Vrpp)</div>
-            <div class="meter-val" id="m-vrip" style="color:var(--amber)">0.00 V</div>
-          </div>
-          <div class="meter-card">
-            <div class="meter-key">RIPPLE FACTOR (γ)</div>
-            <div class="meter-val" id="m-gamma" style="color:var(--rose)">0.00 %</div>
-          </div>
-          <div class="meter-card">
-            <div class="meter-key">EFFICIENCY (η)</div>
-            <div class="meter-val" id="m-eff" style="color:var(--green)">0.00 %</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="chart-panel">
-      <div class="chart-box">
-        <div class="panel-label" style="position:absolute;top:15px;left:15px;z-index:10">Input AC Waveform (Vin)</div>
-        <canvas id="chartIn"></canvas>
-      </div>
-
-      <div class="chart-box">
-        <div class="panel-label" style="position:absolute;top:15px;left:15px;z-index:10">Output DC Waveform (Vout)</div>
-        <canvas id="chartOut"></canvas>
-      </div>
-    </div>
+  <!-- MODE TOGGLE -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btn5-wireless" onclick="switchMode5('wireless')">📡 Wireless Sim</button>
+    <button class="mode-btn"        id="btn5-wired"   onclick="switchMode5('wired')">🔌 Wired Sandbox</button>
   </div>
+
+  <!-- ═══════════ WIRELESS PANEL ═══════════ -->
+  <div id="panel5-wireless">
+    <div class="lab-grid">
+      <div style="display:flex;flex-direction:column;gap:1.5rem">
+        <div class="panel">
+          <div class="panel-label">Topology Settings</div>
+          
+          <div class="toggle-group">
+            <button class="toggle-btn active" id="btn-hw" onclick="setTopology('hw')">Half-Wave</button>
+            <button class="toggle-btn" id="btn-fw" onclick="setTopology('fw')">Full-Wave Bridge</button>
+          </div>
+
+          <div class="switch-row">
+            <span class="switch-label">Enable Capacitor Filter</span>
+            <input type="checkbox" class="switch-input" id="chk-filter" onchange="updateLab()">
+          </div>
+
+          <div class="slider-wrap">
+            <div class="slider-head"><span class="slider-title">Filter Cap (C)</span><span class="slider-val" id="lbl-cap" style="color:var(--green)">10 µF</span></div>
+            <input type="range" id="sid-cap" min="1" max="100" step="1" value="10" oninput="updateLab()" style="accent-color:var(--green)">
+            <div class="slider-range"><span>1µF</span><span>100µF</span></div>
+          </div>
+
+          <div class="slider-wrap">
+            <div class="slider-head"><span class="slider-title">Load Res. (RL)</span><span class="slider-val" id="lbl-load">1000 Ω</span></div>
+            <input type="range" id="sid-load" min="100" max="10000" step="100" value="1000" oninput="updateLab()">
+            <div class="slider-range"><span>100Ω</span><span>10kΩ</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-label">Circuit Observations</div>
+          <div class="meter-grid" style="margin-bottom:0">
+            <div class="meter-card">
+              <div class="meter-key">AVG DC VOLTAGE (Vdc)</div>
+              <div class="meter-val" id="m-vdc" style="color:var(--blue)">0.00 V</div>
+            </div>
+            <div class="meter-card">
+              <div class="meter-key">RIPPLE VOLTAGE (Vrpp)</div>
+              <div class="meter-val" id="m-vrip" style="color:var(--amber)">0.00 V</div>
+            </div>
+            <div class="meter-card">
+              <div class="meter-key">RIPPLE FACTOR (γ)</div>
+              <div class="meter-val" id="m-gamma" style="color:var(--rose)">0.00 %</div>
+            </div>
+            <div class="meter-card">
+              <div class="meter-key">EFFICIENCY (η)</div>
+              <div class="meter-val" id="m-eff" style="color:var(--green)">0.00 %</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-panel">
+        <div class="chart-box">
+          <div class="panel-label" style="position:absolute;top:15px;left:15px;z-index:10">Input AC Waveform (Vin)</div>
+          <canvas id="chartIn"></canvas>
+        </div>
+
+        <div class="chart-box">
+          <div class="panel-label" style="position:absolute;top:15px;left:15px;z-index:10">Output DC Waveform (Vout)</div>
+          <canvas id="chartOut"></canvas>
+        </div>
+      </div>
+    </div>
+  </div><!-- /panel5-wireless -->
+
+  <!-- ═══════════ WIRED SANDBOX ═══════════ -->
+  <div id="panel5-wired" style="display:none">
+    <div class="sandbox-layout">
+      <!-- Left: Palette + guide + readings -->
+      <div class="palette-wrap">
+        <div class="palette-panel">
+          <div class="palette-title">🔧 Component Library</div>
+          <div class="palette-sub">Drag onto canvas, then click blue ports to wire</div>
+          <div class="components-grid" id="palette-grid-5"></div>
+          <div class="wire-guide">
+            <h4>⚡ How to Wire</h4>
+            <ol>
+              <li>Drag components to canvas</li>
+              <li>Click a blue port (turns green)</li>
+              <li>Click another port to connect</li>
+              <li>Right-click any component or wire to delete</li>
+              <li>Double-click component to edit values</li>
+              <li>Long-press (0.6s) activates eraser mode</li>
+              <li>Click ▶ Run to simulate circuit</li>
+            </ol>
+            <div class="hint-chips">
+              <span class="hint-chip" style="background:rgba(26,86,219,.2);color:#1A56DB">🔵 Port</span>
+              <span class="hint-chip" style="background:rgba(16,185,129,.2);color:#10B981">🟢 Selected</span>
+              <span class="hint-chip" style="background:rgba(245,158,11,.2);color:#F59E0B">🟡 Wire</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="readings-panel">
+          <div class="readings-title">📊 Simulation Results</div>
+          <div id="circuit-readings-5">
+            <p style="color:#475569;font-size:.8rem;font-family:'JetBrains Mono',monospace">Add components and click ▶ Run to simulate.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Canvas -->
+      <div class="canvas-wrap">
+        <div class="canvas-header">
+          <h3>⚡ Circuit Canvas</h3>
+          <div class="canvas-btns">
+            <button class="cbtn cbtn-tpl" onclick="buildExampleCircuit5('half-wave')">Half-Wave</button>
+            <button class="cbtn cbtn-tpl" onclick="buildExampleCircuit5('half-wave-filtered')">Half-Wave + Filter</button>
+            <button class="cbtn cbtn-tpl" onclick="buildExampleCircuit5('full-wave-bridge')">Full-Wave Bridge</button>
+            <button class="cbtn cbtn-tpl" onclick="buildExampleCircuit5('full-wave-filtered')">Full-Wave + Filter</button>
+            <button class="cbtn cbtn-danger" onclick="clearCanvas5()">🗑 Clear</button>
+            <button class="cbtn cbtn-run"   onclick="runSimulation5()">▶ Run</button>
+          </div>
+        </div>
+        <svg id="circuit-canvas-5" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid5" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M20,0 L0,0 0,20" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="800" height="400" fill="url(#grid5)"/>
+        </svg>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#334155;margin-top:.25rem;padding-left:.25rem">
+          Right-click component or wire to delete · Double-click component to edit values · Long-press canvas to activate eraser
+        </div>
+      </div>
+    </div>
+  </div><!-- /panel5-wired -->
 </div>
 
 <script defer src="js/nav-shared.js"></script>
+<script src="js/circuit-sandbox.js"></script>
+<script defer src="js/visual-effects.js"></script>
 <script defer src="js/exp5_rectifier.js"></script>
 
 </body>

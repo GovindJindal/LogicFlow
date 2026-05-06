@@ -1,141 +1,306 @@
-// Safety timeout: show error if initialization hangs
-const _expSafetyTimer = setTimeout(function() {
-  if (document.body) {
-    var err = document.createElement('div');
-    err.style.cssText = 'position:fixed;inset:0;background:rgba(255,255,255,0.95);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:sans-serif;';
-    err.innerHTML = '<h2 style="color:#dc3545;margin:0 0 12px;">This experiment failed to load</h2><p style="color:#424848;margin:0 0 24px;">Please refresh or go back.</p><a href="index.html" style="padding:10px 20px;background:#1a56db;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">Go Back</a>';
-    document.body.appendChild(err);
+// ══════════════════════════════════════════════════════════════════════════════
+//  LogicFlow — Exp 4: Zener Diode Voltage Regulator
+//  Wireless Sim mode + Wired Sandbox (uses CircuitSandbox engine)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Physics ───────────────────────────────────────────────────────────────────
+const VZ_DEFAULT = 5.1;
+const P_MAX_MW   = 500;
+
+function solveZener(vin, rs, rl, vz) {
+  let vout = vin * (rl / (rs + rl));
+  let iz = 0;
+  if (vout > vz) {
+    vout = vz;
+    iz = ((vin - vz) / rs) - (vz / rl);
   }
-}, 8000);
+  const il  = vout / rl;
+  const pz  = vout * Math.max(0, iz) * 1000;
+  return { vout, iz: Math.max(0, iz), il, pz, openVout: vin * (rl / (rs + rl)) };
+}
 
-// ── Animated Background ──────────────────────────────────────────
-  (function () {
-      const canvas = document.getElementById('bgCanvas');
-      if (!canvas) return; // bgCanvas removed, skip old animation
-      const ctx = canvas.getContext('2d');
-      let W, H;
-      const blobs = [
-        { xf: .15, yf: .15, rf: .45, color: [120, 100, 255], speed: 0.00018, phase: 0 },
-        { xf: .78, yf: .10, rf: .40, color: [90, 140, 255], speed: 0.00013, phase: 1.2 },
-        { xf: .50, yf: .55, rf: .38, color: [160, 80, 240], speed: 0.00021, phase: 2.4 },
-        { xf: .08, yf: .68, rf: .33, color: [200, 160, 255], speed: 0.00016, phase: 0.7 }
-      ];
-      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-      function draw(ts) {
-        ctx.clearRect(0, 0, W, H);
-        ctx.fillStyle = '#eceeff'; ctx.fillRect(0, 0, W, H);
-        for (const b of blobs) {
-          const angle = ts * b.speed + b.phase;
-          const cx = (b.xf + Math.sin(angle * 1.3) * 0.12) * W;
-          const cy = (b.yf + Math.cos(angle * 0.9) * 0.10) * H;
-          const r = b.rf * Math.min(W, H) * (0.9 + 0.1 * Math.sin(angle * 2.1));
-          const [R, G, B] = b.color;
-          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-          g.addColorStop(0, `rgba(${R},${G},${B},0.58)`);
-          g.addColorStop(1, `rgba(${R},${G},${B},0)`);
-          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
-          ctx.fillStyle = g; ctx.fill();
-        }
-        requestAnimationFrame(draw);
-      }
-      resize();
-      window.addEventListener('resize', resize);
-      requestAnimationFrame(draw);
-  })();
+// ── State ─────────────────────────────────────────────────────────────────────
+let activeMode4 = 'wireless';
+let sandbox4    = null;
+let regChart    = null;
+let electronsAnimated = false;
 
-  // ── Physics ────────────────────────────────────────────────────────
-  const VZ = 5.1;
-  const P_MAX = 500; // mW
+// ── DOMContentLoaded ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  buildRegChart();
+  initSliders4();
+  updateLab();
+
+  sandbox4 = new CircuitSandbox({
+    svgId:      'circuit-canvas-4',
+    readingsId: 'circuit-readings-4',
+    experiment: 'zener'
+  });
+
+  buildPalette4();
+  setTimeout(() => sandbox4.loadTemplate(ZENER_TEMPLATES['basic-regulator']), 100);
+
+  switchMode4('wireless');
+});
+
+// ── Mode switch ────────────────────────────────────────────────────────────────
+function switchMode4(mode) {
+  activeMode4 = mode;
+  document.getElementById('btn4-wireless')?.classList.toggle('active', mode === 'wireless');
+  document.getElementById('btn4-wired')?.classList.toggle('active',   mode === 'wired');
+  document.getElementById('panel4-wireless').style.display = mode === 'wireless' ? '' : 'none';
+  document.getElementById('panel4-wired').style.display    = mode === 'wired'    ? '' : 'none';
+}
+
+// ── Palette ────────────────────────────────────────────────────────────────────
+function buildPalette4() {
+  const grid = document.getElementById('palette-grid-4');
+  if (!grid) return;
+  const items = ['dcSource','resistor','zener','diode','ammeter','voltmeter','ground'];
+  const labels = { dcSource:'DC Src', resistor:'Resistor', zener:'Zener', diode:'Diode', ammeter:'Ammeter', voltmeter:'Voltmeter', ground:'Ground' };
+  grid.innerHTML = items.map(type => `
+    <div class="component-item" draggable="true" data-csb-component="${type}">
+      <svg width="46" height="46" viewBox="0 0 50 50">${sandbox4.defs[type]?.icon || ''}</svg>
+      <span>${labels[type]}</span>
+    </div>
+  `).join('');
+  grid.querySelectorAll('[data-csb-component]').forEach(item => {
+    item.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('csb-type', item.dataset.csbComponent);
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+  });
+}
+
+// ── Templates ─────────────────────────────────────────────────────────────────
+const ZENER_TEMPLATES = {
+  'basic-regulator': {
+    components: [
+      { id:1, type:'dcSource',  x:60,  y:150, values:{ voltage:9 } },
+      { id:2, type:'resistor',  x:175, y:150, values:{ resistance:220 } },
+      { id:3, type:'zener',     x:320, y:220, values:{ vz:5.1 } },
+      { id:4, type:'resistor',  x:430, y:150, values:{ resistance:1000 } },
+      { id:5, type:'voltmeter', x:510, y:220, values:{} },
+      { id:6, type:'ground',    x:540, y:310, values:{} }
+    ],
+    connections: [
+      { fromComp:1, fromPort:0, toComp:2, toPort:0 },
+      { fromComp:2, fromPort:1, toComp:3, toPort:0 },
+      { fromComp:2, fromPort:1, toComp:4, toPort:0 },
+      { fromComp:4, fromPort:1, toComp:6, toPort:0 },
+      { fromComp:3, fromPort:1, toComp:6, toPort:0 },
+      { fromComp:1, fromPort:1, toComp:6, toPort:0 },
+      { fromComp:4, fromPort:0, toComp:5, toPort:0 },
+      { fromComp:6, fromPort:0, toComp:5, toPort:1 }
+    ]
+  },
+  'line-regulation': {
+    components: [
+      { id:1, type:'dcSource',  x:60,  y:160, values:{ voltage:12 } },
+      { id:2, type:'resistor',  x:175, y:160, values:{ resistance:470 } },
+      { id:3, type:'zener',     x:310, y:240, values:{ vz:5.1 } },
+      { id:4, type:'ammeter',   x:420, y:160, values:{} },
+      { id:5, type:'ground',    x:470, y:300, values:{} }
+    ],
+    connections: [
+      { fromComp:1, fromPort:0, toComp:2, toPort:0 },
+      { fromComp:2, fromPort:1, toComp:4, toPort:0 },
+      { fromComp:4, fromPort:1, toComp:5, toPort:0 },
+      { fromComp:2, fromPort:1, toComp:3, toPort:0 },
+      { fromComp:3, fromPort:1, toComp:5, toPort:0 },
+      { fromComp:1, fromPort:1, toComp:5, toPort:0 }
+    ]
+  },
+  'load-regulation': {
+    components: [
+      { id:1, type:'dcSource',  x:60,  y:160, values:{ voltage:9 } },
+      { id:2, type:'resistor',  x:175, y:160, values:{ resistance:220 } },
+      { id:3, type:'zener',     x:310, y:240, values:{ vz:5.1 } },
+      { id:4, type:'resistor',  x:420, y:160, values:{ resistance:500 } },
+      { id:5, type:'voltmeter', x:500, y:220, values:{} },
+      { id:6, type:'ground',    x:540, y:310, values:{} }
+    ],
+    connections: [
+      { fromComp:1, fromPort:0, toComp:2, toPort:0 },
+      { fromComp:2, fromPort:1, toComp:3, toPort:0 },
+      { fromComp:2, fromPort:1, toComp:4, toPort:0 },
+      { fromComp:4, fromPort:1, toComp:6, toPort:0 },
+      { fromComp:3, fromPort:1, toComp:6, toPort:0 },
+      { fromComp:1, fromPort:1, toComp:6, toPort:0 },
+      { fromComp:4, fromPort:0, toComp:5, toPort:0 },
+      { fromComp:6, fromPort:0, toComp:5, toPort:1 }
+    ]
+  }
+};
+
+function buildExampleCircuit4(name) { const t = ZENER_TEMPLATES[name]; if (t) sandbox4.loadTemplate(t); }
+function clearCanvas4()             { sandbox4.clearAll(); }
+function runSimulation4()           { sandbox4.runSimulation(); }
+
+// ── Eraser (long press) ────────────────────────────────────────────────────────
+let _eraserTimer4 = null;
+document.addEventListener('mousedown', e => {
+  if (e.button !== 0 || activeMode4 !== 'wired') return;
+  if (e.target.closest('button,input,select,textarea,.component-item')) return;
+  _eraserTimer4 = setTimeout(() => {
+    sandbox4.activateEraser();
+    document.addEventListener('mouseup', () => setTimeout(() => sandbox4.deactivateEraser(), 800), { once: true });
+    document.addEventListener('keydown', e2 => { if (e2.key === 'Escape') sandbox4.deactivateEraser(); }, { once: true });
+  }, 600);
+});
+document.addEventListener('mouseup', () => { clearTimeout(_eraserTimer4); _eraserTimer4 = null; });
+
+// ── Wireless sliders ───────────────────────────────────────────────────────────
+function initSliders4() {
+  const track = (id, colorVar) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      const pct = ((el.value - el.min) / (el.max - el.min)) * 100;
+      el.style.background = `linear-gradient(to right,var(${colorVar}) ${pct}%,rgba(0,0,0,0.1) ${pct}%)`;
+    });
+    el.dispatchEvent(new Event('input'));
+  };
+  ['sid-vin','sid-rs','sid-rl'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateLab);
+  });
+  track('sid-vin', '--rose');
+  track('sid-rs',  '--amber');
+  track('sid-rl',  '--blue');
+}
+
+// ── Wireless simulation ────────────────────────────────────────────────────────
+function updateLab() {
+  const vin = parseFloat(document.getElementById('sid-vin').value);
+  const rs  = parseFloat(document.getElementById('sid-rs').value);
+  const rl  = parseFloat(document.getElementById('sid-rl').value);
+
+  document.getElementById('lbl-vin').textContent = vin.toFixed(1) + ' V';
+  document.getElementById('lbl-rs').textContent  = rs + ' Ω';
+  document.getElementById('lbl-rl').textContent  = rl >= 1000 ? (rl/1000).toFixed(1)+' kΩ' : rl+' Ω';
+
+  // Slider fill tracks
+  const vinEl = document.getElementById('sid-vin');
+  const rsEl  = document.getElementById('sid-rs');
+  const rlEl  = document.getElementById('sid-rl');
+  if (vinEl) vinEl.style.background = `linear-gradient(to right,#F43F5E ${(vin/15)*100}%,rgba(0,0,0,0.1) ${(vin/15)*100}%)`;
+  if (rsEl)  rsEl.style.background  = `linear-gradient(to right,#F59E0B ${((rs-50)/950)*100}%,rgba(0,0,0,0.1) ${((rs-50)/950)*100}%)`;
+  if (rlEl)  rlEl.style.background  = `linear-gradient(to right,#1A56DB ${((rl-100)/9900)*100}%,rgba(0,0,0,0.1) ${((rl-100)/9900)*100}%)`;
+
+  const state = solveZener(vin, rs, rl, VZ_DEFAULT);
+
+  document.getElementById('m-vout').textContent  = state.vout.toFixed(2)           + ' V';
+  document.getElementById('m-iz').textContent    = (state.iz * 1000).toFixed(2)    + ' mA';
+  document.getElementById('m-il').textContent    = (state.il * 1000).toFixed(2)    + ' mA';
+  document.getElementById('m-power').textContent = state.pz.toFixed(1)             + ' mW';
+
+  // Status card
+  const sc = document.getElementById('statusCard');
+  if (sc) {
+    if (state.pz > P_MAX_MW) {
+      sc.style.cssText = 'background:rgba(244,63,94,0.1);border-color:rgba(244,63,94,0.4);color:#e11d48;margin-top:1.25rem;padding:1rem;border-radius:10px;border:1px solid;font-family:var(--font-mono);font-size:.85rem;font-weight:600';
+      sc.innerHTML = '🔥 WARNING: Zener power dissipation exceeded! Diode will burn out.';
+    } else if (state.iz > 0.001) {
+      sc.style.cssText = 'background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.4);color:#059669;margin-top:1.25rem;padding:1rem;border-radius:10px;border:1px solid;font-family:var(--font-mono);font-size:.85rem;font-weight:600';
+      sc.innerHTML = '✅ REGULATING: Zener in breakdown — output clamped at ~' + VZ_DEFAULT + 'V.';
+    } else {
+      sc.style.cssText = 'background:rgba(100,116,139,0.1);border-color:rgba(100,116,139,0.3);color:#475569;margin-top:1.25rem;padding:1rem;border-radius:10px;border:1px solid;font-family:var(--font-mono);font-size:.85rem;font-weight:600';
+      sc.innerHTML = '⭕ OFF: Vin too low to reach Zener breakdown voltage (' + VZ_DEFAULT + 'V).';
+    }
+  }
+
+  // Chart update
+  if (regChart) {
+    const pts = [], idealPts = [];
+    for (let v = 0; v <= 15; v += 0.2) {
+      const s = solveZener(v, rs, rl, VZ_DEFAULT);
+      pts.push({ x: v, y: s.vout });
+      idealPts.push({ x: v, y: s.openVout });
+    }
+    regChart.data.datasets[0].data = pts;
+    regChart.data.datasets[1].data = [{ x: vin, y: state.vout }];
+    regChart.data.datasets[2].data = idealPts;
+    regChart.update();
+  }
+
+  // Update live circuit SVG
+  updateLiveCircuit(vin, state);
+}
+
+function updateLiveCircuit(vin, state) {
+  // Update current animation dots
+  const dots = document.querySelectorAll('.z-current-dot');
+  const conducting = state.iz > 0.001;
+  dots.forEach((dot, i) => { dot.style.opacity = conducting ? '1' : '0'; });
   
-  // ── Chart setup ──────────────────────────────────────────────
-  const ctxChart = document.getElementById('regChart').getContext('2d');
-  const chart = new Chart(ctxChart, {
+  // Add simple electron flow animation when there's input voltage
+  if (vin > 0 && !electronsAnimated) {
+    const svg = document.getElementById('zener-circuit-svg');
+    if (svg) {
+      // Create animated electron dots along wires
+      const wirePaths = [
+        [{x: 80, y: 70}, {x: 150, y: 70}],
+        [{x: 200, y: 70}, {x: 265, y: 70}],
+        [{x: 370, y: 70}, {x: 500, y: 70}],
+        [{x: 500, y: 70}, {x: 500, y: 155}],
+        [{x: 500, y: 155}, {x: 80, y: 155}],
+        [{x: 80, y: 155}, {x: 80, y: 70}]
+      ];
+      
+      wirePaths.forEach((path, index) => {
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('r', '3');
+        dot.setAttribute('fill', conducting ? '#10B981' : '#F59E0B');
+        svg.appendChild(dot);
+        
+        let progress = index * 0.2;
+        const animate = () => {
+          progress += 0.015;
+          if (progress > 1) progress = 0;
+          
+          const x = path[0].x + (path[1].x - path[0].x) * progress;
+          const y = path[0].y + (path[1].y - path[0].y) * progress;
+          dot.setAttribute('cx', x);
+          dot.setAttribute('cy', y);
+          
+          if (dot.parentNode) {
+            requestAnimationFrame(animate);
+          }
+        };
+        setTimeout(animate, index * 200);
+      });
+      
+      electronsAnimated = true;
+    }
+  }
+  
+  // Update voltage display on circuit
+  const voutLabel = document.getElementById('z-vout-label');
+  if (voutLabel) voutLabel.textContent = state.vout.toFixed(2) + 'V';
+}
+
+// ── Chart ──────────────────────────────────────────────────────────────────────
+function buildRegChart() {
+  const ctx = document.getElementById('regChart')?.getContext('2d');
+  if (!ctx) return;
+  regChart = new Chart(ctx, {
     type: 'line',
     data: {
       datasets: [
-        { label: 'Vout', data: [], borderColor: '#10B981', borderWidth: 2.5, pointRadius: 0, tension: 0 },
-        { label: 'Op Point', data: [], borderColor: '#F43F5E', backgroundColor: '#F43F5E', pointRadius: 6, pointHoverRadius: 8, showLine: false },
-        { label: 'Ideal Unregulated', data: [], borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1.5, borderDash: [5,5], pointRadius: 0, tension: 0 }
+        { label:'Vout',       data:[], borderColor:'#10B981', borderWidth:2.5, pointRadius:0, tension:0, fill:true, backgroundColor:'rgba(16,185,129,0.08)' },
+        { label:'Op Point',   data:[], borderColor:'#F43F5E', backgroundColor:'#F43F5E', pointRadius:8, pointHoverRadius:10, showLine:false },
+        { label:'Unregulated',data:[], borderColor:'rgba(0,0,0,0.12)', borderWidth:1.5, borderDash:[5,5], pointRadius:0, tension:0 }
       ]
     },
     options: {
-      responsive: true, maintainAspectRatio: false, animation: false,
-      plugins: { legend: { display: false }, tooltip: { enabled: false } },
-      scales: {
-        x: { type: 'linear', min: 0, max: 15, title: { display: true, text: 'Vin (V)', color: '#475569', font:{family:'JetBrains Mono',size:10,weight:600} },
-             ticks:{color:'#64748B',font:{family:'JetBrains Mono',size:9}}, grid:{color:'rgba(0,0,0,0.05)'}, border:{color:'rgba(0,0,0,0.1)'} },
-        y: { min: 0, max: 8, title: { display: true, text: 'Vout (V)', color: '#475569', font:{family:'JetBrains Mono',size:10,weight:600} },
-             ticks:{color:'#64748B',font:{family:'JetBrains Mono',size:9}}, grid:{color:'rgba(0,0,0,0.05)'}, border:{color:'rgba(0,0,0,0.1)'} }
+      responsive:true, maintainAspectRatio:false,
+      animation:{ duration:1200, easing:'easeOutQuart' },
+      plugins:{ legend:{display:false}, tooltip:{enabled:false} },
+      scales:{
+        x:{ type:'linear', min:0, max:15, title:{display:true,text:'Vin (V)',color:'#475569',font:{family:'JetBrains Mono',size:10,weight:600}}, ticks:{color:'#64748B',font:{family:'JetBrains Mono',size:9}}, grid:{color:'rgba(0,0,0,.05)'} },
+        y:{ min:0, max:8, title:{display:true,text:'Vout (V)',color:'#475569',font:{family:'JetBrains Mono',size:10,weight:600}}, ticks:{color:'#64748B',font:{family:'JetBrains Mono',size:9}}, grid:{color:'rgba(0,0,0,.05)'} }
       }
     }
   });
-
-  function solveCircuit(vin, rs, rl) {
-    // If Zener is OFF, it acts as an open circuit. Voltage divider controls Vout.
-    let vout = vin * (rl / (rs + rl));
-    let iz = 0;
-    
-    // If voltage divider voltage exceeds VZ, Zener turns ON and clamps voltage.
-    if (vout > VZ) {
-      vout = VZ;
-      // KCL at node Vout: (Vin - Vz)/Rs = Iz + Vz/RL  =>  Iz = (Vin - Vz)/Rs - Vz/RL
-      iz = ((vin - VZ) / rs) - (VZ / rl);
-    }
-    
-    const il = vout / rl;
-    const pz = vout * iz * 1000; // mW
-    
-    return { vout, iz, il, pz, openVout: vin * (rl/(rs+rl)) };
-  }
-
-  function updateLab() {
-    const vin = parseFloat(document.getElementById('sid-vin').value);
-    const rs = parseFloat(document.getElementById('sid-rs').value);
-    const rl = parseFloat(document.getElementById('sid-rl').value);
-    
-    // UI Updates
-    document.getElementById('lbl-vin').textContent = vin.toFixed(1) + ' V';
-    document.getElementById('lbl-rs').textContent = rs + ' Ω';
-    document.getElementById('lbl-rl').textContent = rl >= 1000 ? (rl/1000).toFixed(1) + ' kΩ' : rl + ' Ω';
-    
-    // Slider tracks
-    document.getElementById('sid-vin').style.background = `linear-gradient(to right, #F43F5E ${(vin/15)*100}%, rgba(0,0,0,0.1) ${(vin/15)*100}%)`;
-    document.getElementById('sid-rs').style.background = `linear-gradient(to right, #F59E0B ${((rs-50)/950)*100}%, rgba(0,0,0,0.1) ${((rs-50)/950)*100}%)`;
-    document.getElementById('sid-rl').style.background = `linear-gradient(to right, #1A56DB ${((rl-100)/9900)*100}%, rgba(0,0,0,0.1) ${((rl-100)/9900)*100}%)`;
-
-    // Calculation
-    const state = solveCircuit(vin, rs, rl);
-    
-    document.getElementById('m-vout').textContent = state.vout.toFixed(2) + ' V';
-    document.getElementById('m-iz').textContent = (state.iz * 1000).toFixed(2) + ' mA';
-    document.getElementById('m-il').textContent = (state.il * 1000).toFixed(2) + ' mA';
-    document.getElementById('m-power').textContent = state.pz.toFixed(1) + ' mW';
-    
-    // Status Card
-    const sc = document.getElementById('statusCard');
-    if (state.pz > P_MAX) {
-      sc.style.background = 'rgba(244,63,94,0.1)'; sc.style.borderColor = 'rgba(244,63,94,0.4)'; sc.style.color = '#e11d48';
-      sc.innerHTML = '🔥 WARNING: Zener power dissipation exceeded! Diode will burn out.';
-    } else if (state.iz > 0.001) {
-      sc.style.background = 'rgba(16,185,129,0.1)'; sc.style.borderColor = 'rgba(16,185,129,0.4)'; sc.style.color = '#059669';
-      sc.innerHTML = '✅ REGULATING: Zener is in breakdown region maintaining ~5.1V.';
-    } else {
-      sc.style.background = 'rgba(100,116,139,0.1)'; sc.style.borderColor = 'rgba(100,116,139,0.3)'; sc.style.color = '#475569';
-      sc.innerHTML = '⭕ OFF: Input voltage too low to reach breakdown voltage (Open circuit).';
-    }
-
-    // Chart Update
-    const pts = [], idealPts = [];
-    for (let v = 0; v <= 15; v += 0.5) {
-      const s = solveCircuit(v, rs, rl);
-      pts.push({x: v, y: s.vout});
-      idealPts.push({x: v, y: s.openVout});
-    }
-    chart.data.datasets[0].data = pts;
-    chart.data.datasets[1].data = [{x: vin, y: state.vout}];
-    chart.data.datasets[2].data = idealPts;
-    chart.update();
-  }
-
-  updateLab();
-  clearTimeout(_expSafetyTimer);
+}
