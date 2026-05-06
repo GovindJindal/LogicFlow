@@ -986,6 +986,67 @@ body.landing button.btn-enter {
   padding-right: 0;
 }
 
+/* Team section styles */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 640px) {
+  .team-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.team-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem 1.25rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(15, 15, 26, 0.08);
+  box-shadow: 0 8px 32px rgba(15, 15, 26, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(15, 15, 26, 0.1);
+}
+
+.team-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4a5759, #334042);
+  color: #d7e5e7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+}
+
+.team-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f0f1a;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.02em;
+}
+
+.team-role {
+  font-size: 0.82rem;
+  color: rgba(15, 15, 26, 0.55);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cursor-glow {
     opacity: 0.35;
@@ -1012,5 +1073,9 @@ body.landing button.btn-enter {
 
   body.landing.nav-switching .site-nav {
     transform: translateX(-50%);
+  }
+
+  .team-card:hover {
+    transform: none;
   }
 }
