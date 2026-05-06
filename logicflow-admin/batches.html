@@ -96,14 +96,13 @@
     <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
       <select id="filter-department" style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
         <option value="">All Departments</option>
-        <option value="ECE">ECE</option>
+        <option value="CSE AI">CSE AI</option>
         <option value="CSE">CSE</option>
-        <option value="EEE">EEE</option>
+        <option value="ECE">ECE</option>
         <option value="MECH">MECH</option>
       </select>
       <select id="filter-year" style="font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 14px;border:1px solid #e1e2e8;border-radius:8px;color:#424848;background:#fff;cursor:pointer;outline:none;">
         <option value="">All Years</option>
-        <option value="2024">2024</option>
         <option value="2025">2025</option>
         <option value="2026">2026</option>
       </select>
@@ -122,7 +121,7 @@
       </div>
       <div style="font-size:18px;font-weight:700;color:#191c20;margin-bottom:8px;">No batches yet</div>
       <div style="font-size:14px;color:#737879;font-family:'Space Grotesk',sans-serif;margin-bottom:20px;">Create your first batch to start managing students.</div>
-      <button class="btn-primary" data-modal="new-batch-modal" style="display:inline-flex;"><span class="material-symbols-outlined" style="font-size:16px;">add</span> Create First Batch</button>
+      <button class="btn-primary" onclick="openBatchModal()" style="display:inline-flex;"><span class="material-symbols-outlined" style="font-size:16px;">add</span> Create First Batch</button>
     </div>
 
   </main>
@@ -159,8 +158,7 @@
         <option value="">Select Department</option>
         <option value="ECE">ECE</option>
         <option value="CSE">CSE</option>
-        <option value="EEE">EEE</option>
-        <option value="MECH">MECH</option>
+        <option value="CSE AI">CSE AI</option>
       </select></div>
       <div style="display:flex;gap:10px;margin-top:8px;">
         <button type="button" onclick="document.getElementById('batch-modal').classList.add('hidden');document.getElementById('batch-modal').style.display='none';document.body.style.overflow='';" class="btn-outline" style="flex:1;justify-content:center;">Cancel</button>

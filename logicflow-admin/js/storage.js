@@ -5,6 +5,8 @@ const STORAGE_KEYS = {
   STUDENTS: 'lf_students',
   FACULTY: 'lf_faculty',
   SESSIONS: 'lf_sessions',
+  SUBMISSIONS: 'lf_submissions',
+  TASKS: 'lf_tasks',
   CURRENT_USER: 'lf_currentUser'
 };
 
@@ -33,6 +35,15 @@ function initializeStorage() {
   }
   if (!localStorage.getItem(STORAGE_KEYS.SESSIONS)) {
     localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify([]));
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.SUBMISSIONS)) {
+    localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify([]));
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.TASKS)) {
+    localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify([]));
+  }
+  if (!localStorage.getItem('lf_notifications')) {
+    localStorage.setItem('lf_notifications', JSON.stringify([]));
   }
 }
 
@@ -256,6 +267,82 @@ function getStudentProgress(studentId) {
     averageScore: Math.round(avgScore),
     totalSessions: sessions.length
   };
+}
+
+// ─── Submission Operations ───────────────────────────────────────────
+function getSubmissions() {
+  return getStorage(STORAGE_KEYS.SUBMISSIONS) || [];
+}
+
+function saveSubmission(submissionData) {
+  const submissions = getSubmissions();
+  const newSubmission = {
+    submissionId: Date.now() + Math.random(),
+    ...submissionData,
+    submittedAt: new Date().toISOString()
+  };
+  submissions.push(newSubmission);
+  setStorage(STORAGE_KEYS.SUBMISSIONS, submissions);
+  return newSubmission;
+}
+
+function updateSubmission(submissionId, submissionData) {
+  const submissions = getSubmissions();
+  const index = submissions.findIndex(s => s.submissionId === submissionId);
+  if (index !== -1) {
+    submissions[index] = { ...submissions[index], ...submissionData, updatedAt: new Date().toISOString() };
+    setStorage(STORAGE_KEYS.SUBMISSIONS, submissions);
+    return submissions[index];
+  }
+  return null;
+}
+
+function getSubmissionsByBatch(batchId) {
+  const submissions = getSubmissions();
+  return submissions.filter(s => s.batchId === batchId);
+}
+
+function getSubmissionsByStudent(studentId) {
+  const submissions = getSubmissions();
+  return submissions.filter(s => s.studentId === studentId);
+}
+
+function getSubmissionsByTask(taskId) {
+  const submissions = getSubmissions();
+  return submissions.filter(s => s.taskId === taskId);
+}
+
+// ─── Task Operations ───────────────────────────────────────────────────
+function getTasks() {
+  return getStorage(STORAGE_KEYS.TASKS) || [];
+}
+
+function saveTask(taskData) {
+  const tasks = getTasks();
+  const newTask = {
+    taskId: Date.now(),
+    ...taskData,
+    createdAt: new Date().toISOString()
+  };
+  tasks.push(newTask);
+  setStorage(STORAGE_KEYS.TASKS, tasks);
+  return newTask;
+}
+
+function updateTask(taskId, taskData) {
+  const tasks = getTasks();
+  const index = tasks.findIndex(t => t.taskId === taskId);
+  if (index !== -1) {
+    tasks[index] = { ...tasks[index], ...taskData, updatedAt: new Date().toISOString() };
+    setStorage(STORAGE_KEYS.TASKS, tasks);
+    return tasks[index];
+  }
+  return null;
+}
+
+function getTasksByBatch(batchId) {
+  const tasks = getTasks();
+  return tasks.filter(t => t.batchId === batchId);
 }
 
 // ─── Current User Operations ───────────────────────────────────────────

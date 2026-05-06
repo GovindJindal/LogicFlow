@@ -4,6 +4,7 @@
  */
 (function () {
   const SESSION_KEY = 'logicflow_session';
+  const CURRENT_USER_KEY = 'lf_currentUser';
 
   function pageFile() {
     const seg = (window.location.pathname.split('/').pop() || '').toLowerCase();
@@ -20,6 +21,12 @@
     });
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.dropdown')) expDropdown.classList.remove('show');
+    });
+    // Close dropdown instantly on experiment link click
+    expDropdown.querySelectorAll('a[href]').forEach((link) => {
+      link.addEventListener('click', () => {
+        expDropdown.classList.remove('show');
+      });
     });
   }
 
@@ -39,17 +46,11 @@
     if (!btn || btn.dataset.lfBound === '1') return;
     btn.dataset.lfBound = '1';
     btn.addEventListener('click', () => {
+      localStorage.removeItem(CURRENT_USER_KEY);
       sessionStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem('logicflow_student_email');
       sessionStorage.removeItem('logicflow_student_display');
-      const onStudentTasks = /student-tasks\.html/i.test(window.location.pathname);
-      if (onStudentTasks) {
-        window.location.reload();
-        return;
-      }
-      syncSignOutButton();
-      syncStudentNavItem();
-      highlightCurrentNav();
+      window.location.href = 'index.html';
     });
   }
 
@@ -58,6 +59,29 @@
     if (!tasksItem) return;
     const role = sessionStorage.getItem(SESSION_KEY);
     tasksItem.hidden = role !== 'student';
+  }
+
+  function syncCurriculumNavItem() {
+    // Find curriculum link by href since not all pages have the ID
+    const curriculumLink = document.querySelector('a[href="curriculum.html"]');
+    if (!curriculumLink) return;
+
+    try {
+      const currentUserStr = localStorage.getItem(CURRENT_USER_KEY);
+      const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+      const role = currentUser?.role || sessionStorage.getItem(SESSION_KEY);
+
+      // Hide curriculum for guests and non-logged-in users
+      if (role === 'guest' || !currentUser || role === null) {
+        curriculumLink.closest('li').hidden = true;
+      } else {
+        curriculumLink.closest('li').hidden = false;
+      }
+    } catch (e) {
+      console.error('Error reading current user for curriculum visibility:', e);
+      // Default to hidden on error
+      curriculumLink.closest('li').hidden = true;
+    }
   }
 
   function highlightCurrentNav() {
@@ -107,6 +131,7 @@
     syncSignOutButton();
     initSignOut();
     syncStudentNavItem();
+    syncCurriculumNavItem();
     highlightCurrentNav();
   });
 })();

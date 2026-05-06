@@ -309,14 +309,17 @@
     history.pushState(null, '', window.location.href);
 
     window.addEventListener('popstate', (e) => {
-      // Prevent navigation and show custom modal
-      e.preventDefault();
-      
-      // Push state back to stay on current page
-      history.pushState(null, '', window.location.href);
-      
-      // Show custom modal
-      modal.style.display = 'flex';
+      // Only intercept if state is null (our pushed state for back button)
+      if (e.state === null) {
+        // Prevent navigation and show custom modal
+        e.preventDefault();
+        
+        // Push state back to stay on current page
+        history.pushState(null, '', window.location.href);
+        
+        // Show custom modal
+        modal.style.display = 'flex';
+      }
     });
 
     // Handle cancel button

@@ -5,6 +5,11 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Offset for main content below fixed nav (nav uses top: 32px + pill height + breathing room). */
@@ -230,17 +235,15 @@ nav {
   position: absolute;
   top: 100%;
   left: 50%;
-  transform: translate(-50%, 10px);
-  padding-top: 24px;
-  min-width: 240px;
-  z-index: 101;
-  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  right: auto;
+  transform: translateX(-50%);
+  padding-top: 10px;
+  z-index: 1000;
 }
 
 .dropdown-content.show {
   visibility: visible;
   opacity: 1;
-  transform: translate(-50%, 0);
 }
 
 .dropdown-menu {

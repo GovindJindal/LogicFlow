@@ -16,6 +16,14 @@
           }
         });
       }
+
+      // Show loading overlay when clicking any experiment link
+      document.querySelectorAll('#experimentDropdown a[href^="exp"]').forEach((link) => {
+        link.addEventListener('click', () => {
+          const overlay = document.getElementById('expLoadingOverlay');
+          if (overlay) overlay.style.display = 'flex';
+        });
+      });
     });
 
     // ── Animated blob background (Codex-style) ───────────────────────────────────
@@ -428,18 +436,47 @@
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       function applyNavMode() {
+        const SESSION_KEY = 'logicflow_session';
+        const CURRENT_USER_KEY = 'lf_currentUser';
+        
         const role = sessionStorage.getItem(SESSION_KEY);
-        const authed = role === 'guest' || role === 'student' || role === 'faculty';
+        
+        // Also check localStorage for current user role
+        let effectiveRole = role;
+        try {
+          const currentUserStr = localStorage.getItem(CURRENT_USER_KEY);
+          const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+          if (currentUser?.role) {
+            effectiveRole = currentUser.role;
+          }
+        } catch (e) {
+          console.error('Error reading current user:', e);
+        }
+        
+        const authed = effectiveRole === 'guest' || effectiveRole === 'student' || effectiveRole === 'faculty';
+        const isStudent = effectiveRole === 'student';
+        const isGuest = effectiveRole === 'guest';
         document.body.classList.toggle('has-app-nav', authed);
         const navLanding = document.getElementById('navLinksLanding');
         const navApp = document.getElementById('navLinksApp');
         if (navLanding) navLanding.hidden = authed;
         if (navApp) navApp.hidden = !authed;
+        const navCurriculumItem = document.getElementById('navCurriculumItem');
+        // Hide curriculum for guests and non-logged-in users
+        if (navCurriculumItem) navCurriculumItem.hidden = isGuest || !authed;
+        const btnEnterLab = document.getElementById('btnEnterLab');
         const btnSignOut = document.getElementById('btnSignOut');
-        if (btnSignOut) btnSignOut.hidden = !authed;
+        const studentNavProfile = document.getElementById('studentNavProfile');
+        if (btnEnterLab) btnEnterLab.hidden = authed;
+        if (btnSignOut) btnSignOut.hidden = !authed || isStudent;
+        if (studentNavProfile) {
+          studentNavProfile.hidden = !isStudent;
+          studentNavProfile.style.display = isStudent ? 'flex' : 'none';
+        }
         const tasksItem = document.getElementById('navTasksItem');
-        if (tasksItem) tasksItem.hidden = role !== 'student';
+        if (tasksItem) tasksItem.hidden = !isStudent;
         document.getElementById('experimentDropdown')?.classList.remove('show');
+        document.getElementById('studentAvatarMenu')?.classList.remove('show');
       }
 
       function formatStudentDisplay(email) {
@@ -451,6 +488,23 @@
           .join(' ');
       }
 
+      function updateStudentNavProfile() {
+        const stored = localStorage.getItem('lf_currentUser');
+        if (!stored) return;
+        try {
+          const user = JSON.parse(stored);
+          if (user.role !== 'student') return;
+          const name = user.name || formatStudentDisplay(user.email);
+          const initial = (name || 'S').charAt(0).toUpperCase();
+          const avatarLetter = document.getElementById('studentAvatarLetter');
+          const navName = document.getElementById('studentNavName');
+          const navEmail = document.getElementById('studentNavEmail');
+          if (avatarLetter) avatarLetter.textContent = initial;
+          if (navName) navName.textContent = name;
+          if (navEmail) navEmail.textContent = user.email || '';
+        } catch (_) {}
+      }
+
       function completeSession(role) {
         if (role !== 'student') {
           sessionStorage.removeItem('logicflow_student_email');
@@ -459,9 +513,29 @@
         sessionStorage.setItem(SESSION_KEY, role);
         document.body.classList.add('nav-switching');
         applyNavMode();
+        if (role === 'student') updateStudentNavProfile();
         dialog?.close();
         window.setTimeout(() => document.body.classList.remove('nav-switching'), 480);
       }
+
+      // Page-load auth check: sync lf_currentUser into session state
+      (function checkStoredAuth() {
+        const stored = localStorage.getItem('lf_currentUser');
+        if (stored) {
+          try {
+            const user = JSON.parse(stored);
+            if (user.role === 'student') {
+              sessionStorage.setItem(SESSION_KEY, 'student');
+              sessionStorage.setItem('logicflow_student_email', user.email);
+              sessionStorage.setItem('logicflow_student_display', user.name || formatStudentDisplay(user.email));
+              updateStudentNavProfile();
+            } else if (user.role === 'faculty') {
+              window.location.href = 'logicflow-admin/index.html';
+              return;
+            }
+          } catch (_) {}
+        }
+      })();
 
       applyNavMode();
 
@@ -518,40 +592,91 @@
         const form = e.target;
         const emailInput = form.querySelector('[name="studentEmail"]');
         const passwordInput = form.querySelector('[name="studentPassword"]');
+        const submitBtn = form.querySelector('.access-submit');
         const email = emailInput?.value?.trim();
         const password = passwordInput?.value?.trim();
         const studentNote = document.getElementById('accessStudentNote');
         
-        // Validate against localStorage
-        const student = authenticateStudent(email, password);
+        // Clear previous error
+        if (studentNote) {
+          studentNote.hidden = true;
+          studentNote.textContent = '';
+        }
+        
+        // Disable button and show loading state
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing in...';
+        
+        // Check hardcoded faculty credentials first
+        if (email === 'faculty@chitkara.edu.in' && password === 'CUFaculty') {
+          // Faculty login - save to localStorage
+          localStorage.setItem('lf_currentUser', JSON.stringify({
+            role: 'faculty',
+            email: email,
+            name: 'Faculty User'
+          }));
+          
+          // Also keep sessionStorage for backward compatibility
+          sessionStorage.setItem('logicflow_faculty_email', email);
+          
+          completeSession('faculty');
+          // Redirect to admin overview
+          window.location.href = 'logicflow-admin/overview.html';
+          return;
+        }
+        
+        // Check against students in localStorage
+        const students = JSON.parse(localStorage.getItem('lf_students') || '[]');
+        const student = students.find(s => s.email === email && s.password === password);
         
         if (student) {
-          // Set current user in localStorage
-          setCurrentUser({
+          // Student login - save to localStorage
+          localStorage.setItem('lf_currentUser', JSON.stringify({
             role: 'student',
-            id: student.studentId,
             email: student.email,
             name: student.name,
-            rollNumber: student.rollNumber,
+            studentId: student.studentId,
             batchId: student.batchId
-          });
+          }));
           
           // Also keep sessionStorage for backward compatibility
           sessionStorage.setItem('logicflow_student_email', email);
           sessionStorage.setItem('logicflow_student_display', formatStudentDisplay(email));
           
           completeSession('student');
-          // Redirect to student portal
-          window.location.href = 'student-portal.html';
+          // Stay on index.html with student navbar
+          return;
         } else {
-          // Show error message
+          // Show inline error message
           if (studentNote) {
-            studentNote.textContent = 'Invalid credentials. Please check your institution email and password.';
+            studentNote.textContent = 'Invalid email or password. Please try again.';
             studentNote.hidden = false;
             studentNote.style.color = '#dc3545';
           }
+          
+          // Re-enable button
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalBtnText;
         }
       });
+      
+      // Clear error when user starts typing
+      const formStudentInst = document.getElementById('formStudentInst');
+      if (formStudentInst) {
+        const emailInput = formStudentInst.querySelector('[name="studentEmail"]');
+        const passwordInput = formStudentInst.querySelector('[name="studentPassword"]');
+        const studentNote = document.getElementById('accessStudentNote');
+        
+        [emailInput, passwordInput].forEach(input => {
+          input?.addEventListener('input', () => {
+            if (studentNote) {
+              studentNote.hidden = true;
+              studentNote.textContent = '';
+            }
+          });
+        });
+      }
 
       document.getElementById('formFaculty')?.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -604,6 +729,66 @@
         sessionStorage.removeItem('logicflow_student_display');
         applyNavMode();
         window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+      });
+
+      // Student avatar dropdown toggle
+      const studentAvatarBtn = document.getElementById('studentAvatarBtn');
+      const studentAvatarMenu = document.getElementById('studentAvatarMenu');
+      if (studentAvatarBtn && studentAvatarMenu) {
+        studentAvatarBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          studentAvatarMenu.classList.toggle('show');
+        });
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.student-avatar-dropdown')) {
+            studentAvatarMenu.classList.remove('show');
+          }
+        });
+      }
+
+      // Student sign-out from avatar dropdown: show confirmation modal
+      document.getElementById('studentNavSignOut')?.addEventListener('click', () => {
+        document.getElementById('studentAvatarMenu')?.classList.remove('show');
+        const modal = document.getElementById('studentSignoutModal');
+        if (modal) modal.style.display = 'flex';
+      });
+
+      // Back-button interception for student on index.html
+      const currentRole = sessionStorage.getItem(SESSION_KEY);
+      if (currentRole === 'student') {
+        history.pushState({ studentNav: true }, '', window.location.href);
+        window.addEventListener('popstate', (e) => {
+          if (e.state && e.state.studentNav) {
+            // User pressed back — show custom sign-out modal
+            const modal = document.getElementById('studentSignoutModal');
+            if (modal) modal.style.display = 'flex';
+          }
+        });
+      }
+
+      // Student sign-out modal handlers
+      const studentSignoutModal = document.getElementById('studentSignoutModal');
+      document.getElementById('studentSignoutCancel')?.addEventListener('click', () => {
+        if (studentSignoutModal) {
+          studentSignoutModal.style.display = 'none';
+          history.pushState({ studentNav: true }, '', window.location.href);
+        }
+      });
+      document.getElementById('studentSignoutConfirm')?.addEventListener('click', () => {
+        if (studentSignoutModal) studentSignoutModal.style.display = 'none';
+        localStorage.removeItem('lf_currentUser');
+        sessionStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem('logicflow_student_email');
+        sessionStorage.removeItem('logicflow_student_display');
+        document.body.classList.add('nav-switching');
+        applyNavMode();
+        window.setTimeout(() => document.body.classList.remove('nav-switching'), 480);
+      });
+      studentSignoutModal?.addEventListener('click', (e) => {
+        if (e.target === studentSignoutModal) {
+          studentSignoutModal.style.display = 'none';
+          history.pushState({ studentNav: true }, '', window.location.href);
+        }
       });
 
       document.querySelectorAll('.reveal-section').forEach((el) => {

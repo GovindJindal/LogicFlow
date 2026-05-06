@@ -82,6 +82,108 @@ body.landing button.btn-enter {
   font-family: inherit;
 }
 
+/* Experiment loading spinner */
+@keyframes exp-loading-spin {
+  to { transform: rotate(360deg); }
+}
+.exp-loading-spinner {
+  animation: exp-loading-spin 0.8s linear infinite;
+}
+
+/* Student avatar dropdown in navbar */
+.student-nav-profile {
+  display: flex;
+  align-items: center;
+}
+
+.student-avatar-dropdown {
+  position: relative;
+}
+
+.student-avatar-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #4a5759;
+  color: #d7e5e7;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.student-avatar-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.student-avatar-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  padding: 12px;
+  min-width: 180px;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  z-index: 1000;
+}
+
+.student-avatar-menu.show {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.student-avatar-info {
+  padding: 4px 8px 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  margin-bottom: 8px;
+}
+
+.student-avatar-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #191c20;
+}
+
+.student-avatar-email {
+  font-size: 12px;
+  color: #737879;
+  margin-top: 2px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.student-avatar-signout {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: #dc3545;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+
+.student-avatar-signout:hover {
+  background: rgba(220,53,69,0.08);
+}
+
 @media (max-width: 900px) {
   body.landing .nav-mid {
     overflow-x: auto;
