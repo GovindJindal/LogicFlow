@@ -78,7 +78,7 @@ Password         : CUFaculty
 
 After login, you land on the **Admin Dashboard**:
 
-![Admin Panel Overview](images/Readme_info Images/overview_adminPanel.png)
+![Admin Panel Overview](images/Readme_info%20Images/overview_adminPanel.png)
 
 The sidebar includes: **Overview · Batches · Students · Experiments · Evaluation · Assign Task · Faculty · System Logs · Support**
 
@@ -90,7 +90,7 @@ Before adding students, you must create at least one batch.
 
 Go to **Batches → New Batch**:
 
-![Create Batch](images/Readme_info Images/create_batch.png)
+![Create Batch](images/Readme_info%20Images/create_batch.png)
 
 Fill in:
 
@@ -106,7 +106,7 @@ Click **Save Batch**.
 
 Go to **Students → Add Student**:
 
-![Add Student](images/Readme_info Images/add_student.png)
+![Add Student](images/Readme_info%20Images/add_student.png)
 
 Fill in:
 
@@ -126,7 +126,7 @@ Click **Save Student**.
 
 Go to **Assign Task** in the sidebar:
 
-![Assign Task](images/Readme_info Images/assign_task.png)
+![Assign Task](images/Readme_info%20Images/assign_task.png)
 
 Configure:
 
@@ -156,7 +156,7 @@ Students log in using the credentials that were **created by the faculty** and s
 
 After login, the student sees their **My Tasks dashboard**:
 
-![Student Tasks](images/Readme_info Images/tasks.png)
+![Student Tasks](images/Readme_info%20Images/tasks.png)
 
 This includes:
 
@@ -186,7 +186,7 @@ All experiments are accessible from the **Experiments** tab in the navigation.
 
 ### Experiment 01 — Electronic Components Lab
 
-![Exp 1 – Components](images/Readme_info Images/exp_1.png)
+![Exp 1 – Components](images/Readme_info%20Images/exp_1.png)
 
 Interactive familiarization with resistors, capacitors, inductors, diodes, LEDs, transistors, multimeters, and breadboards. Includes a **live 5-band resistor color-code calculator**.
 
@@ -194,7 +194,7 @@ Interactive familiarization with resistors, capacitors, inductors, diodes, LEDs,
 
 ### Experiment 02 — Virtual Oscilloscope & Function Generator
 
-![Exp 2 – CRO](images/Readme_info Images/exp_2.png)
+![Exp 2 – CRO](images/Readme_info%20Images/exp_2.png)
 
 Simulate a Cathode Ray Oscilloscope (CRO) with a real-time function generator. Supports Sine, Square, Triangle, and Sawtooth waveforms. Adjust frequency, amplitude, DC offset, phase, volts/div, and time/div. Includes **Simple Mode** and **Wiring Mode**.
 
@@ -202,7 +202,7 @@ Simulate a Cathode Ray Oscilloscope (CRO) with a real-time function generator. S
 
 ### Experiment 03 — PN Junction Diode
 
-![Exp 3 – PN Junction](images/Readme_info Images/exp_3.png)
+![Exp 3 – PN Junction](images/Readme_info%20Images/exp_3.png)
 
 Physics-accurate simulation using the Shockley diode equation. Toggle Forward / Reverse bias. Adjust amplitude, frequency, series resistor, and temperature. View live V-I characteristic curve, waveforms, and ammeter/voltmeter readings. Export lab report.
 
@@ -210,7 +210,7 @@ Physics-accurate simulation using the Shockley diode equation. Toggle Forward / 
 
 ### Experiment 04 — Zener Diode Voltage Regulator
 
-![Exp 4 – Zener](images/Readme_info Images/exp_4.png)
+![Exp 4 – Zener](images/Readme_info%20Images/exp_4.png)
 
 Simulate a Zener shunt regulator (IN4733A, Vz = 5.1 V). Adjust input voltage, series resistance (Rs), and load resistance (RL). View live voltage transfer curve and key observations (breakdown voltage, regulation principle).
 
@@ -218,7 +218,7 @@ Simulate a Zener shunt regulator (IN4733A, Vz = 5.1 V). Adjust input voltage, se
 
 ### Experiment 05 — Rectifier & Filter Circuits
 
-![Exp 5 – Rectifier](images/Readme_info Images/exp_5.png)
+![Exp 5 – Rectifier](images/Readme_info%20Images/exp_5.png)
 
 Toggle between **Half-Wave** and **Full-Wave Bridge** rectifier topologies. Enable a capacitor filter and vary filter cap and load resistance. View simultaneous AC input and DC output waveforms with computed Vdc and ripple voltage.
 
@@ -226,7 +226,7 @@ Toggle between **Half-Wave** and **Full-Wave Bridge** rectifier topologies. Enab
 
 ### Experiment 06 — Flip-Flop Architecture
 
-![Exp 6 – Flip-Flops](images/Readme_info Images/exp_6.png)
+![Exp 6 – Flip-Flops](images/Readme_info%20Images/exp_6.png)
 
 Simulate **D Flip-Flop (7474)** and **J-K Flip-Flop (7476)**. Toggle logic inputs, push the manual clock (rising-edge triggered), and watch the live timing diagram update in real time with CLK, J, K, Q, Q̄ traces.
 
@@ -234,7 +234,7 @@ Simulate **D Flip-Flop (7474)** and **J-K Flip-Flop (7476)**. Toggle logic input
 
 ### Experiment 07 — BCD to 7-Segment Decoder
 
-![Exp 7 – BCD Decoder](images/Readme_info Images/exp_7.png)
+![Exp 7 – BCD Decoder](images/Readme_info%20Images/exp_7.png)
 
 Simulate IC 7447 driving a common-anode 7-segment LED display. Set 4-bit BCD input via data switches (D, C, B, A) and watch the display and truth table update instantly.
 
@@ -242,7 +242,7 @@ Simulate IC 7447 driving a common-anode 7-segment LED display. Set 4-bit BCD inp
 
 ### Experiment 08 — 4:1 Multiplexer & 1:4 Demultiplexer
 
-![Exp 8 – MUX/DEMUX](images/Readme_info Images/exp_8.png)
+![Exp 8 – MUX/DEMUX](images/Readme_info%20Images/exp_8.png)
 
 Implement and study a 4:1 MUX and 1:4 DEMUX using basic logic gates. Includes a full **Lab Lifecycle** panel (Aim → Theory → Pretest → Procedure → Simulation → Posttest → Feedback), live circuit diagram, progressive theory, observation table, and CSV export.
 
@@ -250,7 +250,7 @@ Implement and study a 4:1 MUX and 1:4 DEMUX using basic logic gates. Includes a 
 
 ### Experiment 09 — Motherboard Anatomy
 
-![Exp 9 – Motherboard](images/Readme_info Images/exp_9.png)
+![Exp 9 – Motherboard](images/Readme_info%20Images/exp_9.png)
 
 Explore the physical foundation of computer architecture. Interact with a 3D annotated motherboard model to learn about Processor Socket, Memory, PCI Slots, CMOS Battery, and I/O Ports.
 
@@ -258,7 +258,7 @@ Explore the physical foundation of computer architecture. Interact with a 3D ann
 
 ### Experiment 10 — Arithmetic Logic Unit (ALU)
 
-![Exp 10 – ALU](images/Readme_info Images/exp_10.png)
+![Exp 10 – ALU](images/Readme_info%20Images/exp_10.png)
 
 Design and simulate an ALU. Configure 4-bit inputs A and B, select mode and operation, and observe data routing through arithmetic and logic sub-units via the multiplexer. Includes observation table and CSV export.
 
@@ -266,7 +266,7 @@ Design and simulate an ALU. Configure 4-bit inputs A and B, select mode and oper
 
 ## Logic Gate Sandbox
 
-![Sandbox Landing](images/Readme_info Images/sandbox_landing.png)
+![Sandbox Landing](images/Readme_info%20Images/sandbox_landing.png)
 
 The Logic Gate Sandbox is a **Raptor-style drag-and-drop circuit builder** where students can:
 
@@ -277,7 +277,7 @@ The Logic Gate Sandbox is a **Raptor-style drag-and-drop circuit builder** where
 - Auto-generate a **Truth Table** from INPUT + OUTPUT nodes
 - Use **Tidy Layout**, **Undo**, and **Share** features
 
-![Sandbox](images/Readme_info Images/sandbox.png)
+![Sandbox](images/Readme_info%20Images/sandbox.png)
 
 > ⚠️ **The Sandbox runs as a separate React app.** See [Sandbox Setup](#sandbox-setup-react) below.
 
@@ -285,7 +285,7 @@ The Logic Gate Sandbox is a **Raptor-style drag-and-drop circuit builder** where
 
 ## Computer Architecture
 
-![Computer Architecture / COA Pipeline](images/Readme_info Images/comp_architecture.png)
+![Computer Architecture / COA Pipeline](images/Readme_info%20Images/comp_architecture.png)
 
 The **Pipeline Stepper** traces instruction execution through all 4 stages:
 
@@ -302,7 +302,7 @@ For each instruction, it shows:
 
 ## Student Tasks Dashboard
 
-![Tasks](images/Readme_info Images/tasks.png)
+![Tasks](images/Readme_info%20Images/tasks.png)
 
 The student dashboard shows:
 
